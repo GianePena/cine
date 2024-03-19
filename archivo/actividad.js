@@ -6,12 +6,9 @@ class ProductManager {
             this.products = [],
             this.id = 1
     }
-
     getProduct() {
         return this.products;
     }
-
-
     addProduct(title, description, price, thumbnail, code, stock) {
         if (title == undefined || description == undefined || price == undefined || thumbnail == undefined || code == undefined || stock == undefined) {
             console.log("Completar la totalida de los campos")
@@ -46,14 +43,20 @@ class ProductManager {
         }
     }
     updateProduct(id, price) {
+
         for (let i = 0; i < this.products.length; i++) {
             if (this.products[i].id === id) {
                 this.products[i].price = price;
+                console.log(`Producto actualizado: ID ${id}, Precio ${price}`);
+                fs.writeFileSync(this.path, JSON.stringify(this.products))
             }
         }
     }
     deleteProduct(id) {
-
+        const buscarProducto = this.products.findIndex(products => products.id == id)
+        const deleteProducto = this.products.splice(buscarProducto, 1)
+        fs.writeFileSync(this.path, JSON.stringify(this.products))
+        console.log(`El producto eliminado es ${id}`, deleteProducto)
     }
 }
 
@@ -66,6 +69,6 @@ productManager.addProduct("KunFu Panda 4", "basdasdad", 3000, "https://static.ci
 productManager.addProduct("Duna", "sadasda", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290", 132, 40)
 productManager.addProduct("Pobres criaturas", "cxcxcc", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9a7859e6ed1c4fb77bf24248a679946b.jpg?v=00002290", 98, 40)
 productManager.updateProduct(1, 4500)
-productManager.deleteProduct(1)
+productManager.deleteProduct()
 const productos = productManager.getProduct()
 console.log("Listado de peliculas:", productos)
