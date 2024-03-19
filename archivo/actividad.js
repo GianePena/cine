@@ -33,6 +33,7 @@ class ProductManager {
         console.log(`"${title} "producto cargado con exito `)
 
         fs.writeFileSync(this.path, JSON.stringify(this.products))
+        fs.readFileSync(this.path, this.products)
     }
     getProductById(id) {
         if (this.products.find(product => product.id === id)) {
@@ -49,6 +50,8 @@ class ProductManager {
                 this.products[i].price = price;
                 console.log(`Producto actualizado: ID ${id}, Precio ${price}`);
                 fs.writeFileSync(this.path, JSON.stringify(this.products))
+                fs.readFileSync(this.path, this.products)
+
             }
         }
     }
