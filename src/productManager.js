@@ -3,10 +3,27 @@ const fs = require("fs")
 class ProductManager {
     constructor(path) {
         this.path = path,
-            this.products = [],
+            this.products = [{
+                "title": "Patos",
+                "description": "cxcxcxc",
+                "price": 4500,
+                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/eae343c50d05a3beb2532361519d2ecc.jpg?v=00002290",
+                "code": 111,
+                "stock": 40,
+                "id": 1
+            },
+            {
+                "title": "Con todos menos contigo",
+                "description": "grsdfsf",
+                "price": 3000,
+                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290",
+                "code": 143,
+                "stock": 40,
+                "id": 2
+            }],
             this.id = 1
     }
-    getProduct() {
+    getProducts() {
         return this.products;
     }
     addProduct(title, description, price, thumbnail, code, stock) {
@@ -36,8 +53,9 @@ class ProductManager {
         fs.readFileSync(this.path, this.products)
     }
     getProductById(id) {
-        if (this.products.find(product => product.id === id)) {
-            return console.log(`el producto cuyo id es: "${id}"`)
+        let product = this.products.filter(product => product.id === id)
+        if (product) {
+            return product
         }
         else {
             return console.error("Not found")
@@ -61,9 +79,12 @@ class ProductManager {
         fs.writeFileSync(this.path, JSON.stringify(this.products))
         console.log(`El producto eliminado es ${id}`, deleteProducto)
     }
+
+
 }
 
-const productManager = new ProductManager("./archivo.txt")
+/*
+const productManager = new ProductManager("./src/productos.json")
 
 productManager.addProduct("Patos", "cxcxcxc", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/eae343c50d05a3beb2532361519d2ecc.jpg?v=00002290", 111, 40)
 productManager.addProduct("Con todos menos contigo", "grsdfsf", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290", 143, 40)
@@ -72,6 +93,12 @@ productManager.addProduct("KunFu Panda 4", "basdasdad", 3000, "https://static.ci
 productManager.addProduct("Duna", "sadasda", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290", 132, 40)
 productManager.addProduct("Pobres criaturas", "cxcxcc", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9a7859e6ed1c4fb77bf24248a679946b.jpg?v=00002290", 98, 40)
 productManager.updateProduct(1, 4500)
-productManager.deleteProduct()
 const productos = productManager.getProduct()
-console.log("Listado de peliculas:", productos)
+
+
+
+let lectura = JSON.parse(fs.readFileSync("./src/productos.json", { encoding: "utf-8" }))
+console.log(lectura[2].title);
+
+*/
+module.exports = ProductManager
