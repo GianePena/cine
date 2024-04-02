@@ -1,24 +1,28 @@
-const fs = require("fs")
+import fs from "fs";
 
 class ProductManager {
     constructor(path) {
         this.path = path,
             this.products = [{
                 "title": "Patos",
+                "category": "animacion",
                 "description": "cxcxcxc",
                 "price": 4500,
                 "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/eae343c50d05a3beb2532361519d2ecc.jpg?v=00002290",
                 "code": 111,
                 "stock": 40,
+                "status": false,
                 "id": 1
             },
             {
                 "title": "Con todos menos contigo",
+                "category": "comedia",
                 "description": "grsdfsf",
                 "price": 3000,
                 "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290",
                 "code": 143,
                 "stock": 40,
+                "status": false,
                 "id": 2
             }],
             this.id = 1
@@ -26,8 +30,8 @@ class ProductManager {
     getProducts() {
         return this.products;
     }
-    addProduct(title, description, price, thumbnail, code, stock) {
-        if (title == undefined || description == undefined || price == undefined || thumbnail == undefined || code == undefined || stock == undefined) {
+    addProduct(title, category, description, price, thumbnail, code, stock, status) {
+        if (title == undefined || category == undefined || description == undefined || price == undefined || thumbnail == undefined || code == undefined || stock == undefined) {
             console.log("Completar la totalida de los campos")
             return
         }
@@ -37,11 +41,13 @@ class ProductManager {
 
         const newProduct = {
             title,
+            category,
             description,
             price,
             thumbnail,
             code,
             stock,
+            status,
             id: this.id++
         }
 
@@ -50,7 +56,7 @@ class ProductManager {
         console.log(`"${title} "producto cargado con exito `)
 
         fs.writeFileSync(this.path, JSON.stringify(this.products))
-        fs.readFileSync(this.path, this.products)
+
     }
     getProductById(id) {
         let product = this.products.filter(product => product.id === id)
@@ -62,16 +68,13 @@ class ProductManager {
         }
     }
     updateProduct(id, price) {
-
-        for (let i = 0; i < this.products.length; i++) {
-            if (this.products[i].id === id) {
-                this.products[i].price = price;
-                console.log(`Producto actualizado: ID ${id}, Precio ${price}`);
-                fs.writeFileSync(this.path, JSON.stringify(this.products))
-                fs.readFileSync(this.path, this.products)
-
-            }
+        const productId = this.products.findIndex(product => product.id === id);
+        if (productId === -1) {
+            return console.error("Producto no encontrado");
         }
+        this.products[productId].price = price;
+        console.log(`Producto actualizado: ID ${id}, Precio ${price}`);
+        fs.writeFileSync(this.path, JSON.stringify(this.products));
     }
     deleteProduct(id) {
         const buscarProducto = this.products.findIndex(products => products.id == id)
@@ -84,7 +87,7 @@ class ProductManager {
 }
 
 /*
-const productManager = new ProductManager("./src/productos.json")
+
 
 productManager.addProduct("Patos", "cxcxcxc", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/eae343c50d05a3beb2532361519d2ecc.jpg?v=00002290", 111, 40)
 productManager.addProduct("Con todos menos contigo", "grsdfsf", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290", 143, 40)
@@ -101,4 +104,4 @@ let lectura = JSON.parse(fs.readFileSync("./src/productos.json", { encoding: "ut
 console.log(lectura[2].title);
 
 */
-module.exports = ProductManager
+export default ProductManager
