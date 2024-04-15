@@ -15,26 +15,55 @@ class ProductManager {
                 "id": 1
             },
             {
+                "title": "KunFu Panda 4",
+                "category": "animacion",
+                "description": "basdasdad",
+                "price": 4500,
+                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
+                "code": 111,
+                "stock": 40,
+                "status": false,
+                "id": 4
+            },
+            {
+                "title": "KunFu Panda 4",
+                "category": "animacion",
+                "description": "basdasdad",
+                "price": 4500,
+                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
+                "code": 111,
+                "stock": 40,
+                "status": false,
+                "id": 4
+            },
+            {
+                "title": "KunFu Panda 4",
+                "category": "animacion",
+                "description": "basdasdad",
+                "price": 4500,
+                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
+                "code": 111,
+                "stock": 40,
+                "status": false,
+                "id": 4
+            },
+            {
                 "title": "Con todos menos contigo",
                 "category": "comedia",
                 "description": "grsdfsf",
                 "price": 3000,
                 "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290",
-                "code": 143,
+                "code": 13,
                 "stock": 40,
                 "status": false,
                 "id": 2
-            }],
-            this.id = 1
+            }]
+        this.id = 1
     }
     getProducts() {
         return this.products;
     }
     addProduct(title, category, description, price, thumbnail, code, stock, status) {
-        if (title == undefined || category == undefined || description == undefined || price == undefined || thumbnail == undefined || code == undefined || stock == undefined) {
-            console.log("Completar la totalida de los campos")
-            return
-        }
         if (this.products.some(product => product.code === code)) {
             console.log(`El codigo "${code}" ya existe, elige otro`)
         }

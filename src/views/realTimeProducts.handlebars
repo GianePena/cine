@@ -1,0 +1,33 @@
+<h2>Lista de peliculas con websocket</h2>
+<hr>
+<a href="/peliculas">listado con handelbars</a>
+
+<h3>Listado de peliculas</h3>
+<div id="listadoDeProductos">
+</div> <br><br>
+
+
+<h3>Agregar producto</h3>
+
+<form id="addProductForm">
+        <input type="text" id="title" placeholder="Title">
+    <input type="text" id="category" placeholder="Category">
+    <input type="text" id="description" placeholder="Description">
+    <input type="text" id="price" placeholder="Price">
+    <input type="text" id="thumbnail" placeholder="Thumbnail">
+    <input type="text"id="code" placeholder="Code">
+    <input type="text" id="stock" placeholder="Stock">
+    <input type="text" id="status"placeholder="Status">
+    <button type="submit">Agregar Producto</button>
+</form><br><br>
+<h3>Eliminar producto</h3>
+<form id ="deleteProductForm">
+    <input type="number" id="idEliminado"placeholder="id de producto a eliminar">
+    <button type="submit">Eliminar Producto</button>
+</form>
+<br>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script src="/realTimeProducts.js"></script>
+
