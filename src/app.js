@@ -2,7 +2,7 @@ import express from "express"
 import { engine } from "express-handlebars"
 import { router as productsRouter } from "./routes/productRouter.js"
 import { router as cartRouter } from "./routes/cartRouter.js"
-import { router as vistaRouter } from "./routes/vistas.routes.js"
+import { router as vistaRouter } from "./routes/viewsRouter.js"
 import { Server } from "socket.io"
 import ProductManager from "../src/productManager.js"
 const productManager = new ProductManager("../src/api/products.json");
@@ -32,13 +32,14 @@ io.on("connection", (socket) => {
     console.log("Se ha conectado un cliente");
     socket.on("getProducts", () => {
         const products = productManager.getProducts();
-        socket.emit("productos", products);
+        socket.emit("listProducts", products);
     });
-    socket.on("addProduct", (addProduct) => {
-        productManager.addProduct(addProduct);
+    socket.on("addProduct", product => {
+        productManager.addProduct(product);
         const products = productManager.getProducts();
-        io.emit("productos", products);
+        io.emit("products", products);
     });
+
     socket.on("deleteProduct", (idEliminado) => {
         productManager.deleteProduct(idEliminado)
         const products = productManager.getProducts();

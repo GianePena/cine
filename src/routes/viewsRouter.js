@@ -1,11 +1,13 @@
 import { Router } from "express"
-import ProductManager from "../productManager.js"
-
 export const router = Router()
+import ProductManager from "../productManager.js"
+const productManager = new ProductManager("./api/products.json");
 
-const productManager = new ProductManager()
 
-router.get('/peliculas', (req, res) => {
+
+
+
+router.get('/products', (req, res) => {
     let products = productManager.getProducts()
     console.log(products);
     res.setHeader(`Content-Type`, `text/html`)

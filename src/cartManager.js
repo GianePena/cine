@@ -9,9 +9,9 @@ class CartManager {
         return this.products
     }
     addCartProduct(title, quantity) {
-        const productoexistente = this.products.find(p => p.title == title)
-        if (productoexistente) {
-            productoexistente.quantity += quantity
+        const product = this.products.find(p => p.title == title)
+        if (product) {
+            product.quantity += quantity
         }
         const newProduct = {
             title,

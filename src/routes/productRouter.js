@@ -25,14 +25,13 @@ router.get("/:id", (req, res) => {
 router.post("/", (req, res) => {
     const { title, category, description, price, thumbnail, code, stock, status } = req.body;
     res.setHeader('Content-type', 'application/json')
-    try {
-        let newProduct = productManager.addProduct(title, category, description, price, thumbnail, code, stock, status);
-        res.status(201).json({ message: "Producto agregado correctamente" });
-        res.json(newProduct)
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error en el servidor", detalle: error.message });
-    }
+    let products = productManager.getProducts()
+    productManager.addProduct(title, category, description, price, thumbnail, code, stock, status);
+    res.status(201).json({
+        message: "Producto agregado correctamente",
+        products: products,
+
+    });
 });
 router.put("/:id", (req, res) => {
     let { id } = req.params;
@@ -49,16 +48,21 @@ router.put("/:id", (req, res) => {
         res.status(500).json({ error: "Error en el servidor", detalle: error.message });
     }
 });
-router.delete("/:id", (req, res) => {
-    let id = req.params.id
-    id = Number(id)
-    if (isNaN(id)) {
+router.delete("/:code", (req, res) => {
+    let code = req.params.code
+    code = Number(code)
+    if (isNaN(code)) {
         return res.json({ error: `ingrese un id numerico` })
     }
     try {
-        let deletProduct = productManager.deleteProduct(id)
+        let deletProduct = productManager.deleteProduct(code)
+        let products = productManager.getProducts()
         res.setHeader('Content-type', 'application/json')
-        res.status(200).json({ message: `Producto con ID ${id} eliminado correctamente` });
+        res.status(200).json({
+            message: `Producto con codigo ${code} eliminado correctamente`,
+            products: products,
+
+        });
         return res.status(201).json(deletProduct)
     } catch (error) {
         console.error(error);
