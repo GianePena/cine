@@ -51,9 +51,7 @@ router.delete("/:id", (req, res) => {
     try {
         const wasDeleted = productManager.deleteProduct(id)
         if (wasDeleted) {
-            res.status(200).json({ message: `Producto con ID ${id} eliminado correctamente` });
-        } else {
-            res.status(404).json({ error: `Producto con ID ${id} no encontrado` });
+            res.status(200).json({ message: `Producto con ID ${id} eliminado correctamente` })
         }
     } catch (error) {
         console.log(error)

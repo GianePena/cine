@@ -67,20 +67,26 @@ class ProductManager {
         console.log(`Producto actualizado: ID ${id}, Precio ${price}`);
         fs.writeFileSync(this.path, JSON.stringify(this.products));
     }
-
     deleteProduct(id) {
-        const idString = String(id);
-        const filteredProducts = this.products.filter(product => product.id !== idString);
-        this.products = filteredProducts;
-        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
-        console.log(`Producto eliminado: ID ${idString}`);
-    }
-}
+        const fileData = fs.readFileSync(this.path, 'utf-8');
+        this.products = JSON.parse(fileData);
 
+        const productIndex = this.products.findIndex(product => product.id === id);
+        this.products.splice(productIndex, 1);
+        console.log(`Producto con ID ${id} eliminado con éxito.`);
+
+        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
+    }
+
+
+}
 /*
 
 
-
+const filteredProducts = this.products.filter(product => product.id !== idString);
+        this.products = filteredProducts;
+        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
+        console.log(`Producto eliminado: ID ${idString}`);
 productManager.addProduct("KunFu Panda 4", "basdasdad", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290", 125, 40)
 productManager.addProduct("Duna", "sadasda", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290", 132, 40)
 productManager.addProduct("Pobres criaturas", "cxcxcc", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9a7859e6ed1c4fb77bf24248a679946b.jpg?v=00002290", 98, 40)
@@ -91,62 +97,6 @@ const productos = productManager.getProduct()
 
 let lectura = JSON.parse(fs.readFileSync("./src/productos.json", { encoding: "utf-8" }))
 console.log(lectura[2].title);
-
-{
-                "title": "Patos",
-                "category": "animacion",
-                "description": "cxcxcxc",
-                "price": 4500,
-                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/eae343c50d05a3beb2532361519d2ecc.jpg?v=00002290",
-                "code": 111,
-                "stock": 40,
-                "status": false,
-                "id": 1
-            },
-            {
-                "title": "KunFu Panda 4",
-                "category": "animacion",
-                "description": "basdasdad",
-                "price": 4500,
-                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
-                "code": 111,
-                "stock": 40,
-                "status": false,
-                "id": 4
-            },
-            {
-                "title": "KunFu Panda 4",
-                "category": "animacion",
-                "description": "basdasdad",
-                "price": 4500,
-                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
-                "code": 111,
-                "stock": 40,
-                "status": false,
-                "id": 4
-            },
-            {
-                "title": "KunFu Panda 4",
-                "category": "animacion",
-                "description": "basdasdad",
-                "price": 4500,
-                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
-                "code": 111,
-                "stock": 40,
-                "status": false,
-                "id": 4
-            },
-            {
-                "title": "Con todos menos contigo",
-                "category": "comedia",
-                "description": "grsdfsf",
-                "price": 3000,
-                "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290",
-                "code": 13,
-                "stock": 40,
-                "status": false,
-                "id": 2
-            }
 
 */
 export default ProductManager
