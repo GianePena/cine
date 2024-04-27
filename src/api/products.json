@@ -1,1 +1,57 @@
-[{"title":"sherek 3","category":"fantasia","description":"asdasdadasda","price":4000,"thumbnail":"https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290","code":618,"stock":32,"status":"false","id":1},{"title":"sherek 2","category":"fantasia","description":"asdasdadasda","price":4000,"thumbnail":"https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290","code":704,"stock":32,"status":"false","id":1},{"title":"sherek 4","category":"fantasia","description":"asdasdadasda","price":4000,"thumbnail":"https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290","code":795,"stock":32,"status":"false","id":1},{"title":{"title":"duna","category":"fantasia","description":"asadasdsa","price":4000,"thumbnail":"https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290","stock":32,"status":false},"code":438,"id":1},{"title":{"title":"duna","category":"fantasia","description":"asadasdsa","price":4000,"thumbnail":"https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290","stock":32,"status":false},"code":6,"id":1},{"title":{"title":"duna","category":"fantasia","description":"asadasdsa","price":4000,"thumbnail":"https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290","stock":32,"status":false},"code":431,"id":1},{"title":{"title":"duna 7","category":"fantasia","description":"asadasdsa","price":6000,"thumbnail":"https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290","stock":432,"status":false},"code":728,"id":1}]
+[
+  {
+    "title": "KunFu Panda 2",
+    "category": "animacion",
+    "description": "basdasdad",
+    "price": 4500,
+    "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
+    "code": 909,
+    "stock": 40,
+    "status": false,
+    "id": "723b5c67-5ac3-4c3f-9532-03a16f1c26ba"
+  },
+  {
+    "title": "Patos",
+    "category": "animacion",
+    "description": "cxcxcxc",
+    "price": 4500,
+    "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/eae343c50d05a3beb2532361519d2ecc.jpg?v=00002290",
+    "code": 612,
+    "stock": 40,
+    "status": false,
+    "id": "3df7a71e-707f-47a7-b1a2-52d3e7029197"
+  },
+  {
+    "title": "Con todos menos contigo",
+    "category": "comedia",
+    "description": "grsdfsf",
+    "price": 3000,
+    "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/6590da5dcf18a04860c0ccd93727b38f.jpg?v=00002290",
+    "code": 957,
+    "stock": 40,
+    "status": false,
+    "id": "2fddebe2-40f9-4bce-a54d-83c35fb7d99e"
+  },
+  {
+    "title": "KunFu Panda 4",
+    "category": "animacion",
+    "description": "asadasdsa",
+    "price": 4500,
+    "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290",
+    "code": 844,
+    "stock": 32,
+    "status": false,
+    "id": "ebbdcce8-5d96-4ddd-ba8b-f69c34b0cb2c"
+  },
+  {
+    "title": "Patos",
+    "category": "animacion",
+    "description": "cxcxcxc",
+    "price": 4500,
+    "thumbnail": "https://static.cinemarkhoyts.com.ar/Images/Posters/eae343c50d05a3beb2532361519d2ecc.jpg?v=00002290",
+    "code": 385,
+    "stock": 40,
+    "status": false,
+    "id": "f2223aa4-7834-4aba-83e2-d0be61b14c8f"
+  }
+]

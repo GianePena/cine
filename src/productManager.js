@@ -1,6 +1,6 @@
 
 import fs from "fs";
-
+import { v4 as uuidv4 } from 'uuid';
 class ProductManager {
     constructor(path) {
         this.path = path,
@@ -13,7 +13,6 @@ class ProductManager {
         const products = JSON.parse(fileData);
         return products;
     }
-
     addProduct(title, category, description, price, thumbnail, code, stock, status) {
         if (this.products.some(product => product.code === code)) {
             console.log(`El código "${code}" ya existe, elige otro`);
@@ -28,10 +27,9 @@ class ProductManager {
             code: Math.floor(Math.random() * 1000) + 1,
             stock,
             status,
-            id: this.id
+            id: uuidv4()
         };
 
-        // Verificar que todos los campos sean válidos
         if (title === "" || category === "" || description === "" || price === "" || thumbnail === "" || stock === "" || status === "") {
             console.error("Completar todos los campos");
             return;
@@ -69,22 +67,14 @@ class ProductManager {
         console.log(`Producto actualizado: ID ${id}, Precio ${price}`);
         fs.writeFileSync(this.path, JSON.stringify(this.products));
     }
-    deleteProduct(code) {
-        const index = this.products.findIndex(product => product.code === code);
-        if (index === -1) {
-            console.error(`Producto no encontrado con el código ${code}.`);
-            return;
-        }
-        const [deletedProduct] = this.products.splice(index, 1);
-        if (searchProduct === undefined) {
-            console.error("Producto no encontrado con el código proporcionado.");
-            return;
-        }
-        fs.writeFileSync(this.path, JSON.stringify(this.products))
-        console.log(`El producto eliminado es ${code}`, deleteProduct)
+
+    deleteProduct(id) {
+        const idString = String(id);
+        const filteredProducts = this.products.filter(product => product.id !== idString);
+        this.products = filteredProducts;
+        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
+        console.log(`Producto eliminado: ID ${idString}`);
     }
-
-
 }
 
 /*
