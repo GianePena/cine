@@ -1,14 +1,15 @@
 import fs from "fs";
-class CartManager {
-    constructor(path) {
+import { cartModelo } from "./models/cartModelo.js";
+class CartManagerMONGO {
+    /*constructor(path) {
         this.path = path,
             this.products = [],
             this.id = 1;
+    }*/
+    async getCartProducts() {
+        return await cartModelo.find()
     }
-    getCartProducts() {
-        return this.products
-    }
-    addCartProduct(title, quantity) {
+    /*addCartProduct(title, quantity) {
         const product = this.products.find(p => p.title == title)
         if (product) {
             product.quantity += quantity
@@ -21,6 +22,9 @@ class CartManager {
         this.products.push(newProduct)
         fs.writeFileSync(this.path, JSON.stringify(this.products))
         fs.readFileSync(this.path, this.products)
+    }*/
+    async addCartProduct(title, quantity) {
+        return await cartModelo.create()
     }
 }
 /*
@@ -29,6 +33,6 @@ cartManager.addProductCart("Producto 1", 2);
 cartManager.addProductCart("Producto 2", 1);
 cartManager.addProductCart("Producto 3", 5);
 console.log(cartManager.getProduct());*/
+export { CartManagerMONGO }
 
-export default CartManager;
 

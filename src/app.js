@@ -5,8 +5,8 @@ import { router as productsRouter } from "./routes/productRouter.js";
 import { router as cartRouter } from "./routes/cartRouter.js";
 import { router as vistaRouter } from "./routes/viewsRouter.js";
 import { Server } from "socket.io";
-import ProductManager from "../src/productManager.js";
-
+import { ProductManagerMONGO as ProductManager } from "./dao/productManagerMONGO.js";
+import mongoose from "mongoose"
 const PORT = 3000;
 
 const app = express();
@@ -46,3 +46,22 @@ io.on("connection", (socket) => {
         io.emit("listProducts", productManager.getProducts());
     })
 });
+
+
+const connDB = async () => {
+    try {
+        await mongoose.connect(
+            "mongodb+srv://gianellapena01:MiniGala1215@giane.xmh7olf.mongodb.net/?retryWrites=true&w=majority&appName=giane",
+            {
+                dbName: "ecommerce"
+            }
+        )
+        console.log("DB Online...!!!")
+
+    } catch (error) {
+        console.log("Error al conectar a DB", error.message)
+    }
+}
+
+
+connDB()

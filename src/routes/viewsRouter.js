@@ -1,8 +1,7 @@
 import { Router } from "express"
 export const router = Router()
-import ProductManager from "../productManager.js"
+import { ProductManagerMONGO as ProductManager } from "../dao/productManagerMONGO.js"
 const productManager = new ProductManager("./api/products.json");
-
 
 
 
