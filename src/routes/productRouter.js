@@ -1,5 +1,4 @@
 import { Router } from 'express';
-
 import { ProductManagerMONGO as ProductManager } from "../dao/productManagerMONGO.js"
 import { isValidObjectId } from 'mongoose';
 export const router = Router()

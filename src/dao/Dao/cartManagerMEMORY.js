@@ -31,5 +31,5 @@ cartManager.addProductCart("Producto 2", 1);
 cartManager.addProductCart("Producto 3", 5);
 console.log(cartManager.getProduct());*/
 
-export default CartManagerMEMORY;
+export { CartManagerMEMORY };
 

@@ -1,0 +1,21 @@
+<h1> Chat </h1>
+<hr>
+<div id="ocultar">
+    <label for="">Username</label>
+    <input id="name" type="text" placeholder="Username"><br><br>
+    <label for="">Email: </label>
+    <input id="email" type="text" placeholder="Ingrese su email"><br><br>
+    <button id="enviar">Enviar datos</button><br><hr>
+</div>
+
+
+<div id="usuario"></div>
+
+<div id="chat">
+    <label for="">Mensaje: </label>
+    <input id="inputMessage" type="text" placeholder="Escribe tu mensaje">
+    <div id="message"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/chat.js"></script>

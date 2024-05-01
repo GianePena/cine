@@ -99,4 +99,4 @@ let lectura = JSON.parse(fs.readFileSync("./src/productos.json", { encoding: "ut
 console.log(lectura[2].title);
 
 */
-export default ProductManagerMEMORY
+export { ProductManagerMEMORY }
