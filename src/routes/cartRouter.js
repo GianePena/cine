@@ -3,7 +3,7 @@ import { CartManagerMONGO as CartManager } from "../dao/cartManagerMONGO.js"
 
 
 export const router = Router()
-const cartManager = new CartManager("./api/cart.json");
+const cartManager = new CartManager();
 router.get("/", async (req, res) => {
     try {
         let cartProducts = await cartManager.getCartProducts()
@@ -21,13 +21,14 @@ router.get("/", async (req, res) => {
 })
 
 router.post("/", async (req, res) => {
-    const { title, quantity } = req.body;
-    if (!title || !quantity) {
+    const { product, quantity } = req.body;
+    console.log(`Received data - product: ${product},quantity:${quantity}`)
+    if (!product || !quantity) {
         res.setHeader('Content-type', 'application/json')
         return res.status(400).json({ error: "completar la totalidad de los campos" })
     }
     try {
-        let newCartProduct = await cartManager.addCartProduct(quantity, title);
+        let newCartProduct = await cartManager.addCartProduct(product, quantity);
         res.status(201).json(
             {
                 message: "Producto agregado correctamente",

@@ -3,7 +3,7 @@ import { ProductManagerMONGO as ProductManager } from "../dao/productManagerMONG
 import { isValidObjectId } from 'mongoose';
 export const router = Router()
 
-const productManager = new ProductManager("./api/products.json");
+const productManager = new ProductManager();
 //agregar cambiar por los cambios del manager
 /*router.get("/", (req, res) => {
     let products = productManager.getProducts()
@@ -56,7 +56,8 @@ router.get("/:id", async (req, res) => {
 })
 
 router.post("/", async (req, res) => {
-    const { title, category, description, price, thumbnail, code, stock, status, id } = req.body;
+    const { title, category, description, price, thumbnail, stock, status } = req.body;
+    console.log(`Received data - title: ${title}, category: ${category}, description: ${description}, price: ${price}, thumbnail: ${thumbnail}, stock: ${stock}, status: ${status}`);
     if (!title || !category || !description || !price || !thumbnail || !stock || !status) {
         res.setHeader('Content-type', 'application/json')
         return res.status(400).json({ error: "completar la totalidad de los campos" })
@@ -73,7 +74,7 @@ router.post("/", async (req, res) => {
         return res.status(400).json({ error: `El producto con ${title} ya existe` })
     }
     try {
-        let newProduct = await productManager.addProduct({ title, category, description, price, thumbnail, code, stock, status })
+        let newProduct = await productManager.addProduct({ title, category, description, price, thumbnail, stock, status })
         res.setHeader('Content-type', 'application/json')
         return res.status(200).json({ newProduct })
     } catch (error) {

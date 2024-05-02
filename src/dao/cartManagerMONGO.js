@@ -1,5 +1,6 @@
 import fs from "fs";
 import { cartModelo } from "./models/cartModelo.js";
+
 class CartManagerMONGO {
     /*constructor(path) {
         this.path = path,
@@ -9,23 +10,18 @@ class CartManagerMONGO {
     async getCartProducts() {
         return await cartModelo.find()
     }
-    /*addCartProduct(title, quantity) {
-        const product = this.products.find(p => p.title == title)
-        if (product) {
-            product.quantity += quantity
-        }
-        const newProduct = {
-            title,
-            quantity,
-            id: this.id++
-        }
-        this.products.push(newProduct)
-        fs.writeFileSync(this.path, JSON.stringify(this.products))
-        fs.readFileSync(this.path, this.products)
-    }*/
-    async addCartProduct(title, quantity) {
-        return await cartModelo.create()
+    async addCartProduct(product, quantity) {
+        const newCartProduct = {
+            products: [{
+                product: {
+                    title
+                },
+                quantity,
+            }]
+        };
+        return await cartModelo.create(newCartProduct);
     }
+
 }
 /*
 const cartManager = new CartManager(("./src/api/cart.json"))

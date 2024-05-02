@@ -4,13 +4,11 @@ import { engine } from "express-handlebars";
 import { router as productsRouter } from "./routes/productRouter.js";
 import { router as cartRouter } from "./routes/cartRouter.js";
 import { router as viewsRouter } from "./routes/viewsRouter.js";
+import { router as chatRouter } from "./routes/chatRouter.js";
 import { Server } from "socket.io";
 import { ProductManagerMONGO as ProductManager } from "./dao/productManagerMONGO.js";
 import mongoose from "mongoose"
 const PORT = 3000;
-let usuarios = []
-let mensajes = []
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -22,6 +20,7 @@ app.set("views", "./views");
 app.use(express.static("public"));
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
+app.use("/chat", chatRouter);
 app.use("/", viewsRouter);
 
 const serverHTTP = app.listen(PORT, () => {
@@ -30,6 +29,10 @@ const serverHTTP = app.listen(PORT, () => {
 
 const io = new Server(serverHTTP);
 const productManager = new ProductManager("../src/api/products.json");
+
+let usuarios = []
+let mensajes = []
+
 
 io.on("connection", (socket) => {
     console.log("Cliente conectado:", socket.id);
@@ -66,17 +69,18 @@ io.on("connection", (socket) => {
 
 const connDB = async () => {
     try {
-        await mongoose.connect('mongodb+srv://giane.xmh7olf.mongodb.net/', {
-            auth: {
-                username: 'gianellapena01',
-                password: 'd8UyX4Kk97fVtwih'
+        await mongoose.connect(
+            "mongodb+srv://gianellapena01:d8UyX4Kk97fVtwih@giane.xmh7olf.mongodb.net/?retryWrites=true&w=majority&appName=giane",
+            {
+                dbName: "ecommerce"
             }
-        })
-        console.log("base de datos conectada")
-    }
-    catch (error) {
-        console.log("Error al conectar a DB")
+        )
+        console.log("DB Online...!!!")
+
+    } catch (error) {
+        console.log("Error al conectar a DB", error.message)
     }
 }
 
 connDB()
+

@@ -4,9 +4,15 @@ const cartCollection = "cart"
 
 const cartSchema = new mongoose.Schema(
     {
-        title: String,
-        id: String,
-        quantity: Number,
+        products: [
+            {
+                product: {
+                    title: String
+                },
+                quantity: Number,
+                date: Date
+            }
+        ]
     }
 )
 
