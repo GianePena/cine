@@ -23,12 +23,6 @@ class CartManagerMONGO {
     }
 
 }
-/*
-const cartManager = new CartManager(("./src/api/cart.json"))
-cartManager.addProductCart("Producto 1", 2);
-cartManager.addProductCart("Producto 2", 1);
-cartManager.addProductCart("Producto 3", 5);
-console.log(cartManager.getProduct());*/
 export { CartManagerMONGO }
 
 

@@ -26,21 +26,3 @@ export const productModelo = mongoose.model(
     productSchema //el esquema
 )
 
-/*import mongoose from "mongoose";
-
-const productCollection = "products";
-
-const productSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    category: { type: String, required: true },
-    description: { type: String },
-    price: { type: Number, required: true },
-    thumbnail: { type: String },
-    code: { type: Number, required: true, unique: true },
-    stock: { type: Number, required: true },
-    status: { type: Boolean, default: true }
-}, {
-    timestamps: true
-});
-
-export const ProductModel = mongoose.model(productCollection, productSchema); */

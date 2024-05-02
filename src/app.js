@@ -4,10 +4,12 @@ import { engine } from "express-handlebars";
 import { router as productsRouter } from "./routes/productRouter.js";
 import { router as cartRouter } from "./routes/cartRouter.js";
 import { router as viewsRouter } from "./routes/viewsRouter.js";
-import { router as chatRouter } from "./routes/chatRouter.js";
 import { Server } from "socket.io";
 import { ProductManagerMONGO as ProductManager } from "./dao/productManagerMONGO.js";
 import mongoose from "mongoose"
+import { messageModelo } from "./dao/models/messagesModelo.js"
+
+
 const PORT = 3000;
 const app = express();
 app.use(express.json());
@@ -20,7 +22,7 @@ app.set("views", "./views");
 app.use(express.static("public"));
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
-app.use("/chat", chatRouter);
+
 app.use("/", viewsRouter);
 
 const serverHTTP = app.listen(PORT, () => {
@@ -57,15 +59,25 @@ io.on("connection", (socket) => {
             socket.broadcast.emit("nuevoUsuario", user);
         }
     });
-
-    socket.on("mensaje", ({ user, email, message }) => {
+    socket.on("mensaje", async ({ user, email, message }) => {
         if (user && email && message) {
-            mensajes.push({ user, email, message });
-            console.log(mensajes);
-            io.emit("nuevoMensaje", { user, message });
+            try {
+                const nuevoMensaje = await messageModelo.create({
+                    name: user,
+                    email: email,
+                    message: message,
+                });
+                console.log('Mensaje guardado en MongoDB:', nuevoMensaje);
+                mensajes.push({ user, email, message });
+                io.emit("nuevoMensaje", { user, message });
+            } catch (error) {
+                console.error('Error al guardar el mensaje en MongoDB:', error);
+            }
         }
     });
 });
+
+
 
 const connDB = async () => {
     try {

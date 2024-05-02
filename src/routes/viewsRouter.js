@@ -16,3 +16,6 @@ router.get('/realtimeproducts', (req, res) => {
     res.status(200).render('realTimeProducts')
 })
 
+router.get('/chat', (req, res) => {
+    res.status(200).render('chat');
+});
