@@ -15,14 +15,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.engine("handlebars", engine());
-app.set("view engine", "handlebars");
-app.set("views", "./views");
 
-app.use(express.static("public"));
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set("views", "./src/views")
+
+app.use(express.static("./src/public"))
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
-
 app.use("/", viewsRouter);
 
 const serverHTTP = app.listen(PORT, () => {

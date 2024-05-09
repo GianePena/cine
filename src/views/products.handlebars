@@ -1,0 +1,32 @@
+<h1>Products</h1>
+<hr>
+<br>
+<br>
+
+    <div>
+        Username <input id="username"type="text">
+        <br><br>
+        Country <input id="country" type="text">
+    </div>
+<ul>
+    {{#each products}}
+        <li id=""><h4><strong>{{this.title}}</strong></h4> </li>
+        <li ><img src={{this.thumbnail}} alt={{this.title}}></li>
+        <li><strong>Price:</strong> ${{this.price}}</li>
+        <li><strong>Description: </strong>{{this.description}}</li><br><br>
+        <button  onclick="handleAddToCartClick('{{this._id}}')">Agregar al carrito</button><br><br><hr>
+    {{/each}}
+    <p>TOTAL PAGE:  {{totalPages}}</p>
+</ul>
+
+
+
+{{#if hasPrevPage}}
+    <a href="/products?page={{prevPage}}">Ant.</a>
+{{/if}}
+
+{{#if hasNextPage}}
+    <a href="/products?page={{nextPage}}">Sig.</a>
+{{/if}}
+
+<script src="js/products.js"></script>

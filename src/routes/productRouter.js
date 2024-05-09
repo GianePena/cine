@@ -1,39 +1,51 @@
-import { Router } from 'express';
+import { Router, query } from 'express';
 import { ProductManagerMONGO as ProductManager } from "../dao/productManagerMONGO.js"
 import { isValidObjectId } from 'mongoose';
 export const router = Router()
 
 const productManager = new ProductManager();
-//agregar cambiar por los cambios del manager
-/*router.get("/", (req, res) => {
-    let products = productManager.getProducts()
-    let limit = req.query.limit;
-    if (limit) {
-        limit = Number(limit)
-        products = products.slice(0, limit)
-    }
-    res.json(products)
-})*/
-router.get("/", async (req, res) => {
-    try {
-        let products = await productManager.getProducts()
-        let limit = req.query.limit;
-        if (limit) {
-            limit = Number(limit)
-            products = products.slice(0, limit)
-        }
-        res.json(products)
-    } catch (error) {
-        console.log(error);
-        res.setHeader('Content-Type', 'application/json')
-        return res.status(500).json(
-            {
-                error: `Error en el servidor`
-            }
-        )
-    }
 
-})
+router.get("/", async (req, res) => {
+
+    let { limit, page, category, title, stock, sort, available } = req.query;
+    limit = limit ? Number(limit) : 10;
+    page = page ? Number(page) : 1;
+    try {
+        if (category || title) {
+            const filter = {};
+            if (category) {
+                filter.category = category;
+            }
+            if (title && stock > 0) {
+                filter.title = title;
+            }
+            if (available) {
+                filter.stock = { $gt: 0 };
+            }
+            const products = await productManager.getProductsBy(filter);
+            return res.status(200).json(products);
+        } else {
+
+            const { docs: products, totalDocs, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await productManager.getProductsPaginate(page, limit, sort);
+            return res.status(200).json({
+                products,
+                totalDocs,
+                totalPages,
+                page,
+                limit,
+                hasPrevPage,
+                hasNextPage,
+                prevPage,
+                nextPage,
+                linkPrevPage: prevPage ? `?limit=${limit}&page=${prevPage}` : null,
+                linkNextPage: nextPage ? `?limit=${limit}&page=${nextPage}` : null
+            });
+        }
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
+    }
+});
 router.get("/:id", async (req, res) => {
     let { id } = req.params
     if (!isValidObjectId(id)) {
@@ -55,6 +67,12 @@ router.get("/:id", async (req, res) => {
 
 })
 
+
+
+
+
+
+
 router.post("/", async (req, res) => {
     const { title, category, description, price, thumbnail, stock, status } = req.body;
     console.log(`Received data - title: ${title}, category: ${category}, description: ${description}, price: ${price}, thumbnail: ${thumbnail}, stock: ${stock}, status: ${status}`);
@@ -64,7 +82,7 @@ router.post("/", async (req, res) => {
     }
     let existingProduct
     try {
-        existingProduct = await productManager.getProductsBy({ title })//{}tiene funcion de filtro
+        existingProduct = await productManager.getProductsBy({ title })
     } catch (error) {
         res.setHeader('Content-type', 'application/json')
         return res.status(500).json({ error: "Error en el servdior" })

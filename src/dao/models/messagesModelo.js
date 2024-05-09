@@ -3,8 +3,14 @@ const messageCollection = "message"
 
 const messageSchema = new mongoose.Schema(
     {
-        name: String,
-        email: String,
+        name: {
+            type: String,
+            unique: true
+        },
+        email: {
+            type: String,
+            unique: true
+        },
         message: String,
     }
 )

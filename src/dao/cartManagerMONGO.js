@@ -1,28 +1,75 @@
 import fs from "fs";
 import { cartModelo } from "./models/cartModelo.js";
+import { productModelo } from "./models/productModelo.js";
+import mongoose from "mongoose"
+import { error } from "console";
+
 
 class CartManagerMONGO {
-    /*constructor(path) {
-        this.path = path,
-            this.products = [],
-            this.id = 1;
-    }*/
-    async getCartProducts() {
-        return await cartModelo.find()
+    async getCarts() {
+        return await cartModelo.find();
     }
-    async addCartProduct(product, quantity) {
-        const newCartProduct = {
-            products: [{
-                product: {
-                    title
-                },
-                quantity,
-            }]
-        };
-        return await cartModelo.create(newCartProduct);
+    async getCartById(id) {
+        return await cartModelo.findById(id).populate('products.product').lean();
+    }
+    async createCart(products, username, country) {
+        return await cartModelo.create({
+            products: products,
+            username: username,
+            country: country
+        })
+    }
+    async updateQuantity(cid, pid, quantity) {
+        let cartToUpdate = await this.getCartById(cid)
+        if (!cartToUpdate) {
+            throw new Error("Carrito no encontrado")
+        }
+        cartToUpdate.products.forEach(p => {
+            if (p.product._id.toString() === pid) {
+                console.log('entro al')
+                p.quantity = quantity;
+            }
+        });
+        return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
+    }
+    async updateCart(cid, products) {
+        let cartToUpdate = await this.getCartById(cid)
+        if (!cartToUpdate) {
+            throw new Error("Carrito no encontrado")
+        }
+        console.log(cartToUpdate);
+        const finalProducts = cartToUpdate.products.concat(products)
+        console.log('finalProducts', finalProducts)
+        cartToUpdate.products = finalProducts
+        console.log(cartToUpdate);
+
+        return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
+    }
+    async removeProduct(cid, pid) {
+        let cartToUpdate = await this.getCartById(cid)
+        if (!cartToUpdate) {
+            throw new Error("Carrito no encontrado")
+        }
+        cartToUpdate.products.map(p => {
+            if (p.product._id.toString() != pid) {
+                return p
+            }
+        });
+        return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
+    }
+
+    async removeAllProducts(cid) {
+        let cartToUpdate = await this.getCartById(cid)
+        if (!cartToUpdate) {
+            throw new Error("Carrito no encontrado")
+        }
+        cartToUpdate.products = []
+        return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
     }
 
 }
-export { CartManagerMONGO }
 
+
+
+export { CartManagerMONGO }
 
