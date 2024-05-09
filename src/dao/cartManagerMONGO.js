@@ -50,14 +50,10 @@ class CartManagerMONGO {
         if (!cartToUpdate) {
             throw new Error("Carrito no encontrado")
         }
-        cartToUpdate.products.map(p => {
-            if (p.product._id.toString() != pid) {
-                return p
-            }
-        });
-        return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
-    }
+        cartToUpdate.products = cartToUpdate.products.filter(p => p.product._id.toString() != pid);
+        return await cartModelo.updateOne({ _id: cid }, cartToUpdate);
 
+    }
     async removeAllProducts(cid) {
         let cartToUpdate = await this.getCartById(cid)
         if (!cartToUpdate) {
