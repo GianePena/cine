@@ -1,4 +1,4 @@
-import { Router, query } from 'express';
+import { Router } from 'express';
 import { ProductManagerMONGO as ProductManager } from "../dao/productManagerMONGO.js"
 import { isValidObjectId } from 'mongoose';
 export const router = Router()
@@ -6,7 +6,6 @@ export const router = Router()
 const productManager = new ProductManager();
 
 router.get("/", async (req, res) => {
-
     let { limit, page, category, title, stock, sort, available } = req.query;
     limit = limit ? Number(limit) : 10;
     page = page ? Number(page) : 1;
@@ -68,11 +67,6 @@ router.get("/:id", async (req, res) => {
 })
 
 
-
-
-
-
-
 router.post("/", async (req, res) => {
     const { title, category, description, price, thumbnail, stock, status } = req.body;
     console.log(`Received data - title: ${title}, category: ${category}, description: ${description}, price: ${price}, thumbnail: ${thumbnail}, stock: ${stock}, status: ${status}`);
@@ -99,7 +93,6 @@ router.post("/", async (req, res) => {
         res.setHeader('Content-type', 'application/json')
         return res.status(500).json({ error: "Error en el servdior" })
     }
-
 });
 
 router.put("/:id", async (req, res) => {

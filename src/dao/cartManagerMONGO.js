@@ -1,8 +1,7 @@
-import fs from "fs";
+
 import { cartModelo } from "./models/cartModelo.js";
 import { productModelo } from "./models/productModelo.js";
 import mongoose from "mongoose"
-import { error } from "console";
 
 
 class CartManagerMONGO {

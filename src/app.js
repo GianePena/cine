@@ -1,12 +1,19 @@
-
+//EXPRES
 import express from "express";
+//HANDLEBARS
 import { engine } from "express-handlebars";
+//ROUTES
 import { router as productsRouter } from "./routes/productRouter.js";
 import { router as cartRouter } from "./routes/cartRouter.js";
 import { router as viewsRouter } from "./routes/viewsRouter.js";
+import { router as userRouter } from "./routes/userRouter.js";
+//SOCKET
 import { Server } from "socket.io";
-import { ProductManagerMONGO as ProductManager } from "./dao/productManagerMONGO.js";
+//MONGOOSE
 import mongoose from "mongoose"
+//SESSIONS
+import session from "express-session";
+import { ProductManagerMONGO as ProductManager } from "./dao/productManagerMONGO.js";
 import { messageModelo } from "./dao/models/messagesModelo.js"
 
 
@@ -14,13 +21,21 @@ const PORT = 3000;
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+//SESSIONS
+app.use(session({
+    secret: "ecommerce12",
+    resave: true,
+    saveUninitialized: true
 
-
+}))
+//HANDLEBARS
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set("views", "./src/views")
-
+//ARCHIVOS ESTATICOS
 app.use(express.static("./src/public"))
+//ROUTES
+app.use("/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/", viewsRouter);
@@ -29,11 +44,13 @@ const serverHTTP = app.listen(PORT, () => {
     console.log("SERVER ONLINE");
 });
 
+
+//SOCKET
 const io = new Server(serverHTTP);
 const productManager = new ProductManager("../src/api/products.json");
 
-let usuarios = []
-let mensajes = []
+let users = []
+let messages = []
 
 
 io.on("connection", (socket) => {
@@ -53,8 +70,8 @@ io.on("connection", (socket) => {
     })
     ///----------------chat------------
     socket.on("usuario", ({ user, email }) => {
-        if (!usuarios.includes({ user, email })) {
-            usuarios.push({ user, email });
+        if (!users.includes({ user, email })) {
+            users.push({ user, email });
             socket.emit("nuevoUsuario", user);
             socket.broadcast.emit("nuevoUsuario", user);
         }
@@ -68,7 +85,7 @@ io.on("connection", (socket) => {
                     message: message,
                 });
                 console.log('Mensaje guardado en MongoDB:', nuevoMensaje);
-                mensajes.push({ user, email, message });
+                messages.push({ user, email, message });
                 io.emit("nuevoMensaje", { user, message });
             } catch (error) {
                 console.error('Error al guardar el mensaje en MongoDB:', error);
@@ -77,7 +94,7 @@ io.on("connection", (socket) => {
     });
 });
 
-
+//CONCECION BASE DE DATOS
 
 const connDB = async () => {
     try {

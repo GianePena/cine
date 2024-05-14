@@ -2,12 +2,10 @@
 <hr>
 <br>
 <br>
-
-    <div>
-        Username <input id="username"type="text">
-        <br><br>
-        Country <input id="country" type="text">
-    </div>
+<h3>Bienvenido/a {{user.name}}</h3>
+<h5>Email: {{user.email}} </h5>
+<a href="/logout">Logout</a>
+<br>
 <ul>
     {{#each products}}
         <li id=""><h4><strong>{{this.title}}</strong></h4> </li>

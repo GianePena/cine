@@ -2,9 +2,7 @@
 
 let addToCartButtons = document.getElementById("addToCartButton")
 
-function test(p) {
-    console.log(p)
-}
+
 const handleAddToCartClick = async (productsId) => {
     let username = document.getElementById("username").value
     let country = document.getElementById("country").value
