@@ -55,7 +55,8 @@ router.get('/logout', (req, res) => {
         if (err) {
             return res.status(500).send('No se pudo cerrar la sesión.');
         }
-        res.status(200).json({ payload: "Logout Exitoso...!!!" });
+        //res.status(200).json({ payload: "Logout Exitoso...!!!" });
+        res.redirect("login")
     });
 });
 
