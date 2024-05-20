@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { UserManagerMONGO as UserManager } from "../dao/userManagerMONGO.js";
+//import { generaHash, validarPasword } from "../utils.js"
+import passport from "passport";
 
 export const router = Router()
 
-let reMedio = /^(([^<>()\[\]\.,;:\s@\”]+(\.[^<>()\[\]\.,;:\s@\”]+)*)|(\”.+\”))@(([^<>()[\]\.,;:\s@\”]+\.)+[^<>()[\]\.,;:\s@\”]{2,})$/
+//let reMedio = /^(([^<>()\[\]\.,;:\s@\”]+(\.[^<>()\[\]\.,;:\s@\”]+)*)|(\”.+\”))@(([^<>()[\]\.,;:\s@\”]+\.)+[^<>()[\]\.,;:\s@\”]{2,})$/
 
 const userManager = new UserManager()
 //app.use("/user", userRouter)
-
 
 
 //CRUD
@@ -36,6 +37,25 @@ router.get("/:id", async (req, res) => {
         res.status(500).json({ error: "Error fetching users" })
     }
 })
+
+router.get("/error", (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(500).json(
+        {
+            error: `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`,
+            detalle: `Fallo al autenticar...!!!`
+        }
+    )
+
+})
+router.post("/registro", passport.authenticate("registro", { failureRedirect: "/user/error" }), async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json({
+        message: "Registro correcto...!!!",
+        nuevoUsuario: req.user
+    })
+})
+/*
 router.post("/registro", async (req, res) => {
     let { name, email, password } = req.body
     let rol = "usuario"
@@ -46,17 +66,18 @@ router.post("/registro", async (req, res) => {
         }
         console.log(name, email, password);
         const userExistente = await userManager.getBy({ email })
+        if (!reMedio.test(email)) {
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(400).json({ error: `Ingrese un email valido` })
+        }
         if (email === userExistente) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ error: `Ya existe ${email}` })
         }
+        password = generaHash(password)
         if (email === "adminCoder@coder.com" && password === "adminCoder123") {
             rol = "admin"
             console.log({ name, email, password, rol });
-        }
-        if (!reMedio.test(email)) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `Ingrese un email valido` })
         }
         let newUser = await userManager.createUser({ name, email, password, rol })
         res.status(200).json({
@@ -68,19 +89,38 @@ router.post("/registro", async (req, res) => {
         res.status(500).json({ error: "Error fetching users" })
     }
 })
-
+*/
+router.post("/login", passport.authenticate("login", { failureRedirect: "/api/sessions/error" }),
+    async (req, res) => {
+        let { web } = req.body;
+        let user = { ...req.user }
+        delete user.password
+        req.session.user = user
+        if (web) {
+            return res.redirect("/products");
+        }
+        else {
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(200).json({ payload: "Login correcto", user })
+        }
+    })
+/*
 router.post("/login", async (req, res) => { //es un post poirque tengo que tomar datos de body
-    let { email, password } = req.body
+    let { email, password, web } = req.body
     try {
         if (!email || !password) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ error: `completar email y password` })
         }
-        let user = await userManager.getBy({ email, password })
+        let user = await userManager.getBy({ email })
         console.log();
         if (!user) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ error: `Usuario NO registrado` })
+        }
+        if (!validarPasword(password, user.password)) {
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(400).json({ error: `Pasword invalida` })
         }
         user = { ...user }
         delete user.password //para no mostrar la contraseña
@@ -92,7 +132,7 @@ router.post("/login", async (req, res) => { //es un post poirque tengo que tomar
     }
 })
 
-
+*/
 
 router.put("/:id", async (req, res) => {
     const { id } = req.params
@@ -116,3 +156,4 @@ router.delete("/:id", async (req, res) => {
         res.status(500).json({ error: "Error fetching users" })
     }
 })
+

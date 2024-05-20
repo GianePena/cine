@@ -21,6 +21,8 @@ const cartSchema = new mongoose.Schema(
         country: String,
     }, {
     timestamps: true,
+    //STRICT:FALSE --> PERMITE AGREGAR CAMPOS DEIFERENCTES AL MODELO AL CREACION DE UN INSTACION. EJ: FOTO --> SI LA TIENE LA GUARDA Y SI  NO NO
+
 }
 )
 cartSchema.pre('find', function () {

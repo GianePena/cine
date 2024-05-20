@@ -13,6 +13,14 @@ import { Server } from "socket.io";
 import mongoose from "mongoose"
 //SESSIONS
 import session from "express-session";
+//MONGO-STORAGE
+import MongoStore from "connect-mongo";
+//PASPORT
+import passport, { Passport } from "passport";
+import { initPassport } from "./config/passport.config.js";
+
+
+
 import { ProductManagerMONGO as ProductManager } from "./dao/productManagerMONGO.js";
 import { messageModelo } from "./dao/models/messagesModelo.js"
 
@@ -25,9 +33,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
     secret: "ecommerce12",
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: MongoStore.create({
+        ttl: 3600,
+        mongoUrl: "mongodb+srv://gianellapena01:d8UyX4Kk97fVtwih@giane.xmh7olf.mongodb.net/?retryWrites=true&w=majority&appName=giane",
+        dbName: "ecommerce",
+        collectionName: "userSession"
+    })
 
 }))
+//PASPORT 
+initPassport()
+app.use(passport.initialize())
+app.use(passport.session())
 //HANDLEBARS
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
