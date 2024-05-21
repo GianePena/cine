@@ -11,36 +11,6 @@ const userManager = new UserManager()
 //app.use("/user", userRouter)
 
 
-//CRUD
-//PASSPORT GITHUB
-router.get('/github', passport.authenticate("github", {}), (req, res) => { })//peticion del usario a esta ruta--> redirecciona a github y vuleve a "/callbackGithub"
-router.get('/callbackGithub', passport.authenticate("github", { failureRedirect: "/user/error" }), (req, res) => {
-    //registro y login 
-    req.session.user = req.user
-    if (web) {
-        return res.redirect("/products");
-    }
-    else {
-        res.setHeader('Content-Type', 'application/json');
-        return res.status(200).json({ payload: req.user })
-    }
-})
-
-router.get("/:id", async (req, res) => {
-    const { id } = req.params
-    try {
-        let user = await userManager.getById(id)
-        if (!user) {
-            console.log(`Usuario con ID ${id} no encontrado`);
-            res.status(404).json({ message: "usuario no encontrado" }) //404 not found y 400  indica que la solicitud del cliente está mal formada, incompleta o no se puede entender.
-        }
-        res.status(200).json({ user })
-    } catch (error) {
-        console.error("Error fetching users: ", error)
-        res.status(500).json({ error: "Error fetching users" })
-    }
-})
-
 router.get("/error", (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     return res.status(500).json(
@@ -49,8 +19,18 @@ router.get("/error", (req, res) => {
             detalle: `Fallo al autenticar...!!!`
         }
     )
-
 })
+
+//CRUD
+//PASSPORT GITHUB
+router.get('/github', passport.authenticate("github", {}), (req, res) => { })//peticion del usario a esta ruta--> redirecciona a github y vuleve a "/callbackGithub"
+router.get('/callbackGithub', passport.authenticate("github", { failureRedirect: "/user/error" }), (req, res) => {
+    //registro y login 
+    req.session.user = req.user
+    return res.redirect("/products");
+})
+
+
 //PASSPORT-LOCAL
 router.post("/registro", passport.authenticate("registro", { failureRedirect: "/user/error" }), async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
@@ -77,7 +57,32 @@ router.post("/login", passport.authenticate("login", { failureRedirect: "/user/e
 
 
 
+
 /*
+router.get("/", async (req, res) => {
+    try {
+        const users = await userManager.getUsers()
+        res.status(200).json({ users })
+    } catch (error) {
+        console.error("Error fetching users: ", error)
+        res.status(500).json({ error: "Error fetching users" })
+    }
+})
+
+router.get("/:id", async (req, res) => {
+    const { id } = req.params
+    try {
+        let user = await userManager.getById(id)
+        if (!user) {
+            console.log(`Usuario con ID ${id} no encontrado`);
+            res.status(404).json({ message: "usuario no encontrado" }) //404 not found y 400  indica que la solicitud del cliente está mal formada, incompleta o no se puede entender.
+        }
+        res.status(200).json({ user })
+    } catch (error) {
+        console.error("Error fetching users: ", error)
+        res.status(500).json({ error: "Error fetching users" })
+    }
+})
 router.post("/registro", async (req, res) => {
     let { name, email, password } = req.body
     let rol = "usuario"
@@ -111,9 +116,6 @@ router.post("/registro", async (req, res) => {
         res.status(500).json({ error: "Error fetching users" })
     }
 })
-*/
-
-/*
 router.post("/login", async (req, res) => { //es un post poirque tengo que tomar datos de body
     let { email, password, web } = req.body
     try {
@@ -141,8 +143,6 @@ router.post("/login", async (req, res) => { //es un post poirque tengo que tomar
     }
 })
 
-*/
-
 router.put("/:id", async (req, res) => {
     const { id } = req.params
     const { name } = req.body
@@ -164,14 +164,4 @@ router.delete("/:id", async (req, res) => {
         console.error("Error fetching users: ", error)
         res.status(500).json({ error: "Error fetching users" })
     }
-})
-
-router.get("/", async (req, res) => {
-    try {
-        const users = await userManager.getUsers()
-        res.status(200).json({ users })
-    } catch (error) {
-        console.error("Error fetching users: ", error)
-        res.status(500).json({ error: "Error fetching users" })
-    }
-})
+})*/
