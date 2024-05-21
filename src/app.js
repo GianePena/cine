@@ -16,7 +16,7 @@ import session from "express-session";
 //MONGO-STORAGE
 import MongoStore from "connect-mongo";
 //PASPORT
-import passport, { Passport } from "passport";
+import passport from "passport";
 import { initPassport } from "./config/passport.config.js";
 
 
@@ -44,8 +44,8 @@ app.use(session({
 }))
 //PASPORT 
 initPassport()
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(passport.initialize())//siempre es =
+app.use(passport.session()) //siemre que hay sessions
 //HANDLEBARS
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');

@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema(
 
     },
     {
-        timestamps: true
+        timestamps: true,
+        strict: false
     }
 )
 export const userModelo = mongoose.model(

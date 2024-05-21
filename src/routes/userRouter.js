@@ -12,14 +12,17 @@ const userManager = new UserManager()
 
 
 //CRUD
-
-router.get("/", async (req, res) => {
-    try {
-        const users = await userManager.getUsers()
-        res.status(200).json({ users })
-    } catch (error) {
-        console.error("Error fetching users: ", error)
-        res.status(500).json({ error: "Error fetching users" })
+//PASSPORT GITHUB
+router.get('/github', passport.authenticate("github", {}), (req, res) => { })//peticion del usario a esta ruta--> redirecciona a github y vuleve a "/callbackGithub"
+router.get('/callbackGithub', passport.authenticate("github", { failureRedirect: "/user/error" }), (req, res) => {
+    //registro y login 
+    req.session.user = req.user
+    if (web) {
+        return res.redirect("/products");
+    }
+    else {
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(200).json({ payload: req.user })
     }
 })
 
@@ -48,6 +51,7 @@ router.get("/error", (req, res) => {
     )
 
 })
+//PASSPORT-LOCAL
 router.post("/registro", passport.authenticate("registro", { failureRedirect: "/user/error" }), async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({
@@ -55,6 +59,24 @@ router.post("/registro", passport.authenticate("registro", { failureRedirect: "/
         nuevoUsuario: req.user
     })
 })
+router.post("/login", passport.authenticate("login", { failureRedirect: "/user/error" }),
+    async (req, res) => {
+        let { web } = req.body;
+        let user = { ...req.user }
+        delete user.password
+        req.session.user = user
+        if (web) {
+            return res.redirect("/products");
+        }
+        else {
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(200).json({ payload: "Login correcto", user })
+        }
+    })
+
+
+
+
 /*
 router.post("/registro", async (req, res) => {
     let { name, email, password } = req.body
@@ -90,20 +112,7 @@ router.post("/registro", async (req, res) => {
     }
 })
 */
-router.post("/login", passport.authenticate("login", { failureRedirect: "/api/sessions/error" }),
-    async (req, res) => {
-        let { web } = req.body;
-        let user = { ...req.user }
-        delete user.password
-        req.session.user = user
-        if (web) {
-            return res.redirect("/products");
-        }
-        else {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(200).json({ payload: "Login correcto", user })
-        }
-    })
+
 /*
 router.post("/login", async (req, res) => { //es un post poirque tengo que tomar datos de body
     let { email, password, web } = req.body
@@ -157,3 +166,12 @@ router.delete("/:id", async (req, res) => {
     }
 })
 
+router.get("/", async (req, res) => {
+    try {
+        const users = await userManager.getUsers()
+        res.status(200).json({ users })
+    } catch (error) {
+        console.error("Error fetching users: ", error)
+        res.status(500).json({ error: "Error fetching users" })
+    }
+})
