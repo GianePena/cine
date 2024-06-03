@@ -1,30 +1,45 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const userCollection = "users"
+
 const userSchema = new mongoose.Schema(
     {
-        name: {
-            type: String,
-            required: true
+        first_name: {
+            type: String
+        },
+        last_name: {
+            type: String
         },
         email: {
-            type: String
-
+            type: String,
+            required: true,
+            unique: true
+        },
+        age: {
+            type: Number
         },
         password: {
             type: String
         },
+        cart: {
+            type: mongoose.Types.ObjectId,
+            ref: 'cart'
+            //referencia al cart
+        },
         rol: {
             type: String,
-            default: "usuario"
+            default: "user"
         }
-
     },
     {
         timestamps: true,
         strict: false
     }
 )
+userSchema.pre('find', function () {
+    this.populate('cart.cart').lean();
+});
+
 export const userModelo = mongoose.model(
     userCollection,
     userSchema

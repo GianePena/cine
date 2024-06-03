@@ -3,20 +3,33 @@ import passport from "passport"
 import local from "passport-local"
 //PASSPORT GITHUB --> estrategia
 import github from "passport-github2"
+//PASSPORT JWT 
+import passportJWT from "passport-jwt"
+import jwt from "jsonwebtoken"
 
 import { UserManagerMONGO } from "../dao/userManagerMONGO.js"
-import { generaHash, validarPasword } from "../utils.js"
+import { generaHash, validarPasword, SECRET } from "../utils.js"
 const userManager = new UserManagerMONGO
 
+
+
+function buscarToken(req) {
+    let token = null
+    if (req.cookies["userCookie"]) {
+        token = req.cookies["userCookie"]
+    }
+    return token
+}
 
 //PASO 1
 
 export const initPassport = () => {
+    //ESTRATEGIA DE LOGIN -> PASSPORT-GITHUB
     passport.use(
         "github",
         new github.Strategy({
-            clientID: "",
-            clientSecret: "",
+            clientID: "Iv23ctPhpl2fqt9jYBQc",
+            clientSecret: "5f50692752184bf95ac119bfe54d281219688417",
             callbackURL: "http://localhost:3000/user/callbackGithub"
         },
             async (tokenAcesso, tokenRefresh, profile, done) => {
@@ -31,14 +44,14 @@ export const initPassport = () => {
                     if (!user) {
                         user = await userManager.createUser({ name, email, profile })
                     }
-                    return done(null, user)
+                    const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '1h' });
+                    return done(null, token)
                 } catch (error) {
                     return done(error)
                 }
             }
         )//DENTRO DEL PROFILE HAY UNA PROP _JSON DE DONDE PODEMOS SACAR LOS DATOS PARA CREAR EL USUARIO
     )
-
     passport.use(
         "registro",
         new local.Strategy({
@@ -47,16 +60,20 @@ export const initPassport = () => {
         },
             async (req, username, password, done) => {
                 try {
-                    let { name } = req.body
-                    if (!name) {
+                    let { firstName, lastName, age } = req.body
+                    if (!firstName || !lastName || !age) {
                         return done(null, false)
                     }
                     const userExistente = await userManager.getBy({ email: username })
                     if (userExistente) {
                         return done(null, false)
                     }
+                    let rol = "user"
+                    if (username === "adminCoder@coder.com") {
+                        rol = "admin"
+                    }
                     password = generaHash(password)
-                    let newUser = await userManager.createUser({ name, email: username, password, rol: "usuario" })
+                    let newUser = await userManager.createUser({ firstName, lastName, email: username, age, password, rol })
                     return done(null, newUser)
                 } catch (error) {
                     return done(error)
@@ -86,15 +103,26 @@ export const initPassport = () => {
             }
         )
     )
-    passport.serializeUser((user, done) => {
-        return done(null, user._id);
-    });
+    passport.use(
+        "jwt",
+        new passportJWT.Strategy(
+            {
+                secretOrKey: SECRET,
+                jwtFromRequest: new passportJWT.ExtractJwt.fromExtractors([buscarToken])
+            },
+            async (jwt_payload, done) => {
+                try {
+                    const user = await userManager.getBy({ jwt_payload })
+                    if (!user) {
+                        return (null, false, { message: "Token inexistente" })
+                    }
+                    return done(null, user)
+                } catch (error) {
+                    return done(error, false, { message: 'Error en la verificación del token' })
+                }
+            }
+        )
+    )
 
-    passport.deserializeUser(async (id, done) => {
-        let user = await userManager.getBy({ _id: id });
-        return done(null, user);
-    });
 
 }
-
-

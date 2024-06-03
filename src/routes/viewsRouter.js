@@ -1,9 +1,9 @@
 import { Router } from "express"
-import { auth } from "../middleware /auth.js";
 
 export const router = Router()
 import { CartManagerMONGO as CartManager } from "../dao/cartManagerMONGO.js";
 import { ProductManagerMONGO as ProductManager } from "../dao/productManagerMONGO.js"
+import passport from "passport";
 const cartManager = new CartManager();
 const productManager = new ProductManager("./api/products.json");
 
@@ -24,14 +24,14 @@ router.get('/chat', (req, res) => {
     res.status(200).render('chat');
 });
 
-router.get('/products', auth, async (req, res) => {
+router.get('/products', passport.authenticate("jwt", { session: false }), async (req, res) => {
     let { limit, page, sort } = req.query;
     limit = limit ? Number(limit) : 10;
     page = page ? Number(page) : 1;
     try {
         const { docs: products, totalDocs, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await productManager.getProductsPaginate(page, limit, sort);
         return res.status(200).render('products', {
-            user: req.session.user,
+            user: req.user,
             products,
             totalDocs,
             totalPages,
@@ -51,13 +51,8 @@ router.get('/products', auth, async (req, res) => {
     }
 });
 router.get('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.status(500).send('No se pudo cerrar la sesión.');
-        }
-        //res.status(200).json({ payload: "Logout Exitoso...!!!" });
-        res.redirect("login")
-    });
+    res.clearCookie("userCookie");
+    res.redirect("/login");
 });
 
 

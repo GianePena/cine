@@ -11,10 +11,10 @@ import { router as userRouter } from "./routes/userRouter.js";
 import { Server } from "socket.io";
 //MONGOOSE
 import mongoose from "mongoose"
+//COOKIE
+import cookieParser from "cookie-parser";
 //SESSIONS
-import session from "express-session";
-//MONGO-STORAGE
-import MongoStore from "connect-mongo";
+//import session from 'express-session'
 //PASPORT
 import passport from "passport";
 import { initPassport } from "./config/passport.config.js";
@@ -29,23 +29,13 @@ const PORT = 3000;
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//SESSIONS
-app.use(session({
-    secret: "ecommerce12",
-    resave: true,
-    saveUninitialized: true,
-    store: MongoStore.create({
-        ttl: 3600,
-        mongoUrl: "mongodb+srv://gianellapena01:d8UyX4Kk97fVtwih@giane.xmh7olf.mongodb.net/?retryWrites=true&w=majority&appName=giane",
-        dbName: "ecommerce",
-        collectionName: "userSession"
-    })
+//COOKIES
+app.use(cookieParser())
 
-}))
-//PASPORT 
+//PASPORT JWT
 initPassport()
-app.use(passport.initialize())//siempre es =
-app.use(passport.session()) //siemre que hay sessions
+app.use(passport.initialize())
+
 //HANDLEBARS
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
@@ -130,4 +120,3 @@ const connDB = async () => {
 }
 
 connDB()
-

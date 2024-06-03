@@ -61,3 +61,4 @@ const handleAddToCartClick = async (productsId) => {
 addToCartButtons.forEach(button => {
     button.addEventListener("click", handleAddToCartClick);
 });
+
