@@ -110,19 +110,22 @@ export const initPassport = () => {
                 secretOrKey: SECRET,
                 jwtFromRequest: new passportJWT.ExtractJwt.fromExtractors([buscarToken])
             },
-            async (jwt_payload, done) => {
+            async (token, done) => {
                 try {
-                    const user = await userManager.getBy({ jwt_payload })
+                    const user = await userManager.getBy({ email: token.email })
                     if (!user) {
                         return (null, false, { message: "Token inexistente" })
                     }
-                    return done(null, user)
-                } catch (error) {
-                    return done(error, false, { message: 'Error en la verificación del token' })
+                    return done(null, token)
+                }
+                catch (error) {
+                    return done(error)
                 }
             }
         )
     )
 
-
 }
+
+
+

@@ -4,6 +4,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken"
 import { SECRET } from "../utils.js";
 import { passportCall } from "../utils.js";
+import { authorization } from "../middleware /auth.js";
 import { UserManagerMONGO as userManager } from "../dao/userManagerMONGO.js";
 export const router = Router()
 
@@ -57,7 +58,6 @@ router.post("/login", passport.authenticate("login", { session: false }),
         let token = jwt.sign(user, SECRET, { expiresIn: "1h" })
         res.cookie("userCookie", token, { httpOnly: true })
         if (web) {
-            //return res.redirect("/products");
             return res.redirect("/usuario");
         }
         else {
@@ -67,14 +67,6 @@ router.post("/login", passport.authenticate("login", { session: false }),
     }
 
 )
-
-router.get("/usuario", passportCall("jwt"), (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).json({
-        mensaje: 'Perfil usuario',
-        usuario: req.user
-    });
-})
 
 
 
