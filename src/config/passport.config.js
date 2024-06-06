@@ -7,8 +7,9 @@ import github from "passport-github2"
 import passportJWT from "passport-jwt"
 import jwt from "jsonwebtoken"
 
+import { config } from "./config.js"
 import { UserManagerMONGO } from "../dao/userManagerMONGO.js"
-import { generaHash, validarPasword, SECRET } from "../utils.js"
+import { generaHash, validarPasword } from "../utils.js"
 const userManager = new UserManagerMONGO
 
 
@@ -28,9 +29,10 @@ export const initPassport = () => {
     passport.use(
         "github",
         new github.Strategy({
-            clientID: "Iv23ctPhpl2fqt9jYBQc",
-            clientSecret: "5f50692752184bf95ac119bfe54d281219688417",
-            callbackURL: "http://localhost:3000/user/callbackGithub"
+
+            clientID: config.CLIENT_ID_GITHUB,
+            clientSecret: config.CLIENT_SECRET_GITHUB,
+            callbackURL: config.CALLBACK_URL_GITHUB
         },
             async (tokenAcesso, tokenRefresh, profile, done) => {
                 try {
@@ -69,7 +71,7 @@ export const initPassport = () => {
                         return done(null, false)
                     }
                     let rol = "user"
-                    if (username === "adminCoder@coder.com") {
+                    if (username === config.ADMIN_EMAIL) {
                         rol = "admin"
                     }
                     password = generaHash(password)
@@ -107,7 +109,7 @@ export const initPassport = () => {
         "jwt",
         new passportJWT.Strategy(
             {
-                secretOrKey: SECRET,
+                secretOrKey: config.JWT_SECRET,
                 jwtFromRequest: new passportJWT.ExtractJwt.fromExtractors([buscarToken])
             },
             async (token, done) => {

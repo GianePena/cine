@@ -41,7 +41,6 @@ class CartManagerMONGO {
         console.log('finalProducts', finalProducts)
         cartToUpdate.products = finalProducts
         console.log(cartToUpdate);
-
         return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
     }
     async removeProduct(cid, pid) {

@@ -5,7 +5,9 @@ import jwt from "jsonwebtoken"
 import { SECRET } from "../utils.js";
 import { passportCall } from "../utils.js";
 import { authorization } from "../middleware /auth.js";
-import { UserManagerMONGO as userManager } from "../dao/userManagerMONGO.js";
+
+import { UserManagerMONGO as UserManager } from "../dao/userManagerMONGO.js";
+const userManager = new UserManager();
 export const router = Router()
 
 
@@ -68,5 +70,16 @@ router.post("/login", passport.authenticate("login", { session: false }),
 
 )
 
+router.put("/:uid", async (req, res) => {
+    const { cid } = req.body
+    const { uid } = req.params
+    try {
+        const updateUser = await userManager.updateUserCart(uid, cid);
+        res.status(200).json({ updateUser });
+    } catch (error) {
+        console.error("Error en el servidor:", error);
+        res.status(500).json({ error: "Error en el servidor", detalle: error.message });
+    }
+});
 
 

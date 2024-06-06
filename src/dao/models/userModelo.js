@@ -24,7 +24,6 @@ const userSchema = new mongoose.Schema(
         cart: {
             type: mongoose.Types.ObjectId,
             ref: 'cart'
-            //referencia al cart
         },
         rol: {
             type: String,

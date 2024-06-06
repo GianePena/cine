@@ -52,14 +52,7 @@ router.get('/products', passport.authenticate("jwt", { session: false }), async 
         res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
     }
 });
-/*
-router.get("/usuario", passportCall("jwt"), authorization(["user", "admin"]), (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).json({
-        user: req.user
-    });
-})
-*/
+
 router.get("/usuario", passportCall("jwt"), authorization(["user", "admin"]), (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({
