@@ -1,24 +1,17 @@
 
 import { productModelo } from "./models/productModelo.js";
-import { v4 as uuidv4 } from 'uuid';
-class ProductManagerMONGO {
-    /*constructor(path) {
-        this.path = path,
-            this.products = [],
-            this.id = 1
-    }*/
 
+class ProductManagerMONGO {
     async getProducts() {
         return await productModelo.find().lean()
     }
     //PAGINATE
-    async getProductsPaginate(page, limit, sort) {
+    async getProductsPaginate(page, limit, sort) { //agregar
         const options = {
             page: page,
             limit: limit,
             lean: true,
         };
-
         if (sort) {
             options.sort = {
                 'price': sort,
@@ -29,7 +22,7 @@ class ProductManagerMONGO {
     async addProduct(product) {
         return (await productModelo.create(product))
     }
-    async getProductsBy(filter) {
+    async getProductsBy(filter) {//agregar
         return await productModelo.find(filter).lean()
     }
     async getProductById(id) {
@@ -41,8 +34,6 @@ class ProductManagerMONGO {
     async deleteProduct(id) {
         return await productModelo.deleteOne({ _id: id })
     }
-
-
 }
 
 export { ProductManagerMONGO }

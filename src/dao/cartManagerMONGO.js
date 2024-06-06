@@ -1,9 +1,5 @@
 
 import { cartModelo } from "./models/cartModelo.js";
-import { productModelo } from "./models/productModelo.js";
-import mongoose from "mongoose"
-
-
 class CartManagerMONGO {
     async getCarts() {
         return await cartModelo.find();

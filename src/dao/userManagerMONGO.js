@@ -26,7 +26,6 @@ class UserManagerMONGO {
         await user.save();
         return user;
     }
-
     async deleteUser(id) {
         return await userModelo.deleteOne({ _id: id })
     }

@@ -2,11 +2,11 @@ import { Router } from "express";
 import passport from "passport";
 
 import jwt from "jsonwebtoken"
-import { SECRET } from "../utils.js";
+import { config } from "../config/config.js";
+import { UserController } from "../controller/UserController.js";
 import { passportCall } from "../utils.js";
 import { authorization } from "../middleware /auth.js";
-
-import { UserManagerMONGO as UserManager } from "../dao/userManagerMONGO.js";
+import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js";
 const userManager = new UserManager();
 export const router = Router()
 
@@ -33,7 +33,7 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
     if (!user) {
         return res.status(401).json({ message: 'Autenticacion fallida' });
     }
-    const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ email: user.email }, config.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('userCookie', token, { httpOnly: true });
     res.status(200).json({
         message: "Registro correcto...!!!",
@@ -57,10 +57,10 @@ router.post("/login", passport.authenticate("login", { session: false }),
         let { web } = req.body;
         let user = { ...req.user }
         delete user.password
-        let token = jwt.sign(user, SECRET, { expiresIn: "1h" })
+        let token = jwt.sign(user, config.JWT_SECRET, { expiresIn: "1h" })
         res.cookie("userCookie", token, { httpOnly: true })
         if (web) {
-            return res.redirect("/usuario");
+            return res.redirect("/user/data");
         }
         else {
             res.setHeader('Content-Type', 'application/json');
@@ -69,17 +69,8 @@ router.post("/login", passport.authenticate("login", { session: false }),
     }
 
 )
-
-router.put("/:uid", async (req, res) => {
-    const { cid } = req.body
-    const { uid } = req.params
-    try {
-        const updateUser = await userManager.updateUserCart(uid, cid);
-        res.status(200).json({ updateUser });
-    } catch (error) {
-        console.error("Error en el servidor:", error);
-        res.status(500).json({ error: "Error en el servidor", detalle: error.message });
-    }
-});
-
-
+router.get("/data", passportCall("jwt"), authorization(["user", "admin"]), UserController.getData)
+router.get("/", UserController.getUsers)
+router.get("/:id", UserController.getUserBy)
+router.put("/:uid", UserController.updateUserCart);
+router.delete("/:id", UserController.deleteUser)

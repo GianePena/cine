@@ -1,6 +1,3 @@
-//instalar dotev
-//generar el archivo .env
-//importar dotev
 import dotenv from "dotenv"
 import { Command, Option } from "commander"
 
@@ -23,5 +20,6 @@ export const config = {
     CLIENT_SECRET_GITHUB: process.env.CLIENT_SECRET_GITHUB,
     CALLBACK_URL_GITHUB: process.env.CALLBACK_URL_GITHUB,
     JWT_SECRET: process.env.JWT_SECRET,
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD
 }

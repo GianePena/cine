@@ -8,7 +8,7 @@ import passportJWT from "passport-jwt"
 import jwt from "jsonwebtoken"
 
 import { config } from "./config.js"
-import { UserManagerMONGO } from "../dao/userManagerMONGO.js"
+import { UserManagerMONGO } from "../DAO/userManagerMONGO.js"
 import { generaHash, validarPasword } from "../utils.js"
 const userManager = new UserManagerMONGO
 
@@ -46,7 +46,7 @@ export const initPassport = () => {
                     if (!user) {
                         user = await userManager.createUser({ name, email, profile })
                     }
-                    const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '1h' });
+                    const token = jwt.sign({ email: user.email }, config.JWT_SECRET, { expiresIn: '1h' });
                     return done(null, token)
                 } catch (error) {
                     return done(error)
@@ -71,7 +71,7 @@ export const initPassport = () => {
                         return done(null, false)
                     }
                     let rol = "user"
-                    if (username === config.ADMIN_EMAIL) {
+                    if (username === config.ADMIN_EMAIL && password === config.ADMIN_PASSWORD) {
                         rol = "admin"
                     }
                     password = generaHash(password)

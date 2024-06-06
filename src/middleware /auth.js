@@ -1,14 +1,15 @@
 //auth sessions
-/*export const authSessions = (req, res, next) => {
+export const authSessions = (req, res, next) => {
     if (!req.session.user) {
         res.setHeader('Content-Type', 'application/json');
         return res.status(401).json({ error: `No existen usuarios autenticados` })
     }
     next()
-}*/
+}
 //auth jwt
 import jwt from "jsonwebtoken"
-import { SECRET } from "../utils.js";
+import { config } from "../config/config.js";
+
 export const auth = (req, res, next) => {
     if (!req.cookies["userCookie"]) {
         res.setHeader('Content-Type', 'application/json');
@@ -17,7 +18,7 @@ export const auth = (req, res, next) => {
     let token = req.cookies["userCookie"]
     console.log({ token })
     try {
-        let user = jwt.verify(token, SECRET)
+        let user = jwt.verify(token, config.SECRET)
         req.user = user
 
     } catch (error) {

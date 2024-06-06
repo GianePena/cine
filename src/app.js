@@ -1,4 +1,4 @@
-//EXPRES
+//EXPRESS
 import express from "express";
 import { config } from "./config/config.js";
 //HANDLEBARS
@@ -21,7 +21,7 @@ import passport from "passport";
 import { initPassport } from "./config/passport.config.js";
 
 
-import { ProductManagerMONGO as ProductManager } from "./dao/productManagerMONGO.js";
+import { ProductManagerMONGO as ProductManager } from "./DAO/productManagerMONGO.js";
 import { messageModelo } from "./dao/models/messagesModelo.js"
 
 
@@ -102,30 +102,16 @@ io.on("connection", (socket) => {
     });
 });
 
-//CONCECION BASE DE DATOS
-
+//CONECCION BASE DE DATOS
 const connDB = async () => {
-    /* Conexion a la base de datos in usar variables de entorno
-    try {
-        await mongoose.connect(
-            "mongodb+srv://gianellapena01:d8UyX4Kk97fVtwih@giane.xmh7olf.mongodb.net/?retryWrites=true&w=majority&appName=giane",
-            {
-                dbName: "ecommerce"
-            }
-        )
-        console.log("DB Online...!!!")
-    }*/
     try {
         await mongoose.connect(
             config.MONGO_URL, { dbName: config.DB_NAME }
-
         )
         console.log("DB Online...!!!")
-
     }
     catch (error) {
         console.log("Error al conectar a DB", error.message)
     }
 }
-
 connDB()
