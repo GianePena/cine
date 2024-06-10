@@ -5,7 +5,8 @@ import jwt from "jsonwebtoken"
 import { config } from "../config/config.js";
 import { UserController } from "../controller/UserController.js";
 import { passportCall } from "../utils.js";
-import { authorization } from "../middleware /auth.js";
+import { authorization } from "../middleware/auth.js"
+
 import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js";
 const userManager = new UserManager();
 export const router = Router()
@@ -35,7 +36,7 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
     }
     const token = jwt.sign({ email: user.email }, config.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('userCookie', token, { httpOnly: true });
-    res.status(200).json({
+    res.status(201).json({
         message: "Registro correcto...!!!",
     })
 });
@@ -45,7 +46,7 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
 //PASSPORT-LOCAL
 router.post("/registro", passport.authenticate("registro", { session: false }), async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.status(200).json({
+    res.status(201).json({
         message: "Registro correcto...!!!",
         newUser: req.user//ESE REQ. USER LO GENERA PASSPORT
     })

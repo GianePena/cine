@@ -21,7 +21,6 @@ class CartManagerMONGO {
         }
         cartToUpdate.products.forEach(p => {
             if (p.product._id.toString() === pid) {
-                console.log('entro al')
                 p.quantity = quantity;
             }
         });
@@ -32,11 +31,8 @@ class CartManagerMONGO {
         if (!cartToUpdate) {
             throw new Error("Carrito no encontrado")
         }
-        console.log(cartToUpdate);
         const finalProducts = cartToUpdate.products.concat(products)
-        console.log('finalProducts', finalProducts)
         cartToUpdate.products = finalProducts
-        console.log(cartToUpdate);
         return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
     }
     async removeProduct(cid, pid) {

@@ -1,11 +1,13 @@
-import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
-const cartManager = new CartManager()
+//import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
+//const cartManager = new CartManager()
+import { cartService } from "../service/CartService.js"
 export class CartController {
-    static getCart = async (req, res) => {
+    static getCarts = async (req, res) => {
         try {
-            let cartProducts = await cartManager.getCarts()
+            let carts = await cartService.getCarts()
+            //let cartProducts = await cartManager.getCarts()
             res.setHeader('Content-Type', 'application/json')
-            return res.status(200).json({ cartProducts })
+            return res.status(200).json({ carts })
         } catch (error) {
             console.log(error);
             res.setHeader('Content-Type', 'application/json')
@@ -22,7 +24,6 @@ export class CartController {
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json({ cart });
         } catch (error) {
-            console.log(error);
             res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
@@ -34,6 +35,7 @@ export class CartController {
                 return res.status(400).json({ error: "Faltan completar todos los campos" });
             }
             const newCart = await cartManager.createCart(products, username, country);
+            res.setHeader('Content-Type', 'application/json');
             res.status(201).json({ newCart });
         } catch (error) {
             console.error("Error en el servidor:", error);
@@ -45,9 +47,10 @@ export class CartController {
         let { cid, pid } = req.params
         try {
             let updateproduct = await cartManager.updateQuantity(cid, pid, quantity)
+            res.setHeader('Content-Type', 'application/json');
             res.status(200).json({ updateproduct })
         } catch (error) {
-            console.error("Error en el servidor:", error);
+            res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
@@ -56,9 +59,11 @@ export class CartController {
         let { products } = req.body
         try {
             let updateCart = await cartManager.updateCart(cid, products)
-            res.status(200).json({ updateCart })
+            res.setHeader('Content-Type', 'application/json');
+            res.status(201).json({ updateCart })
         } catch (error) {
             console.error("Error en el servidor:", error);
+            res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
@@ -66,9 +71,10 @@ export class CartController {
         let { cid, pid } = req.params
         try {
             let removeProduct = await cartManager.removeProduct(cid, pid)
-            res.status(200).json({ removeProduct })
+            res.setHeader('Content-Type', 'application/json');
+            res.status(201).json({ removeProduct })
         } catch (error) {
-            console.error("Error en el servidor:", error);
+            res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
@@ -77,13 +83,14 @@ export class CartController {
         let { cid } = req.params
         console.log(cid);
         try {
-            let removeProducts = await cartManager.removeAllProducts(cid)
             if (!cid) {
                 return res.status(404).json({ error: `Cart ${cid} no encontrado` });
             }
-            res.status(200).json({ removeProducts })
+            let removeProducts = await cartManager.removeAllProducts(cid)
+            res.setHeader('Content-Type', 'application/json');
+            res.status(201).json({ removeProducts })
         } catch (error) {
-            console.error("Error en el servidor:", error);
+            res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }

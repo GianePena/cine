@@ -39,7 +39,7 @@ export class UserController {
         const { uid } = req.params
         try {
             const updateUser = await userManager.updateUserCart(uid, cid);
-            res.status(200).json({ updateUser });
+            res.status(201).json({ updateUser });
         } catch (error) {
             console.error("Error en el servidor:", error);
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
@@ -49,7 +49,7 @@ export class UserController {
         const { id } = req.params
         try {
             const deleteUser = await userManager.deleteUser(id)
-            res.status(200).json({ deleteUser })
+            res.status(204).json({ deleteUser })
         } catch (error) {
             console.error("Error fetching users: ", error)
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });

@@ -27,7 +27,6 @@ export const auth = (req, res, next) => {
     }
     next()
 }
-
 export const authorization = (permisos = []) => {
     return (req, res, next) => {
         permisos = permisos.map(p => p.toLowerCase())
@@ -45,3 +44,4 @@ export const authorization = (permisos = []) => {
         return next()
     }
 }
+

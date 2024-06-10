@@ -4,7 +4,7 @@ import { CartController } from '../controller/CartController.js';
 
 export const router = Router()
 
-router.get("/", CartController.getCart)
+router.get("/", CartController.getCarts)
 router.get("/:id", CartController.getCartById);
 router.delete(("/:cid"), CartController.removeAllProduct)
 router.post("/", CartController.createCart);

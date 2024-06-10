@@ -1,5 +1,6 @@
 import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js";
-const productManager = new ProductManager()
+const productManager = new ProductManager();
+import mongoose from "mongoose";
 export class ProductController {
     static getProducts = async (req, res) => {
         let { limit, page, category, title, stock, sort, available } = req.query;
@@ -36,7 +37,7 @@ export class ProductController {
                 });
             }
         } catch (error) {
-            console.error("Error al obtener productos:", error);
+            res.setHeader('Content-Type', 'application/json')
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
@@ -65,18 +66,18 @@ export class ProductController {
         let existingProduct
         try {
             existingProduct = await productManager.getProductsBy({ title })
+            if (existingProduct) {
+                res.setHeader('Content-type', 'application/json')
+                return res.status(400).json({ error: `El producto con ${title} ya existe` })
+            }
         } catch (error) {
             res.setHeader('Content-type', 'application/json')
             return res.status(500).json({ error: "Error en el servdior" })
         }
-        if (existingProduct) {
-            res.setHeader('Content-type', 'application/json')
-            return res.status(400).json({ error: `El producto con ${title} ya existe` })
-        }
         try {
             let newProduct = await productManager.addProduct({ title, category, description, price, thumbnail, stock, status })
             res.setHeader('Content-type', 'application/json')
-            return res.status(200).json({ newProduct })
+            return res.status(201).json({ newProduct })
         } catch (error) {
             res.setHeader('Content-type', 'application/json')
             return res.status(500).json({ error: "Error en el servdior" })
@@ -109,14 +110,13 @@ export class ProductController {
             const wasDeleted = await productManager.deleteProduct(id)
             if (wasDeleted) {
                 res.setHeader('Content-type', 'application/json')
-                return res.status(200).json({ message: `Producto con ID ${id} eliminado correctamente` })
+                return res.status(204).json({ message: `Producto con ID ${id} eliminado correctamente` })
             }
         } catch (error) {
             console.log(error)
             res.setHeader('Content-type', 'application/json')
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
-
     }
 
 }
