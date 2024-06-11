@@ -5,7 +5,6 @@ export class CartController {
     static getCarts = async (req, res) => {
         try {
             let carts = await cartService.getCarts()
-            //let cartProducts = await cartManager.getCarts()
             res.setHeader('Content-Type', 'application/json')
             return res.status(200).json({ carts })
         } catch (error) {

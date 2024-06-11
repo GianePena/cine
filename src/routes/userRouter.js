@@ -35,7 +35,8 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
     }
     res.cookie('userCookie', token, { httpOnly: true });
     res.status(201).json({
-        message: "Registro correcto...!!!",
+        //message: "Registro correcto...!!!",
+        message: req.user,
     });
 });
 

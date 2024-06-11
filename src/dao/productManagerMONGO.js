@@ -19,17 +19,20 @@ class ProductManagerMONGO {
         }
         return await productModelo.paginate({}, options) //2 argumentos: filtro
     }//DEVUELVE UN OBJETO CON PROPIEDADES DOCS (ARRAY CON DOCUMENTOS), TOTAL DOC, LIMITE, ....
-    async addProduct(product) {
-        return (await productModelo.create(product))
+    async createProduct(product) {
+        return await productModelo.create(product)
     }
-    async getProductsBy(filter) {//agregar
+    async getProductsBy(filter) {
         return await productModelo.find(filter).lean()
     }
     async getProductById(id) {
         return await productModelo.findById(id)
     }
     async updateProduct(id, price) {
-        return await productModelo.findByIdAndUpdate(id, price)
+        let product = await this.getProductById(id)
+        product.price = price
+        product.save();
+        return await productModelo.updateOne({ _id: id }, { price: price })
     }
     async deleteProduct(id) {
         return await productModelo.deleteOne({ _id: id })
