@@ -26,7 +26,7 @@ class ProductManagerMONGO {
         return await productModelo.find(filter).lean()
     }
     async getProductById(id) {
-        return await productModelo.findById({ id })
+        return await productModelo.findById(id)
     }
     async updateProduct(id, price) {
         return await productModelo.findByIdAndUpdate(id, price)

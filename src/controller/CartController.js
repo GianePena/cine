@@ -17,7 +17,8 @@ export class CartController {
     static getCartById = async (req, res) => {
         try {
             const { id } = req.params
-            let cart = await cartManager.getCartById(id)
+            //let cart = await cartManager.getCartById(id)
+            let cart = await cartService.getCartById(id)
             if (!cart) {
                 return res.status(404).json({ error: 'Cart not found' });
             }
@@ -30,11 +31,11 @@ export class CartController {
     }
     static createCart = async (req, res) => {
         try {
-            const { products, username, country } = req.body;
-            if (!products) {
+            const { products, username } = req.body;
+            if (!products && !username) {
                 return res.status(400).json({ error: "Faltan completar todos los campos" });
             }
-            const newCart = await cartManager.createCart(products, username, country);
+            const newCart = await cartService.createCart(products, username)
             res.setHeader('Content-Type', 'application/json');
             res.status(201).json({ newCart });
         } catch (error) {
@@ -46,7 +47,7 @@ export class CartController {
         let { quantity } = req.body
         let { cid, pid } = req.params
         try {
-            let updateproduct = await cartManager.updateQuantity(cid, pid, quantity)
+            let updateproduct = await cartService.updateQuantity(cid, pid, quantity)
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({ updateproduct })
         } catch (error) {
@@ -58,7 +59,7 @@ export class CartController {
         let { cid } = req.params
         let { products } = req.body
         try {
-            let updateCart = await cartManager.updateCart(cid, products)
+            let updateCart = await cartService.updateCart(cid, products)
             res.setHeader('Content-Type', 'application/json');
             res.status(201).json({ updateCart })
         } catch (error) {
@@ -70,7 +71,7 @@ export class CartController {
     static removeProduct = async (req, res) => {
         let { cid, pid } = req.params
         try {
-            let removeProduct = await cartManager.removeProduct(cid, pid)
+            let removeProduct = await cartService.removeProduct(cid, pid)
             res.setHeader('Content-Type', 'application/json');
             res.status(201).json({ removeProduct })
         } catch (error) {
@@ -86,7 +87,7 @@ export class CartController {
             if (!cid) {
                 return res.status(404).json({ error: `Cart ${cid} no encontrado` });
             }
-            let removeProducts = await cartManager.removeAllProducts(cid)
+            let removeProducts = await cartService.removeAllProducts(cid)
             res.setHeader('Content-Type', 'application/json');
             res.status(201).json({ removeProducts })
         } catch (error) {

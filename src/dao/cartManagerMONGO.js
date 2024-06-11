@@ -1,7 +1,7 @@
 
 import { cartModelo } from "./models/cartModelo.js";
 class CartManagerMONGO {
-    async getCarts() {
+    async getAll() {
         return await cartModelo.find();
     }
     async getCartById(id) {

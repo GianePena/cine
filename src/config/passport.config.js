@@ -29,7 +29,6 @@ export const initPassport = () => {
     passport.use(
         "github",
         new github.Strategy({
-
             clientID: config.CLIENT_ID_GITHUB,
             clientSecret: config.CLIENT_SECRET_GITHUB,
             callbackURL: config.CALLBACK_URL_GITHUB

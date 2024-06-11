@@ -1,6 +1,5 @@
-import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js";
-const productManager = new ProductManager();
 import mongoose from "mongoose";
+import { productService } from "../service/ProductService.js";
 export class ProductController {
     static getProducts = async (req, res) => {
         let { limit, page, category, title, stock, sort, available } = req.query;
@@ -18,7 +17,7 @@ export class ProductController {
                 if (available) {
                     filter.stock = { $gt: 0 };
                 }
-                const products = await productManager.getProductsBy(filter);
+                const products = await productService.getProductBy(filter)
                 return res.status(200).json(products);
             } else {
                 const { docs: products, totalDocs, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await productManager.getProductsPaginate(page, limit, sort);
@@ -47,7 +46,7 @@ export class ProductController {
             return res.status(400).json({ error: "ingrese un id valido" })
         }
         try {
-            let product = await productManager.getProductById({ _id: id })
+            let product = await productService.getProductById(id)
             res.setHeader('Content-Type', 'application/json')
             res.status(200).json(product)
         } catch (error) {
@@ -58,14 +57,13 @@ export class ProductController {
     }
     static addProducts = async (req, res) => {
         const { title, category, description, price, thumbnail, stock, status } = req.body;
-        console.log(`Received data - title: ${title}, category: ${category}, description: ${description}, price: ${price}, thumbnail: ${thumbnail}, stock: ${stock}, status: ${status}`);
         if (!title || !category || !description || !price || !thumbnail || !stock || !status) {
             res.setHeader('Content-type', 'application/json')
             return res.status(400).json({ error: "completar la totalidad de los campos" })
         }
         let existingProduct
         try {
-            existingProduct = await productManager.getProductsBy({ title })
+            existingProduct = await productService.getProductBy({ title })
             if (existingProduct) {
                 res.setHeader('Content-type', 'application/json')
                 return res.status(400).json({ error: `El producto con ${title} ya existe` })
@@ -75,7 +73,7 @@ export class ProductController {
             return res.status(500).json({ error: "Error en el servdior" })
         }
         try {
-            let newProduct = await productManager.addProduct({ title, category, description, price, thumbnail, stock, status })
+            let newProduct = await productService.createProduct({ title, category, description, price, thumbnail, stock, status })
             res.setHeader('Content-type', 'application/json')
             return res.status(201).json({ newProduct })
         } catch (error) {
@@ -91,7 +89,7 @@ export class ProductController {
             return res.status(400).json(error + "Ingrese un id valido")
         }
         try {
-            let updatedProduct = await productManager.updateProduct(id, price);
+            let updatedProduct = await productService.updateProduct(id, price)
             res.setHeader('Content-type', 'application/json')
             res.status(200).json({ message: `Producto con ID ${id} actualizado correctamente`, product: updatedProduct });
         } catch (error) {
@@ -107,7 +105,7 @@ export class ProductController {
             return res.status(400).json(error + "Ingrese un id valido")
         }
         try {
-            const wasDeleted = await productManager.deleteProduct(id)
+            const wasDeleted = await productService.deleteProduct(id)
             if (wasDeleted) {
                 res.setHeader('Content-type', 'application/json')
                 return res.status(204).json({ message: `Producto con ID ${id} eliminado correctamente` })

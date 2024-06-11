@@ -29,16 +29,14 @@ router.get("/error", (req, res) => {
 router.get('/github', passport.authenticate("github", {}), (req, res) => { });
 
 router.get('/callbackGithub', passport.authenticate("github", { session: false }), (req, res) => {
-    // Registro y login 
-    const user = req.user
-    if (!user) {
-        return res.status(401).json({ message: 'Autenticacion fallida' });
+    const token = req.user;
+    if (!token) {
+        return res.status(401).json({ message: 'Autenticación fallida' });
     }
-    const token = jwt.sign({ email: user.email }, config.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('userCookie', token, { httpOnly: true });
     res.status(201).json({
         message: "Registro correcto...!!!",
-    })
+    });
 });
 
 
@@ -61,6 +59,7 @@ router.post("/login", passport.authenticate("login", { session: false }),
         let token = jwt.sign(user, config.JWT_SECRET, { expiresIn: "1h" })
         res.cookie("userCookie", token, { httpOnly: true })
         if (web) {
+            //return res.redirect("/products")
             return res.redirect("/user/data");
         }
         else {
