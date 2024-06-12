@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+
 import { productService } from "../service/ProductService.js";
 export class ProductController {
     static getAllProducts = async (req, res) => {

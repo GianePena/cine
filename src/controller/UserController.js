@@ -1,10 +1,9 @@
+import { userService } from "../service/UserService.js"
 
-import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js"
-const userManager = new UserManager()
 export class UserController {
     static getUsers = async (req, res) => {
         try {
-            const users = await userManager.getUsers()
+            const users = await userService.getAllUsers()
             res.status(200).json({ users })
         } catch (error) {
             console.error("Error fetching users: ", error)
@@ -14,7 +13,7 @@ export class UserController {
     static getUserBy = async (req, res) => {
         const { id } = req.params
         try {
-            let user = await userManager.getById(id)
+            let user = await userService.getUserById(id)
             if (!user) {
                 console.log(`Usuario con ID ${id} no encontrado`);
                 res.status(404).json({ message: "usuario no encontrado" })
@@ -38,7 +37,7 @@ export class UserController {
         const { cid } = req.body
         const { uid } = req.params
         try {
-            const updateUser = await userManager.updateUserCart(uid, cid);
+            const updateUser = await userService.updateUserCart(uid, cid)
             res.status(201).json({ updateUser });
         } catch (error) {
             console.error("Error en el servidor:", error);
@@ -48,7 +47,7 @@ export class UserController {
     static deleteUser = async (req, res) => {
         const { id } = req.params
         try {
-            const deleteUser = await userManager.deleteUser(id)
+            const deleteUser = await userService.deleteUser(id)
             res.status(204).json({ deleteUser })
         } catch (error) {
             console.error("Error fetching users: ", error)
