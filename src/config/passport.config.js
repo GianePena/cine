@@ -39,7 +39,7 @@ export const initPassport = () => {
                     let name = profile._json.name
                     let email = profile._json.email
                     if (!name || !email) {
-                        return done(null, false)
+                        return done(null, false, { message: "Datos insuficiente no posee nombre o email en su cuenta de github" })
                     }
                     let user = await userManager.getBy({ email })
                     if (!user) {
