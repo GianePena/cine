@@ -1,11 +1,12 @@
-
+import { ProductDTO } from "../DTO/ProductDTO.js";
 import { productService } from "../service/ProductService.js";
 export class ProductController {
     static getAllProducts = async (req, res) => {
         try {
             let products = await productService.getProducts()
+            let productDto = products.map(p => new ProductDTO(p))
             res.setHeader('Content-Type', 'application/json')
-            return res.status(200).json({ products })
+            return res.status(200).json({ productDto })
         } catch (error) {
             console.log(error);
             res.setHeader('Content-Type', 'application/json')
@@ -65,6 +66,7 @@ export class ProductController {
     }
     static addProduct = async (req, res) => {
         const { title, category, description, price, thumbnail, stock, status } = req.body;
+        console.log({ title, category, description, price, thumbnail, stock, status });
         if (!title || !category || !description || !price || !thumbnail || !stock || !status) {
             res.setHeader('Content-type', 'application/json')
             return res.status(400).json({ error: "completar la totalidad de los campos" })

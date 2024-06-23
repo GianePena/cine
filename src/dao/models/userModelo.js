@@ -42,4 +42,4 @@ userSchema.pre('find', function () {
 export const userModelo = mongoose.model(
     userCollection,
     userSchema
-) 
+)

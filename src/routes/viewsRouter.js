@@ -2,7 +2,8 @@ import { Router } from "express"
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js";
 import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js"
 import passport from "passport";
-
+import { authorization } from "../middleware/auth.js";
+import { passportCall } from "../utils.js";
 export const router = Router()
 const cartManager = new CartManager();
 const productManager = new ProductManager("./api/products.json");
@@ -20,7 +21,7 @@ router.get('/realtimeproducts', (req, res) => {
 })
 
 
-router.get('/chat', (req, res) => {
+router.get('/chat', passportCall("jwt"), authorization(["user"]), (req, res) => {
     res.status(200).render('chat');
 });
 

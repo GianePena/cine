@@ -27,21 +27,19 @@ export const auth = (req, res, next) => {
     }
     next()
 }
+
 export const authorization = (permisos = []) => {
     return (req, res, next) => {
         permisos = permisos.map(p => p.toLowerCase())
-        if (permisos.includes("user")) {
-            return next()
-        }
         if (!req.user.rol) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(401).json({ error: `No hay usuarios autenticados, o problema con el rol` })
         }
-        if (!permisos.includes(req.user.rol.toLowerCase())) {
+        const userRol = req.user.rol.toLowerCase();
+        if (!permisos.includes(userRol)) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(403).json({ error: `Privilegios insuficientes para acceder al recurso` })
         }
         return next()
     }
 }
-

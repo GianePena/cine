@@ -9,19 +9,22 @@
 
 <h3>Agregar producto</h3>
 
-<form id="addProductForm">
-        <input type="text" id="title" placeholder="Title">
-    <input type="text" id="category" placeholder="Category">
-    <input type="text" id="description" placeholder="Description">
-    <input type="text" id="price" placeholder="Price">
-    <input type="text" id="thumbnail" placeholder="Thumbnail">
-    <input type="text" id="stock" placeholder="Stock">
-    <input type="text" id="status"placeholder="Status">
-    <button type="submit">Agregar Producto</button>
-</form><br><br>
+<form action="/api/products" method="post">
+    Titulo: <input type="text" name="title">
+    Categoria: <input type="text" name="category" >
+    Descripcion:<input type="text" name="description">
+    Precio:<input type="text" name="price">
+    Imagen:<input type="text" name="thumbnail">
+    Stock: <input type="text" name="stock">
+    Status: <input type="text" name="status">
+    <input type="submit" value="Crear Producto" >
+</form>
+
+
 <h3>Eliminar producto</h3>
+
 <form id ="deleteProductForm">
-    <input type="text" id="codeProductDeleted"placeholder="codigo de producto a eliminar">
+    Id: <input type="text" id="codeProductDeleted">
     <button type="submit">Eliminar Producto</button>
 </form>
 <br>

@@ -20,5 +20,13 @@ export const passportCall = (estrategia) => {
     }
 }
 
+import { cartModelo } from "./DAO/models/cartModelo.js"
 
-
+export const amount = async (cid) => {
+    const cart = await cartModelo.findById(cid).populate('products.product');
+    if (!cart) throw new Error('Cart not found');
+    let total = cart.products.reduce((acum, item) => {
+        return acum + (item.product.price * item.quantity)
+    }, 0)
+    return total
+}

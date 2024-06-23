@@ -51,7 +51,6 @@ const handleAddToCartClick = async (productsId) => {
             alert("Error al agregar al carrito: " + data.error);
         }
     }
-
 }
 
 

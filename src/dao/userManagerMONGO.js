@@ -13,7 +13,7 @@ class UserManagerMONGO {
     async createUser(user) {
         return await userModelo.create(user)
     }
-    async updateUserCart(uid, cid) {
+    async updateCart(uid, cid) {
         const user = await userModelo.findById(uid);
         if (!user) {
             throw new Error('Usuario no encontrado');
@@ -26,9 +26,10 @@ class UserManagerMONGO {
         await user.save();
         return user;
     }
-    async deleteUser(id) {
+    async delete(id) {
         return await userModelo.deleteOne({ _id: id })
     }
+
 }
 
 export { UserManagerMONGO }

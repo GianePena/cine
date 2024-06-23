@@ -61,7 +61,11 @@ router.post("/login", passport.authenticate("login", { session: false }),
         res.cookie("userCookie", token, { httpOnly: true })
         if (web) {
             //return res.redirect("/products")
-            return res.redirect("/user/data");
+            if (user.rol === "admin") {
+                return res.redirect("/realTimeProducts");
+            }
+            //return res.redirect("/user/data");
+            return res.redirect("/products");
         }
         else {
             res.setHeader('Content-Type', 'application/json');
@@ -72,6 +76,6 @@ router.post("/login", passport.authenticate("login", { session: false }),
 )
 router.get("/data", passportCall("jwt"), authorization(["user", "admin"]), UserController.getData)
 router.get("/", UserController.getUsers)
-router.get("/:id", UserController.getUserBy)
+router.get("/:id", UserController.getBy)
 router.put("/:uid", UserController.updateUserCart);
 router.delete("/:id", UserController.deleteUser)

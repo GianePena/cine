@@ -61,8 +61,8 @@ export const initPassport = () => {
         },
             async (req, username, password, done) => {
                 try {
-                    let { firstName, lastName, age } = req.body
-                    if (!firstName || !lastName || !age) {
+                    let { first_name, last_name, age } = req.body
+                    if (!first_name || !last_name || !age) {
                         return done(null, false)
                     }
                     const userExistente = await userManager.getBy({ email: username })
@@ -74,7 +74,7 @@ export const initPassport = () => {
                         rol = "admin"
                     }
                     password = generaHash(password)
-                    let newUser = await userManager.createUser({ firstName, lastName, email: username, age, password, rol })
+                    let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password, rol })
                     return done(null, newUser)
                 } catch (error) {
                     return done(error)
