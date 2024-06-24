@@ -11,18 +11,20 @@ class CartManagerMONGO {
     async getCartById(id) {
         return await cartModelo.findById(id).populate('products.product').lean();
     }
-    async create(products, username) {
+    async findUserBy(filtro) {
+        return await userModelo.findOne({ filtro });
+    }
+    async create(products) {
         return await cartModelo.create({
-            products: products,
-            username: username
+            products: products
         })
     }
     async updateQuantity(cid, pid, quantity) {
-        let cart = await this.getCartById(cid)
-        if (!cart) {
+        let cartToUpdate = await this.getCartById(cid)
+        if (!cartToUpdate) {
             throw new Error("Carrito no encontrado")
         }
-        cart.products.forEach(p => {
+        cartToUpdate.products.forEach(p => {
             if (p.product._id.toString() === pid) {
                 p.quantity = quantity;
             }
@@ -34,9 +36,9 @@ class CartManagerMONGO {
         if (!cartToUpdate) {
             throw new Error("Carrito no encontrado")
         }
-        const finalProducts = cartToUpdate.products.concat(products)
+        const finalProducts = cartToUpdate.products.concat({ products })
         cartToUpdate.products = finalProducts
-        return await cart.save();
+        return await cartModelo.updateOne({ _id: cid }, { products: finalProducts });
     }
     async removeProduct(cid, pid) {
         let cartToUpdate = await this.getCartById(cid)
@@ -58,9 +60,9 @@ class CartManagerMONGO {
         const newTicket = new ticketModelo({ amount, purchaser });
         return await newTicket.save();
     }
-    /*async findUserByCartId(cid) {
-        return await userModelo.findOne({ cart: cid });
-    }*/
+    async findUserByCartId(cartId) {
+        return await userModelo.findOne({ cart: cartId });
+    }
     async findUserBy(filtro) {
         return await userModelo.findOne({ filtro });
     }

@@ -1,15 +1,11 @@
-import mongoose from "mongoose";
-
+import { CartDTO } from "../DTO/CartDTO.js"
 import { cartService } from "../service/CartService.js"
-import { ticketModelo } from "../DAO/models/ticketModelo.js"
-import { amount } from '../utils.js';
-import { userModelo } from "../DAO/models/userModelo.js"
-import { productModelo } from "../DAO/models/productModelo.js";
-import { cartModelo } from "../DAO/models/cartModelo.js";
+
 export class CartController {
     static getCarts = async (req, res) => {
         try {
             let carts = await cartService.getCarts()
+            let cartDTO = carts.map(c => new CartDTO(c))
             res.setHeader('Content-Type', 'application/json')
             return res.status(200).json({ carts })
         } catch (error) {
@@ -21,26 +17,28 @@ export class CartController {
     static getCartById = async (req, res) => {
         try {
             const { id } = req.params
-            let cartResult = await cartService.getCartById(id)
+            let cart = await cartService.getCartById(id)
             res.setHeader('Content-Type', 'application/json');
-            return res.status(200).json({ cartResult });
+            return res.status(200).json(new CartDTO(cart));
         } catch (error) {
             res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
+
     static createCart = async (req, res) => {
-        const { uid } = req.params;
-        const { products } = req.body;
+        const { product, quantity } = req.body;
+
         try {
-            const newCart = await cartService.createCart(uid, products);
+            const newCart = await cartService.createCart([{ product, quantity }]);
             res.status(201).json({ newCart });
         } catch (error) {
             console.error("Error en el servidor:", error);
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
-    //-------------
+
+
     static updateQuantity = async (req, res) => {
         let { quantity } = req.body
         let { cid, pid } = req.params
@@ -48,7 +46,9 @@ export class CartController {
             let updateproduct = await cartService.updateQuantity(cid, pid, quantity)
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({ updateproduct })
+
         } catch (error) {
+            console.log(error);
             res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
@@ -57,9 +57,9 @@ export class CartController {
         let { cid } = req.params
         let { products } = req.body
         try {
-            let updateCart = await cartService.updateCart(cid, products)
+            const updateCart = await cartService.updateCart(cid, products)
             res.setHeader('Content-Type', 'application/json');
-            res.status(201).json({ updateCart })
+            res.status(201).json(new CartDTO(updateCart))
         } catch (error) {
             console.error("Error en el servidor:", error);
             res.setHeader('Content-Type', 'application/json');
@@ -71,7 +71,7 @@ export class CartController {
         try {
             let removeProduct = await cartService.removeProduct(cid, pid)
             res.setHeader('Content-Type', 'application/json');
-            res.status(201).json({ removeProduct })
+            res.status(201).json(`Producto eliminado con exito: ${removeProduct}`)
         } catch (error) {
             res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
@@ -85,7 +85,7 @@ export class CartController {
             }
             let removeProducts = await cartService.removeAllProducts(cid)
             res.setHeader('Content-Type', 'application/json');
-            res.status(201).json({ removeProducts })
+            res.status(201).json(`Cart ${cid} productos eliminados con exito`)
         } catch (error) {
             res.setHeader('Content-Type', 'application/json');
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });

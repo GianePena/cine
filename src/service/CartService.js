@@ -1,5 +1,6 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
-
+import mongoose from "mongoose"
+import { cartModelo } from "../DAO/models/cartModelo.js"
 class CartService {
     constructor(dao) {
         this.dao = dao
@@ -20,29 +21,46 @@ class CartService {
         }
         return this.dao.getCartById(id)
     }
-    createCart = async (uid, products) => {
-        const user = await this.dao.findUserBy({ id: uid })
-        if (!user) {
-            throw new Error("Usuario no encontrado: Registrarse");
-        }
-        if (user.rol === "user") {
-            const newCart = await this.dao.create(products, user.first_name)
-            return newCart
-        } else {
-            throw new Error(`No es un usuario con rol "user"`);
-        }
+    createCart = async (products) => {
+        const newCart = await cartModelo.create({
+            products: products.map(p => ({
+                product: p.product,
+                quantity: p.quantity || 1,
+            }))
+        });
+
+        return newCart;
+
     }
+
+
+
     updateQuantity = async (cid, pid, quantity) => {
         return this.dao.updateQuantity(cid, pid, quantity)
     }
-    updateCart = async (id, products) => {
-        return this.dao.updateCart(id, products)
+    updateCart = async (cid, products) => {
+        const cart = await this.dao.getCartById(cid)
+        if (!cart) {
+            throw new Error("Carrito no encontrado")
+        }
+        const updateCart = await this.dao.updateCart(cid, products)
+        return updateCart
     }
     removeProduct = async (cid, pid) => {
-        return this.dao.removeProduct(cid, pid)
+        const cart = await this.dao.getCartById(cid)
+        if (!cart) {
+            throw new Error("Carrito no encontrado")
+        }
+        const updateCart = await this.dao.removeProduct(cid, pid)
+        return updateCart
     }
     removeAllProducts = async (cid) => {
-        return this.dao.removeAllProducts(cid)
+        const cart = await this.dao.getCartById(cid)
+        if (!cart) {
+            throw new Error("Carrito no encontrado")
+        }
+        const updateCart = await this.dao.removeAllProducts(cid)
+        return updateCart
     }
     purchase = async (cid) => {
         const cart = await this.dao.getCartById(cid)

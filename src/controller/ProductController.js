@@ -57,7 +57,7 @@ export class ProductController {
         try {
             let product = await productService.getProductById(id)
             res.setHeader('Content-Type', 'application/json')
-            res.status(200).json(product)
+            res.status(200).json(new ProductDTO(product))
         } catch (error) {
             console.log(error);
             res.setHeader('Content-Type', 'application/json')

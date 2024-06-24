@@ -9,21 +9,32 @@ const cartSchema = new mongoose.Schema(
                 {
                     product: {
                         type: mongoose.Types.ObjectId,
-                        ref: 'products'
+                        ref: 'products',
+                        required: true
                     },
-                    quantity: Number
+                    quantity: {
+                        type: Number,
+                        default: 1
+                    }
                 }
             ]
         },
     }, {
-    timestamps: true,
+    timestamps: true
     //STRICT:FALSE --> PERMITE AGREGAR CAMPOS DEIFERENCTES AL MODELO AL CREACION DE UN INSTACION. EJ: FOTO --> SI LA TIENE LA GUARDA Y SI  NO NO
 
 }
 )
+
+cartSchema.pre('findOne', function () {
+    this.populate('products.product').lean();
+});
 cartSchema.pre('find', function () {
     this.populate('products.product').lean();
 });
+
+
+
 
 
 export const cartModelo = mongoose.model(
