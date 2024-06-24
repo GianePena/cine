@@ -16,11 +16,6 @@ export class UserController {
         const { id } = req.params
         try {
             let user = await userService.getUserById(id)
-            if (!user) {
-                console.log(`Usuario con ID ${id} no encontrado`);
-                res.status(404).json({ message: "usuario no encontrado" })
-            }
-            //res.status(200).json({ user })
             res.status(200).json(new userDTO(user))
         } catch (error) {
             console.error("Error fetching users: ", error)
@@ -29,9 +24,8 @@ export class UserController {
     }
     static getData = (req, res) => {
         try {
-            res.setHeader('Content-Type', 'application/json');
-            //res.status(200).json({ user: req.user });
             let user = new userDTO(req.user)
+            res.setHeader('Content-Type', 'application/json');
             res.status(200).json({ user });
         } catch (error) {
             console.error("Error fetching users: ", error)
@@ -43,7 +37,6 @@ export class UserController {
         const { uid } = req.params
         try {
             const updateUser = await userService.updateUserCart(uid, cid)
-            //res.status(201).json({ updateUser });
             res.status(201).json(new userDTO(updateUser));
         } catch (error) {
             console.error("Error en el servidor:", error);

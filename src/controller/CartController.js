@@ -66,6 +66,19 @@ export class CartController {
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
+
+
+    static addProductsToCart = async (req, res) => {
+        const { cid } = req.params;
+        const products = req.body.products
+        try {
+            const updatedCart = await cartService.addProductsToCart(cid, products);
+            res.status(200).json({ message: 'Productos agregados con éxito', updatedCart });
+        } catch (error) {
+            console.error("Error en el servidor:", error);
+            res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
+        }
+    }
     static removeProduct = async (req, res) => {
         let { cid, pid } = req.params
         try {

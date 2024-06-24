@@ -32,9 +32,9 @@ class CartService {
         return newCart;
 
     }
-
-
-
+    addProductsToCart = async (cid, products) => {
+        return this.dao.addProductsToCart(cid, products);
+    }
     updateQuantity = async (cid, pid, quantity) => {
         return this.dao.updateQuantity(cid, pid, quantity)
     }

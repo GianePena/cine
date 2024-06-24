@@ -8,8 +8,9 @@ class CartManagerMONGO {
     async getAll() {
         return await cartModelo.find();
     }
+
     async getCartById(id) {
-        return await cartModelo.findById(id).populate('products.product').lean();
+        return await cartModelo.findById(id).populate('products.product')
     }
     async findUserBy(filtro) {
         return await userModelo.findOne({ filtro });
@@ -18,6 +19,25 @@ class CartManagerMONGO {
         return await cartModelo.create({
             products: products
         })
+    }
+    async addProductsToCart(cid, newProducts) {
+        let cart = await this.getCartById(cid);
+        if (!cart) {
+            throw new Error("Carrito no encontrado");
+        }
+        newProducts.forEach(item => {
+            let existingProduct = cart.products.find(p => p.product.toString() === item.product);
+            if (existingProduct) {
+                existingProduct.quantity += item.quantity;
+            } else {
+                cart.products.push({
+                    product: item.product,
+                    quantity: item.quantity
+                });
+            }
+        });
+        await cart.save()
+        return cart
     }
     async updateQuantity(cid, pid, quantity) {
         let cartToUpdate = await this.getCartById(cid)
