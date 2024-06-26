@@ -30,3 +30,7 @@ export const amount = async (cid) => {
     }, 0)
     return total
 }
+
+
+
+

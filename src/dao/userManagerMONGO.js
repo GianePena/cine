@@ -1,5 +1,5 @@
 import { userModelo } from "./models/userModelo.js";
-import mongoose from "mongoose";
+
 class UserManagerMONGO {
     async getUsers() {
         return await userModelo.find()
@@ -13,6 +13,7 @@ class UserManagerMONGO {
     async createUser(user) {
         return await userModelo.create(user)
     }
+    /*
     async updateCart(uid, cid) {
         const user = await userModelo.findById(uid);
         if (!user) {
@@ -25,7 +26,7 @@ class UserManagerMONGO {
         }
         await user.save();
         return user;
-    }
+    }*/
     async delete(id) {
         return await userModelo.deleteOne({ _id: id })
     }

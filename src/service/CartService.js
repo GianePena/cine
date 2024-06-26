@@ -1,6 +1,5 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
-import mongoose from "mongoose"
-import { cartModelo } from "../DAO/models/cartModelo.js"
+
 class CartService {
     constructor(dao) {
         this.dao = dao
@@ -21,16 +20,9 @@ class CartService {
         }
         return this.dao.getCartById(id)
     }
-    createCart = async (products) => {
-        const newCart = await cartModelo.create({
-            products: products.map(p => ({
-                product: p.product,
-                quantity: p.quantity || 1,
-            }))
-        });
-
+    createCart = async (uid, products) => {
+        const newCart = await this.dao.create(uid, products)
         return newCart;
-
     }
     addProductsToCart = async (cid, products) => {
         return this.dao.addProductsToCart(cid, products);

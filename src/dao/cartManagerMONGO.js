@@ -1,4 +1,4 @@
-
+import mongoose from "mongoose";
 import { cartModelo } from "./models/cartModelo.js";
 import { ticketModelo } from "./models/ticketModelo.js";
 import { userModelo } from "./models/userModelo.js";
@@ -12,13 +12,28 @@ class CartManagerMONGO {
     async getCartById(id) {
         return await cartModelo.findById(id).populate('products.product')
     }
-    async findUserBy(filtro) {
-        return await userModelo.findOne({ filtro });
+    async findUserBy(uid) {
+        return await userModelo.findById(uid);
     }
-    async create(products) {
-        return await cartModelo.create({
-            products: products
-        })
+    async findUserByCartId(cartId) {
+        return await userModelo.findOne({ cart: cartId });
+    }
+    async create(uid, products) {
+        let user = await this.findUserBy(uid)
+        if (!user) {
+            throw new Error("Usuario no encontrado, registarse ");
+        }
+        if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
+            const newCart = await cartModelo.create({
+                products: products.map(p => ({
+                    product: new mongoose.Types.ObjectId(p.product),
+                    quantity: p.quantity || 1,
+                }))
+            });
+            user.cart = newCart._id;
+            await user.save();
+            return newCart;
+        }
     }
     async addProductsToCart(cid, newProducts) {
         let cart = await this.getCartById(cid);
@@ -79,12 +94,6 @@ class CartManagerMONGO {
     async createTicket(amount, purchaser) {
         const newTicket = new ticketModelo({ amount, purchaser });
         return await newTicket.save();
-    }
-    async findUserByCartId(cartId) {
-        return await userModelo.findOne({ cart: cartId });
-    }
-    async findUserBy(filtro) {
-        return await userModelo.findOne({ filtro });
     }
     async updateProductStock(productId, quantity) {
         return await productModelo.findByIdAndUpdate(productId, { $inc: { stock: -quantity } });

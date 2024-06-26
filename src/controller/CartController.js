@@ -25,20 +25,17 @@ export class CartController {
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
-
     static createCart = async (req, res) => {
-        const { product, quantity } = req.body;
-
+        const { uid } = req.params;
+        const { products } = req.body;
         try {
-            const newCart = await cartService.createCart([{ product, quantity }]);
+            const newCart = await cartService.createCart(uid, products);
             res.status(201).json({ newCart });
         } catch (error) {
             console.error("Error en el servidor:", error);
             res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
         }
     }
-
-
     static updateQuantity = async (req, res) => {
         let { quantity } = req.body
         let { cid, pid } = req.params
