@@ -16,7 +16,7 @@ router.get('/products/json', (req, res) => {
     res.status(200).render('index', { products })
 })
 
-router.get('/realtimeproducts', passportCall("jwt"), authorization(["user"]), (req, res) => {
+router.get('/realtimeproducts', passportCall("jwt"), authorization(["admin"]), (req, res) => {
     res.status(200).render('realTimeProducts')
 })
 
@@ -25,7 +25,7 @@ router.get('/chat', passportCall("jwt"), authorization(["user"]), (req, res) => 
     res.status(200).render('chat');
 });
 
-router.get('/products', passport.authenticate("jwt", { session: false }), async (req, res, next) => {
+router.get('/products', passportCall("jwt"), authorization(["admin"]), async (req, res, next) => {
     let { limit, page, sort } = req.query;
     limit = limit ? Number(limit) : 10;
     page = page ? Number(page) : 1;
@@ -51,6 +51,33 @@ router.get('/products', passport.authenticate("jwt", { session: false }), async 
     }
 });
 
+/*
+router.get('/products', passport.authenticate("jwt", { session: false }), async (req, res, next) => {
+    let { limit, page, sort } = req.query;
+    limit = limit ? Number(limit) : 10;
+    page = page ? Number(page) : 1;
+    try {
+        const { docs: products, totalDocs, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await productManager.getProductsPaginate(page, limit, sort);
+        return res.status(200).render('products', {
+            user: req.user,
+            products,
+            totalDocs,
+            totalPages,
+            page,
+            limit,
+            hasPrevPage,
+            hasNextPage,
+            prevPage,
+            nextPage,
+            linkPrevPage: prevPage ? `?limit=${limit}&page=${prevPage}` : null,
+            linkNextPage: nextPage ? `?limit=${limit}&page=${nextPage}` : null,
+        });
+    }
+    catch (error) {
+        next(error)
+    }
+});
+*/
 router.get('/logout', (req, res) => {
     res.clearCookie("userCookie");
     res.redirect("/login");
