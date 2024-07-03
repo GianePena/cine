@@ -20,7 +20,7 @@ export const passportCall = (estrategia) => {
     }
 }
 
-import { cartModelo } from "./DAO/models/cartModelo.js"
+import { cartModelo } from "../DAO/models/cartModelo.js"
 
 export const amount = async (cid) => {
     const cart = await cartModelo.findById(cid).populate('products.product');

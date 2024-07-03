@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken"
 
 import { config } from "./config.js"
 import { UserManagerMONGO } from "../DAO/userManagerMONGO.js"
-import { generaHash, validarPasword } from "../utils.js"
+import { generaHash, validarPasword } from "../utils/utils.js"
 const userManager = new UserManagerMONGO
 
 
@@ -67,7 +67,7 @@ export const initPassport = () => {
                     }
                     const userExistente = await userManager.getBy({ email: username })
                     if (userExistente) {
-                        return done(null, false)
+                        return done(null, false, { message: "Usuario existente pruebe con otro email" })
                     }
                     let rol = "user"
                     if (username === config.ADMIN_EMAIL && password === config.ADMIN_PASSWORD) {
@@ -75,6 +75,7 @@ export const initPassport = () => {
                     }
                     password = generaHash(password)
                     let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password, rol })
+                    console.log(newUser)
                     return done(null, newUser)
                 } catch (error) {
                     return done(error)

@@ -1,4 +1,6 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
+import { CustomError } from "../utils/CustomError.js"
+import { TIPOS_ERRORS } from "../utils/Errors.js";
 
 class CartService {
     constructor(dao) {
@@ -16,7 +18,7 @@ class CartService {
     getCartById = async (id) => {
         const cart = await this.dao.getCartById(id)
         if (!cart) {
-            return res.status(404).json({ error: 'Cart not found' });
+            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
         return this.dao.getCartById(id)
     }
@@ -33,7 +35,7 @@ class CartService {
     updateCart = async (cid, products) => {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
-            throw new Error("Carrito no encontrado")
+            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
         const updateCart = await this.dao.updateCart(cid, products)
         return updateCart
@@ -41,7 +43,7 @@ class CartService {
     removeProduct = async (cid, pid) => {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
-            throw new Error("Carrito no encontrado")
+            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
         const updateCart = await this.dao.removeProduct(cid, pid)
         return updateCart
@@ -49,7 +51,7 @@ class CartService {
     removeAllProducts = async (cid) => {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
-            throw new Error("Carrito no encontrado")
+            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
         const updateCart = await this.dao.removeAllProducts(cid)
         return updateCart
@@ -57,7 +59,7 @@ class CartService {
     purchase = async (cid) => {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
-            throw new Error("Carrito no encontrado");
+            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
         let insufficientStock = [];
         let totalAmount = 0;
@@ -74,10 +76,10 @@ class CartService {
         }
         const user = await this.dao.findUserByCartId(cid)
         if (!user) {
-            throw new Error("Usuario no encontrado");
+            CustomError.createError("User NotFound Error", `User con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+
         }
         const ticket = await this.dao.createTicket(totalAmount, user.email);
-
         for (let item of cart.products) {
             await this.dao.updateProductStock(item.product._id, item.quantity)
         }

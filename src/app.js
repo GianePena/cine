@@ -1,6 +1,7 @@
 //EXPRESS
 import express from "express";
 import { config } from "./config/config.js";
+import compression from "express-compression";
 //HANDLEBARS
 import { engine } from "express-handlebars";
 //ROUTES
@@ -19,7 +20,8 @@ import cookieParser from "cookie-parser";
 //PASPORT
 import passport from "passport";
 import { initPassport } from "./config/passport.config.js";
-
+//MIDDLEWARE DE  ERRORES
+import { errorHandler } from "./middleware/errorHandler.js";
 
 import { ProductManagerMONGO as ProductManager } from "./DAO/productManagerMONGO.js";
 import { messageModelo } from "./dao/models/messagesModelo.js"
@@ -31,6 +33,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //COOKIES
 app.use(cookieParser())
+//COMPRESSION --> comprime toda la salida siempre y cuando este comprimida por otro metodo antes
+app.use(compression({ brotli: { enabled: true } }))//indica que comprima con el metodo brotli
+//ver el tipo de compresein segun la informacion que se envia
+//--------------------------------------
+
 
 //PASPORT JWT
 initPassport()
@@ -47,6 +54,8 @@ app.use("/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/", viewsRouter);
+//MIDDLEWARE DE  ERRORES
+app.use(errorHandler)
 
 const serverHTTP = app.listen(PORT, () => {
     console.log("SERVER ONLINE");

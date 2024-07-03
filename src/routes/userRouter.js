@@ -1,10 +1,12 @@
+
 import { Router } from "express";
 import passport from "passport";
 
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js";
 import { UserController } from "../controller/UserController.js";
-import { passportCall } from "../utils.js";
+import { passportCall } from "../utils/utils.js";
+
 import { authorization } from "../middleware/auth.js"
 
 import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js";

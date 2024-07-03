@@ -3,7 +3,7 @@ import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js";
 import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js"
 import passport from "passport";
 import { authorization } from "../middleware/auth.js";
-import { passportCall } from "../utils.js";
+import { passportCall } from "../utils/utils.js";
 export const router = Router()
 const cartManager = new CartManager();
 const productManager = new ProductManager("./api/products.json");
@@ -16,7 +16,7 @@ router.get('/products/json', (req, res) => {
     res.status(200).render('index', { products })
 })
 
-router.get('/realtimeproducts', (req, res) => {
+router.get('/realtimeproducts', passportCall("jwt"), authorization(["user"]), (req, res) => {
     res.status(200).render('realTimeProducts')
 })
 
@@ -25,7 +25,7 @@ router.get('/chat', passportCall("jwt"), authorization(["user"]), (req, res) => 
     res.status(200).render('chat');
 });
 
-router.get('/products', passport.authenticate("jwt", { session: false }), async (req, res) => {
+router.get('/products', passport.authenticate("jwt", { session: false }), async (req, res, next) => {
     let { limit, page, sort } = req.query;
     limit = limit ? Number(limit) : 10;
     page = page ? Number(page) : 1;
@@ -47,8 +47,7 @@ router.get('/products', passport.authenticate("jwt", { session: false }), async 
         });
     }
     catch (error) {
-        console.error("Error al obtener productos:", error);
-        res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
+        next(error)
     }
 });
 
