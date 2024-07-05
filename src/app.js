@@ -47,6 +47,9 @@ app.use(passport.initialize())
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set("views", "./src/views")
+
+//MIDDLEWARE DE  ERRORES
+app.use(errorHandler)
 //ARCHIVOS ESTATICOS
 app.use(express.static("./src/public"))
 //ROUTES
@@ -54,8 +57,7 @@ app.use("/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/", viewsRouter);
-//MIDDLEWARE DE  ERRORES
-app.use(errorHandler)
+
 
 const serverHTTP = app.listen(PORT, () => {
     console.log("SERVER ONLINE");

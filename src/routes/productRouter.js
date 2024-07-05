@@ -14,7 +14,6 @@ router.get('/mockingproducts', (req, res) => {
 router.get("/", ProductController.getProducts);
 router.get("/all", ProductController.getAllProducts);
 router.get("/:id", ProductController.getProductsById)
-//router.post("/", passportCall("jwt"), authorization(["admin"]), ProductController.addProduct);
-router.post("/", ProductController.addProduct);
+router.post("/", passportCall("jwt"), authorization(["admin"]), ProductController.addProduct);
 router.put("/:id", passportCall("jwt"), authorization(["admin"]), ProductController.updateProduct);
 router.delete("/:id", passportCall("jwt"), authorization(["admin"]), ProductController.deleteProduct)

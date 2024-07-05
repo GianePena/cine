@@ -1,7 +1,3 @@
-//CAPTURA Y PROCESSA LOS ERRORES 
-//ESTE SE PASA A NIVEL DE APLICAION EN EL APP.JS AL FINAL DE TODAS LAS RUTAS --> app.use(errorHandler)
-//se define al final de todas las rutas y middlewares y se encarga de capturar todos los errores que no se hayan manejado previamente, y proporciona respuestas estructuradas.
-
 import { TIPOS_ERRORS } from "../utils/Errors.js"
 
 
