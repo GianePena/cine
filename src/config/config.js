@@ -6,13 +6,18 @@ programa.addOption(new Option("-m, --mode <modo>", "Mode de ejecución del scrip
 programa.parse()
 const argumentos = programa.opts()
 
+
 const mode = argumentos.mode
+//node src/app.js --mode prod
+//node src/app.js --mode dev
+
 dotenv.config({
     path: mode === "prod" ? "./src/.env.production" : "./src/.env.development",
     override: true
 
 })
 export const config = {
+    NODE_ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
     MONGO_URL: process.env.MONGO_URL,
     DB_NAME: process.env.DB_NAME,

@@ -4,6 +4,7 @@ import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { argumentosProducts } from "../utils/erroresProducts.js";
 
+
 export class ProductController {
     static getAllProducts = async (req, res, next) => {
         try {
@@ -12,6 +13,7 @@ export class ProductController {
             res.setHeader('Content-Type', 'application/json')
             return res.status(200).json({ productDto })
         } catch (error) {
+            req.logger.error(`Error fetching all products: ${error.message}`)
             next(error)
         }
     }
@@ -22,6 +24,7 @@ export class ProductController {
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json(result);
         } catch (error) {
+            req.logger.error(`Error fetching product: ${error.message}`)
             next(error)
         }
     }
@@ -35,6 +38,7 @@ export class ProductController {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json(new ProductDTO(product));
         } catch (error) {
+            req.logger.error(`Error fetching product by ID ${id}: ${error.message}`)
             next(error);
         }
     }
@@ -43,13 +47,17 @@ export class ProductController {
         try {
             const datosIncompletos = argumentosProducts({ title, category, description, price, thumbnail, stock, status });
             if (datosIncompletos !== "Todos los datos están completos.") {
+                req.logger.warn('Datos incompletos necesarios para producto');
+                req.logger.debug(`Datos recibidos: ${title, category, description, price, thumbnail, stock, status}`);
                 return CustomError.createError("Faltante de datos", datosIncompletos, "Completar la totalidad de los campos para ejecutar la creación del producto", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
             }
             let newProduct = await productService.createProduct(product);
+            req.logger.info(`Producto creado exitosamente: ${newProduct}`)
             res.setHeader('Content-Type', 'application/json');
             return res.status(201).json({ newProduct });
         } catch (error) {
             next(error);
+            req.logger.error(`Error en la creacion de un nuevo producto: ${error.message}`)
         }
     }
     static updateProduct = async (req, res, next) => {
@@ -61,10 +69,12 @@ export class ProductController {
         try {
             const updatedProduct = await productService.updateProduct(id, price);
             res.setHeader('Content-type', 'application/json');
+            req.logger.info(`Producto modificado exitosamente: ${updatedProduct}`)
             res.status(200).json({ message: `Producto con ID ${id} actualizado correctamente`, product: updatedProduct });
             console.log(updatedProduct);
         } catch (error) {
             next(error)
+            req.logger.error(`Error en la modificacion del product ID${id}: ${error.message}`)
         }
     }
     static deleteProduct = async (req, res, next) => {
@@ -78,6 +88,7 @@ export class ProductController {
             return res.status(204).json({ message: `Producto con ID ${id} eliminado correctamente` })
         } catch (error) {
             next(error)
+            req.logger.error(`Error en la eliminacion del producto ID${id}: ${error.message}`)
         }
     }
 

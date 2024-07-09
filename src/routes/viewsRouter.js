@@ -1,12 +1,12 @@
 import { Router } from "express"
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js";
 import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js"
-import passport from "passport";
 import { authorization } from "../middleware/auth.js";
 import { passportCall } from "../utils/utils.js";
 export const router = Router()
 const cartManager = new CartManager();
 const productManager = new ProductManager("./api/products.json");
+
 
 
 router.get('/products/json', (req, res) => {
@@ -51,33 +51,17 @@ router.get('/products', passportCall("jwt"), authorization(["admin"]), async (re
     }
 });
 
-/*
-router.get('/products', passport.authenticate("jwt", { session: false }), async (req, res, next) => {
-    let { limit, page, sort } = req.query;
-    limit = limit ? Number(limit) : 10;
-    page = page ? Number(page) : 1;
-    try {
-        const { docs: products, totalDocs, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await productManager.getProductsPaginate(page, limit, sort);
-        return res.status(200).render('products', {
-            user: req.user,
-            products,
-            totalDocs,
-            totalPages,
-            page,
-            limit,
-            hasPrevPage,
-            hasNextPage,
-            prevPage,
-            nextPage,
-            linkPrevPage: prevPage ? `?limit=${limit}&page=${prevPage}` : null,
-            linkNextPage: nextPage ? `?limit=${limit}&page=${nextPage}` : null,
-        });
-    }
-    catch (error) {
-        next(error)
-    }
+
+router.get('/loggerTest', (req, res) => {
+    req.logger.error('Error: log test');
+    req.logger.warn('Warn: log test');
+    req.logger.info('Info: log test')
+    req.logger.http('http: log test')
+    req.logger.verbose('verbose: log test');
+    req.logger.debug('Debug: log test');
+    req.logger.silly('Silly: log test')
+    res.send('Logging tests');
 });
-*/
 router.get('/logout', (req, res) => {
     res.clearCookie("userCookie");
     res.redirect("/login");

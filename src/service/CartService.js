@@ -1,6 +1,7 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
+import { logger } from "../utils/logger.js";
 
 class CartService {
     constructor(dao) {
@@ -19,6 +20,7 @@ class CartService {
         const cart = await this.dao.getCartById(id)
         if (!cart) {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+            logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
         return this.dao.getCartById(id)
     }
@@ -36,6 +38,7 @@ class CartService {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+            logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
         const updateCart = await this.dao.updateCart(cid, products)
         return updateCart
@@ -44,6 +47,7 @@ class CartService {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+            logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
         const updateCart = await this.dao.removeProduct(cid, pid)
         return updateCart
@@ -52,6 +56,7 @@ class CartService {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+            logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
         const updateCart = await this.dao.removeAllProducts(cid)
         return updateCart
@@ -60,6 +65,7 @@ class CartService {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+            logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
         let insufficientStock = [];
         let totalAmount = 0;

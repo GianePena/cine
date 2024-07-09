@@ -8,6 +8,7 @@ export class UserController {
             const usersDto = users.map(u => new userDTO(u))
             res.status(200).json(usersDto)
         } catch (error) {
+            req.logger.error(`Error fetching all users: ${error.message}`)
             next(error)
         }
     }
@@ -17,6 +18,7 @@ export class UserController {
             let user = await userService.getUserById(id)
             res.status(200).json(new userDTO(user))
         } catch (error) {
+            req.logger.error(`Error fetching users by ${id}: ${error.message}`)
             next(error)
         }
     }
@@ -26,6 +28,7 @@ export class UserController {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json({ user });
         } catch (error) {
+            req.logger.error(`Error al obtener la data del user: ${error.message}`)
             next(error)
         }
     }
@@ -36,6 +39,7 @@ export class UserController {
             const updateUser = await userService.updateUserCart(uid, cid)
             res.status(201).json(new userDTO(updateUser));
         } catch (error) {
+            req.logger.error(`Error al modificar los datos del user: ${error.message}`)
             next(error)
         }
     }
@@ -44,7 +48,9 @@ export class UserController {
         try {
             const deleteUser = await userService.deleteUser(id)
             res.status(204).json({ message: "Usuario eliminado con exito" })
+            req.info(`Usuario ${id}: ELIMINADO CON EXITO`)
         } catch (error) {
+            req.logger.error(`Error al elimianr el usuario ${id}: ${error.message}`)
             next(error)
         }
     }

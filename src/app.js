@@ -22,7 +22,8 @@ import passport from "passport";
 import { initPassport } from "./config/passport.config.js";
 //MIDDLEWARE DE  ERRORES
 import { errorHandler } from "./middleware/errorHandler.js";
-
+//LOGGER
+import { logger, middLogger } from "./utils/logger.js"
 import { ProductManagerMONGO as ProductManager } from "./DAO/productManagerMONGO.js";
 import { messageModelo } from "./dao/models/messagesModelo.js"
 
@@ -31,6 +32,8 @@ const PORT = config.PORT;
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+//MIDDLEWARE LOGGER
+app.use(middLogger)
 //COOKIES
 app.use(cookieParser())
 //COMPRESSION --> comprime toda la salida siempre y cuando este comprimida por otro metodo antes
@@ -53,6 +56,7 @@ app.use(errorHandler)
 //ARCHIVOS ESTATICOS
 app.use(express.static("./src/public"))
 //ROUTES
+
 app.use("/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
@@ -119,10 +123,10 @@ const connDB = async () => {
         await mongoose.connect(
             config.MONGO_URL, { dbName: config.DB_NAME }
         )
-        console.log("DB Online...!!!")
+        logger.info(`DB Online...!!! EN PUERTO ${config.PORT}`);
     }
     catch (error) {
-        console.log("Error al conectar a DB", error.message)
+        logger.error("Error al conectar a DB", error.message)
     }
 }
 connDB()
