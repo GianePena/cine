@@ -6,26 +6,28 @@ import github from "passport-github2"
 //PASSPORT JWT 
 import passportJWT from "passport-jwt"
 import jwt from "jsonwebtoken"
-
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { config } from "./config.js"
 import { UserManagerMONGO } from "../DAO/userManagerMONGO.js"
 import { generaHash, validarPasword } from "../utils/utils.js"
+import { logger } from "../utils/logger.js"
 const userManager = new UserManagerMONGO
 
-
-
 function buscarToken(req) {
-    let token = null
-    if (req.cookies["userCookie"]) {
-        token = req.cookies["userCookie"]
+    let token = null;
+    if (req.cookies && req.cookies["userCookie"]) {
+        token = req.cookies["userCookie"];
+        console.log("Token extraído:", token);
+    } else {
+        console.log("No se encontró la cookie 'userCookie' o no contiene un token");
     }
-    return token
+    return token;
 }
-
 //PASO 1
 
 export const initPassport = () => {
     //ESTRATEGIA DE LOGIN -> PASSPORT-GITHUB
+
     passport.use(
         "github",
         new github.Strategy({
@@ -35,24 +37,29 @@ export const initPassport = () => {
         },
             async (tokenAcesso, tokenRefresh, profile, done) => {
                 try {
-                    //console.log(profile); //SE VEN TODAS LAS PROP DEL PROFILE
-                    let name = profile._json.name
-                    let email = profile._json.email
+                    let name = profile._json.name;
+                    let email = profile._json.email;
+
                     if (!name || !email) {
-                        return done(null, false, { message: "Datos insuficiente no posee nombre o email en su cuenta de github" })
+                        return done(null, false, { message: "Datos insuficientes, no posee nombre o email en su cuenta de GitHub" });
                     }
-                    let user = await userManager.getBy({ email })
+
+                    let user = await userManager.getBy({ email });
+                    let rol = "user";
+
                     if (!user) {
-                        user = await userManager.createUser({ name, email, profile })
+                        user = await userManager.createUser({ name, email, rol });
                     }
-                    const token = jwt.sign({ email: user.email }, config.JWT_SECRET, { expiresIn: '1h' });
-                    return done(null, token)
+
+                    const token = jwt.sign({ email: user.email, rol: user.rol }, config.JWT_SECRET, { expiresIn: '1h' });
+                    //return done(null, { token, user }); 
+                    return done(null, { token, ...user.toObject() });
                 } catch (error) {
-                    return done(error)
+                    console.error("Error en estrategia GitHub:", error);
+                    return done(error);
                 }
-            }
-        )//DENTRO DEL PROFILE HAY UNA PROP _JSON DE DONDE PODEMOS SACAR LOS DATOS PARA CREAR EL USUARIO
-    )
+            })
+    );
     passport.use(
         "registro",
         new local.Strategy({
@@ -61,28 +68,28 @@ export const initPassport = () => {
         },
             async (req, username, password, done) => {
                 try {
-                    let { first_name, last_name, age } = req.body
+                    let { first_name, last_name, age } = req.body;
                     if (!first_name || !last_name || !age) {
-                        return done(null, false)
+                        return done(null, false, { message: "Faltan datos en el formulario" });
                     }
-                    const userExistente = await userManager.getBy({ email: username })
+                    let rol = "user";
+                    const userExistente = await userManager.getBy({ email: username });
                     if (userExistente) {
-                        return done(null, false, { message: "Usuario existente pruebe con otro email" })
+                        return done(null, false, { message: "Usuario existente, pruebe con otro email" });
                     }
-                    let rol = "user"
                     if (username === config.ADMIN_EMAIL && password === config.ADMIN_PASSWORD) {
-                        rol = "admin"
+                        rol = "admin";
                     }
-                    password = generaHash(password)
-                    let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password, rol })
-                    console.log(newUser)
-                    return done(null, newUser)
+                    const hashedPassword = generaHash(password);
+                    let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol });
+
+                    return done(null, newUser);
                 } catch (error) {
-                    return done(error)
+
+                    return done(error);
                 }
-            }
-        )
-    )
+            })
+    );
     passport.use(
         "login",
         new local.Strategy(
@@ -98,7 +105,7 @@ export const initPassport = () => {
                     if (!validarPasword(password, user.password)) {
                         return done(null, false)
                     }
-                    return done(null, user)
+                    return done(null, user.toObject())
                 } catch (error) {
                     return done(error)
                 }
@@ -112,13 +119,13 @@ export const initPassport = () => {
                 secretOrKey: config.JWT_SECRET,
                 jwtFromRequest: new passportJWT.ExtractJwt.fromExtractors([buscarToken])
             },
-            async (token, done) => {
+            async (contenidoToken, done) => {
                 try {
-                    const user = await userManager.getBy({ email: token.email })
+                    const user = await userManager.getBy({ email: contenidoToken.email })
                     if (!user) {
                         return (null, false, { message: "Token inexistente" })
                     }
-                    return done(null, token)
+                    return done(null, contenidoToken)
                 }
                 catch (error) {
                     return done(error)
@@ -126,8 +133,5 @@ export const initPassport = () => {
             }
         )
     )
-
 }
-
-
 

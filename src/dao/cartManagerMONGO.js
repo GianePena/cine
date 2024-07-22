@@ -18,13 +18,24 @@ class CartManagerMONGO {
     async findUserByCartId(cartId) {
         return await userModelo.findOne({ cart: cartId });
     }
+
     async create(uid, products) {
-        let user = await this.findUserBy(uid)
+        let user = await this.findUserBy(uid);
         if (!user) {
-            throw new Error("Usuario no encontrado, registarse ");
+            throw new Error("Usuario no encontrado, regístrate");
         }
         if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
-            const newCart = await cartModelo.create({
+            let newCart;
+            for (let p of products) {
+                let product = await productModelo.findById(p.product);
+                if (!product) {
+                    throw new Error(`Producto con ID ${p.product} no encontrado`);
+                }
+                if (user.rol === "premium" && product.owner === user.email) {
+                    throw new Error("No es posible agregar un producto creado por usted mismo");
+                }
+            }
+            newCart = await cartModelo.create({
                 products: products.map(p => ({
                     product: new mongoose.Types.ObjectId(p.product),
                     quantity: p.quantity || 1,
@@ -33,6 +44,8 @@ class CartManagerMONGO {
             user.cart = newCart._id;
             await user.save();
             return newCart;
+        } else {
+            throw new Error("El usuario ya tiene un carrito asociado");
         }
     }
     async addProductsToCart(cid, newProducts) {

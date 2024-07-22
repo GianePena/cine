@@ -1,11 +1,17 @@
 import mongoose from "mongoose"
-import { v4 as uuidv4 } from 'uuid';
 
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 const productCollection = "products"
 const productSchema = new mongoose.Schema(
     {
+        owner: {
+            type: String,
+            default: "admin"
+            //type: mongoose.Types.ObjectId,
+            //ref: 'users',
+            //default: "admin"//si el usuario no tiene rol porque se logeo con git hub --> crearlo --> crear un producto
+        },
         title: {
             type: String,
             required: true
@@ -41,6 +47,19 @@ const productSchema = new mongoose.Schema(
         timestamps: true
     }
 )
+/*
+productSchema.pre('findOne', function () {
+    this.populate('owner')
+});
+productSchema.pre('findOne', function () {
+    this.populate({
+        path: 'owner',
+        select: 'email'
+    });
+});
+*/
+
+
 
 productSchema.plugin(mongoosePaginate)
 export const productModelo = mongoose.model(

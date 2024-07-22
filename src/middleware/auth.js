@@ -44,3 +44,4 @@ export const authorization = (permisos = []) => {
         return next()
     }
 }
+

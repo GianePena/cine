@@ -7,11 +7,20 @@ class UserManagerMONGO {
     async getById(id) {
         return await userModelo.findById(id)
     }
+
     async getBy(filtro = {}) {
-        return await userModelo.findOne(filtro).lean()
+        return await userModelo.findOne(filtro)
     }
     async createUser(user) {
         return await userModelo.create(user)
+    }
+    async updateUserRol(uid, rol) {
+        let user = await userModelo.findById(uid)
+        user.rol = rol
+        user.save()
+    }
+    async updatePassword() {
+
     }
     /*
     async updateCart(uid, cid) {

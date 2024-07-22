@@ -20,3 +20,17 @@ export const generateProducts = () => {
     return products
 }
 export const productsGenerados = generateProducts()
+
+import { userModelo } from "../models/userModelo.js"
+export const generateUser = () => {
+    const firstName = faker.person.firstName();
+    let user = new userModelo({
+        first_name: firstName,
+        last_name: faker.person.lastName(),
+        email: faker.internet.email({ firstName }),
+        age: faker.number.int({ min: 10, max: 100, dec: 0 }),
+        password: faker.internet.password({ length: 5 })
+    })
+    return user
+}
+export const usersGenerados = generateUser()

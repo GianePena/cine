@@ -43,15 +43,16 @@ export class ProductController {
         }
     }
     static addProduct = async (req, res, next) => {
-        const { title, category, description, price, thumbnail, stock, status } = req.body;
+        const { owner, title, category, description, price, thumbnail, stock, status } = req.body;
         try {
-            const datosIncompletos = argumentosProducts({ title, category, description, price, thumbnail, stock, status });
+            const datosIncompletos = argumentosProducts({ owner, title, category, description, price, thumbnail, stock, status });
             if (datosIncompletos !== "Todos los datos están completos.") {
                 req.logger.warn('Datos incompletos necesarios para producto');
                 req.logger.debug(`Datos recibidos: ${title, category, description, price, thumbnail, stock, status}`);
                 return CustomError.createError("Faltante de datos", datosIncompletos, "Completar la totalidad de los campos para ejecutar la creación del producto", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
             }
-            let newProduct = await productService.createProduct(product);
+            let newProduct = await productService.createProduct({ owner, title, category, description, price, thumbnail, stock, status })
+            //let newProduct = await productService.createProduct(product);
             req.logger.info(`Producto creado exitosamente: ${newProduct}`)
             res.setHeader('Content-Type', 'application/json');
             return res.status(201).json({ newProduct });
@@ -62,12 +63,12 @@ export class ProductController {
     }
     static updateProduct = async (req, res, next) => {
         const { id } = req.params;
-        const { price } = req.body;
+        const { email, price } = req.body;
         if (isNaN(price) || price < 0) {
             return CustomError.createError("Datos incorrectos", " El precio debe ser un número", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
         }
         try {
-            const updatedProduct = await productService.updateProduct(id, price);
+            const updatedProduct = await productService.updateProduct(email, id, price);
             res.setHeader('Content-type', 'application/json');
             req.logger.info(`Producto modificado exitosamente: ${updatedProduct}`)
             res.status(200).json({ message: `Producto con ID ${id} actualizado correctamente`, product: updatedProduct });
@@ -78,9 +79,10 @@ export class ProductController {
         }
     }
     static deleteProduct = async (req, res, next) => {
+        let { email } = req.body
         let { id } = req.params
         try {
-            const product = await productService.deleteProduct(id)
+            const product = await productService.deleteProduct(email, id)
             if (!product) {
                 return CustomError.createError("Product NotFound Error", `Producto con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             }
@@ -92,4 +94,4 @@ export class ProductController {
         }
     }
 
-}
+} 

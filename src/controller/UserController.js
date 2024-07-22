@@ -32,12 +32,26 @@ export class UserController {
             next(error)
         }
     }
+    static updateRol = async (req, res, next) => {
+        const { uid } = req.params
+        const { rol } = req.body
+        try {
+            if (!['user', 'premium'].includes(rol)) {
+                return res.status(400).json({ error: 'Rol inválido' });
+            }
+            const updatedRol = await userService.updateUserRol(uid, rol)
+            res.status(200).json(updatedRol)
+        } catch (error) {
+            req.logger.error(`Error al modificar los datos del user: ${error.message}`)
+            next(error)
+        }
+    }
     static updateUserCart = async (req, res, next) => {
         const { cid } = req.body
         const { uid } = req.params
         try {
             const updateUser = await userService.updateUserCart(uid, cid)
-            res.status(201).json(new userDTO(updateUser));
+            res.status(201).json(updateUser);
         } catch (error) {
             req.logger.error(`Error al modificar los datos del user: ${error.message}`)
             next(error)

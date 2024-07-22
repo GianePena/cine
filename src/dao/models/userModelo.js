@@ -12,8 +12,7 @@ const userSchema = new mongoose.Schema(
         },
         email: {
             type: String,
-            required: true,
-            unique: true
+            required: true
         },
         age: {
             type: Number
@@ -26,13 +25,13 @@ const userSchema = new mongoose.Schema(
             ref: 'cart'
         },
         rol: {
-            type: String,
-            default: "user"
+            type: String, enum: ['admin', 'premium', 'user'],
+            default: 'user'
         }
+
     },
     {
-        timestamps: true,
-        strict: false
+        timestamps: true
     }
 )
 userSchema.pre('find', function () {

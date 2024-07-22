@@ -32,17 +32,17 @@ class ProductService {
     getProductBy = async (filter) => {
         return this.dao.getProductBy(filter)
     }
-    createProduct = async ({ title, category, description, price, thumbnail, stock, status }) => {
-        return this.dao.createProduct({ title, category, description, price, thumbnail, stock, status })
+    createProduct = async ({ owner, title, category, description, price, thumbnail, stock, status }) => {
+        return this.dao.createProduct({ owner, title, category, description, price, thumbnail, stock, status })
     }
-    updateProduct = async (id, price) => {
+    updateProduct = async (email, id, price) => {
         if (isNaN(price) || price < 0) throw new Error('Precio inválido.');
-        const updatedProduct = await this.dao.updateProduct(id, price);
+        const updatedProduct = await this.dao.updateProduct(email, id, price);
         if (!updatedProduct) throw new Error(`Producto con ID ${id} no encontrado.`);
         return updatedProduct
     }
-    deleteProduct = async (id) => {
-        const wasDeleted = await this.dao.deleteProduct(id);
+    deleteProduct = async (email, id) => {
+        const wasDeleted = await this.dao.deleteProduct(email, id);
         if (!wasDeleted) throw new Error(`Producto con ID ${id} no encontrado.`);
         return wasDeleted;
     }

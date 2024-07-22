@@ -31,7 +31,6 @@ export class CartController {
             next(error);
         }
     }
-
     static createCart = async (req, res, next) => {
         const { uid } = req.params;
         const { products } = req.body;
