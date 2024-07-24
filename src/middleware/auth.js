@@ -48,18 +48,18 @@ export const authorization = (permisos = []) => {
 
 
 //validar token
-
+import { logger } from "../utils/logger.js";
 const validateToken = (req, res, next) => {
-    const token = req.query.token;/*Se obtiene el token de la cadena de consulta de la solicitud. Esto asume que el token se pasa como un parámetro de consulta en la URL (por ejemplo, http://localhost:3000/resetPassword?token=XYZ).*/
-
+    const token = req.query.token
     if (!token) {
-        return res.status(401).json({ message: 'Token no proporcionado' });
+        logger.warn(`token vacio o no proporcionado, token ${token}`)
+        return CustomError.createError("Error de autenticacion", `Token no proporcionado`, TIPOS_ERRORS.ERROR_AUTENTICACION)
     }
-    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {/*jwt.verify(token, JWT_SECRET, callback): Esta función verifica el token JWT usando el secreto. Si la verificación es exitosa, el token se decodifica y se pasa al callback.*/
+    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(401).json({ message: 'Token inválido o expirado' });
+            return CustomError.createError("Error de autenticacion", `Token invalido o expirado`, TIPOS_ERRORS.ERROR_AUTENTICACION)
         }
-        req.email = decoded.email; /*Si la verificación es exitosa, se extrae el campo email del token decodificado y se asigna a req.email. Esto permite que las rutas siguientes en la cadena de middleware accedan al email del usuario.*/
+        req.email = decoded.email
         next();
     });
 };

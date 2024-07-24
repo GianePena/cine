@@ -52,7 +52,6 @@ export class ProductController {
                 return CustomError.createError("Faltante de datos", datosIncompletos, "Completar la totalidad de los campos para ejecutar la creación del producto", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
             }
             let newProduct = await productService.createProduct({ owner, title, category, description, price, thumbnail, stock, status })
-            //let newProduct = await productService.createProduct(product);
             req.logger.info(`Producto creado exitosamente: ${newProduct}`)
             res.setHeader('Content-Type', 'application/json');
             return res.status(201).json({ newProduct });

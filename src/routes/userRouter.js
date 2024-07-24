@@ -24,12 +24,7 @@ router.get('/mockinguser', (req, res) => {
 
 router.get("/error", (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    return res.status(500).json(
-        {
-            error: `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`,
-            detalle: `Fallo al autenticar...!!!`
-        }
-    )
+    return CustomError.createError(`Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`, `Fallo al autenticar`, TIPOS_ERRORS.ERROR_SERVIDOR_INTERNO)
 })
 
 
@@ -41,13 +36,13 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
     console.log(req.user)
     console.log("ROL DEL USUARIO:" + req.user.rol)
     if (!token) {
-        return res.status(401).json({ message: 'Autenticación fallida' });
+        return CustomError.createError("Autenticación fallida", `Token vacio o no proporcionado`, TIPOS_ERRORS.ERROR_AUTENTICACION)
     }
     res.cookie('userCookie', token, { httpOnly: true });
     res.status(201).json({
         message: req.user,
     });
-});//ACA el token esta dentro del req.user=token se alamacena el la cokie
+});
 
 
 
@@ -62,7 +57,7 @@ router.post("/registro", passport.authenticate("registro", { session: false }), 
 router.post("/login", passport.authenticate("login", { session: false }),
     async (req, res) => {
         let { web } = req.body;
-        let user = req.user //aca el  token viene directo del req.user y se alamcana en la cokie
+        let user = req.user
         delete user.password;
         let token = jwt.sign(user, config.JWT_SECRET, { expiresIn: "1h" })
         res.cookie("userCookie", token, { httpOnly: true })
@@ -92,15 +87,18 @@ router.post("/updatePassword", UserController.updatePassword)
 
 
 import { code, transporter } from "../utils/mail.js";
+import { CustomError } from "../utils/CustomError.js";
+import { TIPOS_ERRORS } from "../utils/Errors.js";
+import { logger } from "../utils/logger.js";
 
 router.post('/sendCode', (req, res) => {
     const { email } = req.body;
     if (!email) {
-        return res.status(400).send('Email es necesario para recuperar la contraseña');
+        return CustomError.createError("Error en el email", 'Email es necesario para recuperar la contraseña', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
     }
     const token = jwt.sign({ email }, config.JWT_SECRET, { expiresIn: "1h" });
     res.cookie("linkRecuperacionPassword", token, { httpOnly: true });
-    console.log(code);
+    req.logger.info(`Codigo: ${code}`)
     res.cookie("codigoRecuperacionContraseña", code, { maxAge: 10000000, httpOnly: true })
     const link = `http://localhost:3000/newPassword?token=${token}`;
     const mailOptions = {
@@ -110,6 +108,7 @@ router.post('/sendCode', (req, res) => {
         html: `<h2>Código de recuperación de contraseña:${code}</h2><br><hr> 
         <a href="${link}">Generar nueva contraseña</a>`
     };
+    req.logger.info(mailOptions)
     transporter.sendMail(mailOptions)
         .then(resultado => res.send("Correo enviado: " + resultado.response))
         .catch(error => res.send("Error al enviar correo: " + error.message));
