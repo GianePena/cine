@@ -26,5 +26,6 @@ export const config = {
     CALLBACK_URL_GITHUB: process.env.CALLBACK_URL_GITHUB,
     JWT_SECRET: process.env.JWT_SECRET,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+    CONTRASEÑA_APLICACION_EMAIL: process.env.CONTRASEÑA_APLICACION_EMAIL
 }

@@ -1,7 +1,7 @@
 
 import { Router } from "express";
 import passport from "passport";
-
+import cookieParser from "cookie-parser"
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js";
 import { UserController } from "../controller/UserController.js";
@@ -86,6 +86,31 @@ router.post("/login", passport.authenticate("login", { session: false }),
 router.get("/data", passportCall("jwt"), authorization(["user", "admin"]), UserController.getData)
 router.get("/", UserController.getUsers)
 router.put('/premium/:uid', UserController.updateRol)
-router.get("/:id", UserController.getBy)
-router.put("/:uid", UserController.updateUserCart);
+router.get("/:id", passportCall("jwt"), authorization(["user"]), UserController.getBy)
 router.delete("/:id", UserController.deleteUser)
+router.post("/updatePassword", UserController.updatePassword)
+
+
+import { code, transporter } from "../utils/mail.js";
+
+router.post('/sendCode', (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).send('Email es necesario para recuperar la contraseña');
+    }
+    const token = jwt.sign({ email }, config.JWT_SECRET, { expiresIn: "1h" });
+    res.cookie("linkRecuperacionPassword", token, { httpOnly: true });
+    console.log(code);
+    res.cookie("codigoRecuperacionContraseña", code, { maxAge: 10000000, httpOnly: true })
+    const link = `http://localhost:3000/newPassword?token=${token}`;
+    const mailOptions = {
+        from: "gianellapena01@gmail.com",
+        to: email,
+        subject: "Código de Recuperación de Contraseña",
+        html: `<h2>Código de recuperación de contraseña:${code}</h2><br><hr> 
+        <a href="${link}">Generar nueva contraseña</a>`
+    };
+    transporter.sendMail(mailOptions)
+        .then(resultado => res.send("Correo enviado: " + resultado.response))
+        .catch(error => res.send("Error al enviar correo: " + error.message));
+});

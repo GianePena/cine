@@ -2,7 +2,8 @@
 import express from "express";
 import { config } from "./config/config.js";
 import compression from "express-compression";
-//HANDLEBARS
+
+//HANDLEBARSs
 import { engine } from "express-handlebars";
 //ROUTES
 import { router as productsRouter } from "./routes/productRouter.js";
@@ -61,6 +62,7 @@ app.use("/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/", viewsRouter);
+
 
 
 const serverHTTP = app.listen(PORT, () => {

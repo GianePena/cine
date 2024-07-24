@@ -1,5 +1,7 @@
 import { userDTO } from "../DTO/UserDTO.js"
 import { userService } from "../service/UserService.js"
+import { CustomError } from "../utils/CustomError.js"
+import { TIPOS_ERRORS } from "../utils/Errors.js"
 
 export class UserController {
     static getUsers = async (req, res, next) => {
@@ -37,27 +39,35 @@ export class UserController {
         const { rol } = req.body
         try {
             if (!['user', 'premium'].includes(rol)) {
-                return res.status(400).json({ error: 'Rol inválido' });
+                req.logger.warn(`Datos ingresados: rol: ${rol}  y  id del usuario ${uid}`)
+                return CustomError.createError("Error en la modificacion del producto", "Caracteres validos: user y premium", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
             }
             const updatedRol = await userService.updateUserRol(uid, rol)
-            res.status(200).json(updatedRol)
+            let user = await userService.getUserById(uid)
+            req.logger.info(`Rol del usario modificado correctamente ${user}`)
+            res.status(200).json(user)
         } catch (error) {
             req.logger.error(`Error al modificar los datos del user: ${error.message}`)
             next(error)
         }
     }
-    static updateUserCart = async (req, res, next) => {
-        const { cid } = req.body
-        const { uid } = req.params
+    static updatePassword = async (req, res, next) => {
+        const { code, email, password } = req.body
         try {
-            const updateUser = await userService.updateUserCart(uid, cid)
-            res.status(201).json(updateUser);
+            const codeCookie = req.cookies.codigoRecuperacionContraseña;
+            if (!code || !codeCookie || code !== codeCookie) {
+                req.logger.error(`Error al modificar los datos del user: codigo incompatible para ectualizar password `);
+                return CustomError.createError("Codigo incorrecto", "El codigo ingresado no coincide con el enviado", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            }
+            const newPassword = await userService.updateUserPassword(email, password)
+            res.status(201).json(`Contraseña actualizada`);
         } catch (error) {
             req.logger.error(`Error al modificar los datos del user: ${error.message}`)
             next(error)
         }
     }
     static deleteUser = async (req, res, next) => {
+
         const { id } = req.params
         try {
             const deleteUser = await userService.deleteUser(id)

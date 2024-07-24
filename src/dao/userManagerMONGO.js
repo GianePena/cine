@@ -1,5 +1,6 @@
 import { userModelo } from "./models/userModelo.js";
 
+import { generaHash } from "../utils/utils.js";
 class UserManagerMONGO {
     async getUsers() {
         return await userModelo.find()
@@ -19,23 +20,18 @@ class UserManagerMONGO {
         user.rol = rol
         user.save()
     }
-    async updatePassword() {
-
-    }
-    /*
-    async updateCart(uid, cid) {
-        const user = await userModelo.findById(uid);
+    async updatePassword(email, password) {
+        let user = await userModelo.findOne({ email: email });
         if (!user) {
-            throw new Error('Usuario no encontrado');
+            throw new Error("Carrito no encontrado");
         }
-        if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
-            user.cart = new mongoose.Types.ObjectId(cid);
-        } else {
-            throw new Error('El usuario ya tiene un carrito asignado');
+        if (user.password === password) {
+            throw new Error("Contraseña usada: Introducir una nueva contraseña");
         }
-        await user.save();
-        return user;
-    }*/
+        user.password = generaHash(password);
+        await user.save()
+        return user
+    }
     async delete(id) {
         return await userModelo.deleteOne({ _id: id })
     }

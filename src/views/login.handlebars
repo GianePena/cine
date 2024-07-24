@@ -5,35 +5,49 @@
 <h3><strong>Loguarse</strong></h3>
 
 <form action="user/login" method="post">
-    Email: <input type="text" name="email">
+    Email: <input type="text" name="email" id="email">
     Password: <input type="password" name="password">
     <input type="submit" value="Login"><br>
-    <a href="#">Olvide mi contraseña</a><br><br>
+    <a href="#" id="sendEmail">Olvide mi contraseña</a><br><br>
     <input type="hidden" name="web" value="true">
 </form>
+<div id="response"></div>
 <a href="/user/github">Acceder con Github</a>
 <br>
 
 
 
-
 <script>
-    /*
-    const handleLoginClick= async()=>{
-            let name = document.getElementById("name").value
-            let password = document.getElementById("password").value
-            console.log(name, email, password)
-            const response= await fetch("/user",{
-                method:"GET",
+        document.getElementById("sendEmail").addEventListener('click', function(event) {
+            event.preventDefault();
+            const email = document.getElementById("email").value;
+            console.log(email)
+            fetch('user/sendCode', {
+                method: 'POST',
                 headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name:name,
-                password:password
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email })
             })
-            })  
-            const data = await response.json();            
-    }*/
-</script>
-
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('response').innerText = "Revise su correo para recuperar la contraseña.";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('response').innerText = 'Error al enviar correo.';
+            });
+        });
+        /*document.getElementById("sendEmail").addEventListener('click', function(event) {
+            event.preventDefault();
+            fetch('/sendCode')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('response').innerText = "Revise su correo para recuperar la contraseña.";
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('response').innerText = 'Error al enviar correo.';
+                });
+        });*/
+    </script>

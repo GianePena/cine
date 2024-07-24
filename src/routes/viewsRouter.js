@@ -1,12 +1,15 @@
 import { Router } from "express"
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js";
+import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js";
 import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js"
 import { authorization } from "../middleware/auth.js";
 import { passportCall } from "../utils/utils.js";
 
 export const router = Router()
+
 const cartManager = new CartManager();
 const productManager = new ProductManager("./api/products.json");
+const userManager = new UserManager()
 
 
 
@@ -96,3 +99,34 @@ router.get('/registro', (req, res) => {
 router.get('/login', (req, res) => {
     res.status(200).render('login')
 })
+
+
+
+
+
+
+
+
+
+
+
+import { config } from "../config/config.js";
+import cookieParser from "cookie-parser"
+
+import jwt from "jsonwebtoken"
+
+
+
+router.get("/newPassword", (req, res) => {
+    const token = req.query.token;
+    if (!token) {
+        return res.status(400).send("LINK INVALIDO SOLICITE UNO NUEVO");
+    }
+    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(400).send("Token inválido o expirado, solicite uno nuevo");
+        }
+        const user = decoded.email
+        return res.status(200).render('newPassword', { user });
+    });
+});

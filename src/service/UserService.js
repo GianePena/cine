@@ -23,8 +23,8 @@ class UserService {
     updateUserRol = async (uid, rol) => {
         return this.dao.updateUserRol(uid, rol)
     }
-    updateUserCart = async (uid, cid) => {
-        return this.dao.updateCart(uid, cid)
+    updateUserPassword = async (email, password) => {
+        return this.dao.updatePassword(email, password)
     }
     deleteUser = async (id) => {
         return this.dao.delete(id)
