@@ -3,6 +3,7 @@ import express from "express";
 import { config } from "./config/config.js";
 import compression from "express-compression";
 
+
 //HANDLEBARSs
 import { engine } from "express-handlebars";
 //ROUTES
@@ -15,7 +16,7 @@ import { Server } from "socket.io";
 //MONGOOSE
 import mongoose from "mongoose"
 //COOKIE
-import cookieParser from "cookie-parser";
+import cookieParser from 'cookie-parser';
 //SESSIONS
 //import session from 'express-session'
 //PASPORT
@@ -31,12 +32,16 @@ import { messageModelo } from "./dao/models/messagesModelo.js"
 
 const PORT = config.PORT;
 const app = express();
+
+
+//COOKIES
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //MIDDLEWARE LOGGER
 app.use(middLogger)
-//COOKIES
-app.use(cookieParser())
+
+
 //COMPRESSION --> comprime toda la salida siempre y cuando este comprimida por otro metodo antes
 app.use(compression({ brotli: { enabled: true } }))//indica que comprima con el metodo brotli
 //ver el tipo de compresein segun la informacion que se envia
@@ -66,7 +71,7 @@ app.use("/", viewsRouter);
 
 
 const serverHTTP = app.listen(PORT, () => {
-    console.log("SERVER ONLINE");
+    logger.info(`SERVER ONLINE EN PUERTO ${PORT}`)
 });
 
 
@@ -125,7 +130,7 @@ const connDB = async () => {
         await mongoose.connect(
             config.MONGO_URL, { dbName: config.DB_NAME }
         )
-        logger.info(`DB Online...!!! EN PUERTO ${config.PORT}`);
+        logger.info(`Conexion de DB exitosa: DB online`);
     }
     catch (error) {
         logger.error("Error al conectar a DB", error.message)

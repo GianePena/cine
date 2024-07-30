@@ -2,6 +2,7 @@ import { userDTO } from "../DTO/UserDTO.js"
 import { userService } from "../service/UserService.js"
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js"
+import { config } from "../config/config.js"
 
 export class UserController {
     static getUsers = async (req, res, next) => {
@@ -52,22 +53,21 @@ export class UserController {
         }
     }
     static updatePassword = async (req, res, next) => {
-        const { code, email, password } = req.body
+        const { code, email, password } = req.body;
         try {
-            const codeCookie = req.cookies.codigoRecuperacionContraseña;
-            if (!code || !codeCookie || code !== codeCookie) {
-                req.logger.error(`Error al modificar los datos del user: codigo incompatible para ectualizar password `);
-                return CustomError.createError("Codigo incorrecto", "El codigo ingresado no coincide con el enviado", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            if (!code || code !== config.CODIGO_DE_RECURERACION_DE_PASSWORD) {
+                req.logger.error(`Error al modificar los datos del user: codigo incompatible para actualizar password`);
+                const error = CustomError.createError("Codigo incorrecto", "El codigo ingresado no coincide con el enviado", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
+                return next(error);
             }
-            const newPassword = await userService.updateUserPassword(email, password)
+            const newPassword = await userService.updateUserPassword(email, password);
             res.status(201).json(`Contraseña actualizada`);
         } catch (error) {
-            req.logger.error(`Error al modificar los datos del user: ${error.message}`)
-            next(error)
+            req.logger.error(`Error al modificar los datos del user: ${error.message}`);
+            next(error);
         }
-    }
+    };
     static deleteUser = async (req, res, next) => {
-
         const { id } = req.params
         try {
             const deleteUser = await userService.deleteUser(id)

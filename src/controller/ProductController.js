@@ -9,9 +9,9 @@ export class ProductController {
     static getAllProducts = async (req, res, next) => {
         try {
             let products = await productService.getProducts()
-            let productDto = products.map(p => new ProductDTO(p))
             res.setHeader('Content-Type', 'application/json')
-            return res.status(200).json({ productDto })
+            return res.status(200).json({ products })
+
         } catch (error) {
             req.logger.error(`Error fetching all products: ${error.message}`)
             next(error)

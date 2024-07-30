@@ -86,11 +86,13 @@ router.delete("/:id", UserController.deleteUser)
 router.post("/updatePassword", UserController.updatePassword)
 
 
-import { code, transporter } from "../utils/mail.js";
+
+import { transporter } from "../utils/mail.js";
 import { CustomError } from "../utils/CustomError.js";
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { logger } from "../utils/logger.js";
 
+let code = "C-4F74A8"
 router.post('/sendCode', (req, res) => {
     const { email } = req.body;
     if (!email) {
@@ -99,7 +101,6 @@ router.post('/sendCode', (req, res) => {
     const token = jwt.sign({ email }, config.JWT_SECRET, { expiresIn: "1h" });
     res.cookie("linkRecuperacionPassword", token, { httpOnly: true });
     req.logger.info(`Codigo: ${code}`)
-    res.cookie("codigoRecuperacionContraseña", code, { maxAge: 10000000, httpOnly: true })
     const link = `http://localhost:3000/newPassword?token=${token}`;
     const mailOptions = {
         from: "gianellapena01@gmail.com",

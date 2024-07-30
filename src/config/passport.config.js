@@ -10,7 +10,7 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { config } from "./config.js"
 import { UserManagerMONGO } from "../DAO/userManagerMONGO.js"
 import { generaHash, validarPasword } from "../utils/utils.js"
-import { logger } from "../utils/logger.js"
+
 const userManager = new UserManagerMONGO
 
 function buscarToken(req) {
@@ -39,18 +39,14 @@ export const initPassport = () => {
                 try {
                     let name = profile._json.name;
                     let email = profile._json.email;
-
                     if (!name || !email) {
                         return done(null, false, { message: "Datos insuficientes, no posee nombre o email en su cuenta de GitHub" });
                     }
-
                     let user = await userManager.getBy({ email });
                     let rol = "user";
-
                     if (!user) {
                         user = await userManager.createUser({ name, email, rol });
                     }
-
                     const token = jwt.sign({ email: user.email, rol: user.rol }, config.JWT_SECRET, { expiresIn: '1h' });
                     //return done(null, { token, user }); 
                     return done(null, { token, ...user.toObject() });
@@ -82,10 +78,8 @@ export const initPassport = () => {
                     }
                     const hashedPassword = generaHash(password);
                     let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol });
-
                     return done(null, newUser);
                 } catch (error) {
-
                     return done(error);
                 }
             })

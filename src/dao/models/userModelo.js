@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     }
 )
 userSchema.pre('find', function () {
-    this.populate('cart.cart').lean();
+    this.populate('cart').lean();
 });
 
 export const userModelo = mongoose.model(
