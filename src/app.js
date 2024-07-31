@@ -3,6 +3,10 @@ import express from "express";
 import { config } from "./config/config.js";
 import compression from "express-compression";
 
+//swagger
+import swaggerJSDoc from "swagger-jsdoc";
+
+import swaggerUi from 'swagger-ui-express';
 
 //HANDLEBARSs
 import { engine } from "express-handlebars";
@@ -30,6 +34,7 @@ import { ProductManagerMONGO as ProductManager } from "./DAO/productManagerMONGO
 import { messageModelo } from "./dao/models/messagesModelo.js"
 
 
+
 const PORT = config.PORT;
 const app = express();
 
@@ -41,6 +46,22 @@ app.use(express.urlencoded({ extended: true }));
 //MIDDLEWARE LOGGER
 app.use(middLogger)
 
+// Swagger
+//1. instalar swager, 
+//2. configuracion donde se configuran parametros 
+const options = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "E-commerce API",
+            version: "1.0.0",
+            description: "API para cart y products"
+        }
+    },
+    apis: ["./src/docs/*.yaml"]//3.leer archivos 
+};
+const spec = swaggerJSDoc(options);//4.generar specificaion
+app.use("/api-doc", swaggerUi.serve, swaggerUi.setup(spec));//5. cargar la documentacion
 
 //COMPRESSION --> comprime toda la salida siempre y cuando este comprimida por otro metodo antes
 app.use(compression({ brotli: { enabled: true } }))//indica que comprima con el metodo brotli
@@ -84,7 +105,6 @@ let messages = []
 
 
 io.on("connection", (socket) => {
-    console.log("Cliente conectado:", socket.id);
     socket.emit("listProducts", productManager.getProducts());
     socket.on("addProduct", ({ title, category, description, price, thumbnail, code, stock, status }) => {
         if (title && category && description && price && thumbnail && stock) {
@@ -137,3 +157,5 @@ const connDB = async () => {
     }
 }
 connDB()
+
+

@@ -4,7 +4,6 @@ import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { argumentosProducts } from "../utils/erroresProducts.js";
 
-
 export class ProductController {
     static getAllProducts = async (req, res, next) => {
         try {
@@ -61,17 +60,16 @@ export class ProductController {
         }
     }
     static updateProduct = async (req, res, next) => {
-        const { id } = req.params;
+        let { id } = req.params;
         const { email, price } = req.body;
         if (isNaN(price) || price < 0) {
-            return CustomError.createError("Datos incorrectos", " El precio debe ser un número", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            return CustomError.createError("Datos incorrectos", " El precio dxebe ser un número", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
         }
         try {
-            const updatedProduct = await productService.updateProduct(email, id, price);
+            const updatedProduct = await productService.updateProduct(id, email, price);
             res.setHeader('Content-type', 'application/json');
             req.logger.info(`Producto modificado exitosamente: ${updatedProduct}`)
             res.status(200).json({ message: `Producto con ID ${id} actualizado correctamente`, product: updatedProduct });
-            console.log(updatedProduct);
         } catch (error) {
             next(error)
             req.logger.error(`Error en la modificacion del product ID${id}: ${error.message}`)
@@ -93,4 +91,4 @@ export class ProductController {
         }
     }
 
-} 
+}

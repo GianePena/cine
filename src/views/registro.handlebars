@@ -1,22 +1,13 @@
-
-
-<script>/*
-    const handleCreateClick= async()=>{
-            let name = document.getElementById("name").value
-            let email = document.getElementById("email").value
-            let password = document.getElementById("password").value
-            console.log(name, email, password)
-            const response= await fetch("/use/registro",{
-                method:"POST",
-                headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name:name,
-                email:email,
-                password:password
-            })
-            })  
-            const data = await response.json();            
-    }*/
-</script>
+<h1>REGISTRO</h1>
+<br>
+<br>
+<hr>
+<h3><strong>Registrarse como usuario</strong></h3>
+<form action="/user/registro" method="post">
+    Nombre: <input type="text" name="first_Name" required>
+    Apellido: <input type="text" name="last_Name" required>
+    Email: <input type="email" name="email" required>
+    Edad: <input type="number" name="age" required>
+    Password: <input type="password" name="password" required><br><br>
+    <input type="submit" value="Registrar">
+</form>

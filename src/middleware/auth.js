@@ -16,7 +16,7 @@ export const auth = (req, res, next) => {
         return res.status(401).json({ error: `No existen usuarios autenticados` })
     }
     let token = req.cookies["userCookie"]
-    console.log({ token })
+    logger.info({ token })
     try {
         let user = jwt.verify(token, config.SECRET)
         req.user = user

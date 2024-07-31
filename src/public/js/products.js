@@ -1,12 +1,10 @@
 
-
 let addToCartButtons = document.getElementById("addToCartButton")
 
 
 const handleAddToCartClick = async (productsId) => {
     let username = document.getElementById("username").value
     let country = document.getElementById("country").value
-    console.log(productsId, username, country);
     const cartId = localStorage.getItem('cartId')
     if (!cartId) {
         const response = await fetch("/api/cart", {

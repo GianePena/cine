@@ -1,0 +1,355 @@
+paths:
+  /api/products:
+    get:
+      summary: Obtiene todos los productos de la DB.
+      tags:
+        - Products
+      description: Devuelve una lista de todos los productos almacenados en la base de datos.
+      responses:
+        "200":
+          description: Productos encontrados de manera exitoss
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              examples:
+                  value:
+                    - owner: "mia@gmail.com"
+                      title: "GARFIELD FUERA DE CASA"
+                      category: "animación"
+                      description: "Garfield, el famoso gato amante de la lasaña que odia los lunes, está…"
+                      price: 2000
+                      thumbnail: "https://static.cinemarkhoyts.com.ar/Images/Posters/2bc9ca70c2febb6faf5…"
+                      stock: 5
+                      status: true
+                    - owner: "john@gmail.com"
+                      title: "SUPERMAN RETURNS"
+                      category: "acción"
+                      description: "Superman regresa a la Tierra después de una larga ausencia…"
+                      price: 2500
+                      thumbnail: "https://static.cinemarkhoyts.com.ar/Images/Posters/6a12441fc44c3621acf8a43b92861c8e.jpg"
+                      stock: 3
+                      status: true
+        "404":
+          description: Not Found Productos no encontrados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No se encontraron productos."
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error interno del servidor."
+
+  /api/products/{pid}:
+    get:
+      summary: Obtiene el producto segun id
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: ID del producto que se desea ENCONTRAR/BUSCAR.
+          schema:
+            type:  ObjectId
+            example: 66341e3bae100d582fa75341
+      responses:
+        "200":
+          description: Producto encontrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "404":
+          description: Not Found:Producto no encontrado
+        "500":
+          description: Error interno del servidor
+    /api/products:
+    post:
+      summary: Crea un nuevo producto.
+      tags:
+        - Products
+      requestBody:
+        $ref: '#/components/requestBodies/productRequestBody'
+      responses:
+        "201":
+          description: Producto creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: Solicitud inválida.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Datos inválidos."
+        "500":
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error interno del servidor."
+    /api/products/{pid}:
+    delete:
+      summary: Eliminar un producto de la DB.
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: piD
+          required: true
+          description: ID del producto que se desea eliminar.
+          schema:
+            type:  ObjectId
+            example: 66341e3bae100d582fa75341
+      requestBody:
+        description: Cuerpo de solicitud para la eliminación de un producto.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deleteProduct'
+      responses:
+        "200":
+          
+          description: Producto eliminado exitosamente.
+        "404":
+          description: Producto no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No se encontró producto con el ID ingresado."
+      "400":
+        description: Solicitud inválida.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Email del propietario es necesario."
+      "500":
+        description: Error interno del servidor.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Error interno del servidor."
+              
+    put:
+      summary: Actualiza un producto existente.
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: ID del producto que se desea actualizar.
+          schema:
+            type:  ObjectId
+            example: 66341e3bae100d582fa75341
+      requestBody:
+        $ref: '#/components/requestBodies/productUpdateRequestBody'
+      responses:
+        "200":
+          description: Producto actualizado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductUpdated'
+        "404":
+          description: Producto no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Producto no encontrado."
+        "400":
+          description: Solicitud inválida.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Datos inválidos."
+        "500":
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error interno del servidor."
+    
+
+#definir schemas --> 
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        owner:
+          type: string
+          description: Email del owner
+          example: mia@gmail.com
+        title:
+          type: string
+          description: Título del producto
+          example: GARFIELD FUERA DE CASA
+        category:
+          type: string
+          description: Categoría del producto
+          example: animación
+        description:
+          type: string
+          description: Descripción del producto
+          example: Garfield, el famoso gato amante de la lasaña que odia los lunes, está…
+        price:
+          type: number
+          format: float
+          description: Precio del producto
+          example: 2000
+        thumbnail:
+          type: string
+          description: Imagen del producto
+          example: https://static.cinemarkhoyts.com.ar/Images/Posters/2bc9ca70c2febb6faf5…
+        stock:
+          type: number
+          description: Cantidad en stock
+          example: 5
+        status:
+          type: boolean
+          description: Disponibilidad del producto
+          example: true
+    deleteProduct:
+      type: object
+      properties:
+        email:
+          type: string
+          example: mia@gmail.com
+    ProductUpdated:
+      type: object
+      properties:
+        owner:
+          type: string
+          description: Email del owner
+          example: mia@gmail.com
+        title:
+          type: string
+          description: Título del producto
+          example: GARFIELD FUERA DE CASA
+        category:
+          type: string
+          description: Categoría del producto
+          example: animación
+        description:
+          type: string
+          description: Descripción del producto
+          example: Garfield, el famoso gato amante de la lasaña que odia los lunes, está…
+        price:
+          type: number
+          format: float
+          description: Precio del producto
+          example: 20033
+        thumbnail:
+          type: string
+          description: Imagen del producto
+          example: https://static.cinemarkhoyts.com.ar/Images/Posters/2bc9ca70c2febb6faf5…
+        stock:
+          type: number
+          description: Cantidad en stock
+          example: 5
+        status:
+          type: boolean
+          description: Disponibilidad del producto
+          example: true
+
+  requestBodies:
+    productRequestBody:
+      description: Cuerpo de la solicitud para crear un nuevo producto.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
+          examples:
+            ejemploProducto:
+              value:
+                owner: dsadas@gmail.com
+                title: SUPER MAN 311
+                category: acción
+                description: "Hachiko (Batong) es un lindo perro pastor chino. Conoce a su dueño Chen Jingxiu entre la gran multitud y se convierte en miembro de la familia Chen. Con el paso del tiempo, la casa que alguna vez fue hermosa ya no está allí, pero Batong espera y espera, sabiendo que su destino está estrechamente ligado a su familia."
+                price: 20000
+                thumbnail: https://static.cinemarkhoyts.com.ar/Images/Posters/6a12441fc44c3621acf8a43b92861c8e.jpg?v=00002337
+                stock: 10
+                status: true
+    productUpdateRequestBody:
+      description: Cuerpo de la solicitud para actualizar un producto.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              price:
+                type: number
+                format: float
+                description: Precio del producto.
+          examples:
+            ejemploProducto:
+              value:
+                price: 20033
+    deleteProductRequeestBody:
+      description: Cuerpo de slicitud de eliminacion de producto
+      required: true
+      content:
+        application/json:
+          schema:
+          type: object
+          properties:
+            owner:
+              type: string
+              description: email para verificar rol
+
+
+
+
+
+

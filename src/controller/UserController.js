@@ -18,7 +18,7 @@ export class UserController {
     static getBy = async (req, res, next) => {
         const { id } = req.params
         try {
-            let user = await userService.getUserById(id)
+            const user = await userService.getUserById(id);
             res.status(200).json(new userDTO(user))
         } catch (error) {
             req.logger.error(`Error fetching users by ${id}: ${error.message}`)
@@ -45,8 +45,11 @@ export class UserController {
             }
             const updatedRol = await userService.updateUserRol(uid, rol)
             let user = await userService.getUserById(uid)
-            req.logger.info(`Rol del usario modificado correctamente ${user}`)
-            res.status(200).json(user)
+            if (user) {
+                delete user.password
+                req.logger.info(`Rol del usario modificado correctamente ${user}`)
+                res.status(200).json(user)
+            }
         } catch (error) {
             req.logger.error(`Error al modificar los datos del user: ${error.message}`)
             next(error)

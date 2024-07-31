@@ -2,6 +2,7 @@ import { CartDTO } from "../DTO/CartDTO.js"
 import { cartService } from "../service/CartService.js"
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
+import { logger } from "../utils/logger.js";
 
 export class CartController {
     static getCarts = async (req, res, next) => {
@@ -34,7 +35,6 @@ export class CartController {
     static createCart = async (req, res, next) => {
         const { uid } = req.params;
         const { products } = req.body;
-        console.log(uid, products);
         try {
             if (!uid || !products) {
                 req.logger.warn('Datos incompletos necesarios para producto');
@@ -149,5 +149,6 @@ export class CartController {
         }
     }
 }
+
 
 

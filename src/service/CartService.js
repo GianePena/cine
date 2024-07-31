@@ -13,14 +13,14 @@ class CartService {
             return carts
         }
         else {
-            throw new Error("Carts vacio");
+            return CustomError.createError("Cart vacio", `Cart no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
     }
     getCartById = async (id) => {
         const cart = await this.dao.getCartById(id)
         if (!cart) {
-            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             logger.error(`Cart ${cart} NO ENCONTRADO`)
+            return CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
         return this.dao.getCartById(id)
     }
@@ -31,10 +31,12 @@ class CartService {
     addProductsToCart = async (cid, products) => {
         return this.dao.addProductsToCart(cid, products);
     }
+
     updateQuantity = async (cid, pid, quantity) => {
         return this.dao.updateQuantity(cid, pid, quantity)
     }
     updateCart = async (cid, products) => {
+
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)

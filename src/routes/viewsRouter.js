@@ -15,7 +15,6 @@ const userManager = new UserManager()
 
 router.get('/products/json', (req, res) => {
     let products = productManager.getProducts()
-    console.log(products);
     res.setHeader(`Content-Type`, `text/html`)
     res.status(200).render('index', { products })
 })
@@ -82,7 +81,6 @@ router.get('/carts/:id', async (req, res) => {
         if (!cart) {
             return res.status(404).json({ error: 'Cart not found' });
         }
-        console.log(cart);
         res.setHeader(`Content-Type`, `text/html`)
         return res.status(200).render('cart', { cart });
 

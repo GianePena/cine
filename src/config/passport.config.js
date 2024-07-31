@@ -10,6 +10,8 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { config } from "./config.js"
 import { UserManagerMONGO } from "../DAO/userManagerMONGO.js"
 import { generaHash, validarPasword } from "../utils/utils.js"
+import { logger } from "../utils/logger.js"
+
 
 const userManager = new UserManagerMONGO
 
@@ -17,9 +19,9 @@ function buscarToken(req) {
     let token = null;
     if (req.cookies && req.cookies["userCookie"]) {
         token = req.cookies["userCookie"];
-        console.log("Token extraído:", token);
+        logger.info(`Token extraido: ${token}`)
     } else {
-        console.log("No se encontró la cookie 'userCookie' o no contiene un token");
+        logger.error("No se encontró la cookie 'userCookie' o no contiene un token")
     }
     return token;
 }
@@ -51,7 +53,8 @@ export const initPassport = () => {
                     //return done(null, { token, user }); 
                     return done(null, { token, ...user.toObject() });
                 } catch (error) {
-                    console.error("Error en estrategia GitHub:", error);
+
+
                     return done(error);
                 }
             })

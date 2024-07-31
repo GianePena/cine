@@ -7,12 +7,7 @@ class UserService {
         return this.dao.getUsers()
     }
     getUserById = async (id) => {
-        let user = this.dao.getById(id)
-        if (!user) {
-            console.log(`Usuario con ID ${id} no encontrado`);
-            res.status(404).json({ message: "usuario no encontrado" })
-        }
-        return user
+        return this.dao.getUserById(id);
     }
     getUserBy = async (filtro) => {
         return this.dao.getBy(filtro)
