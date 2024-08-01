@@ -47,7 +47,9 @@ class CartService {
             logger.error(`El usuario ${uid} ya tiene un cart asociado`);
             throw CustomError.createError("Error al crear el carrito", "El usuario ya tiene un cart asociado", TIPOS_ERRORS.ERROR_AUTORIZACION);
         }
+
     };
+
     addProductsToCart = async (cid, products) => {
         const cart = await this.dao.getCartById(cid);
         if (!cart) {

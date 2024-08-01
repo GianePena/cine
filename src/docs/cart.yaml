@@ -1,7 +1,7 @@
 #https://swagger.io/docs/specification/basic-structure/
 
 paths:
-  /api/cart: #obtener todos los cart
+  /api/cart: 
     get:
       summary: Obtiene todos los carts
       tags:
@@ -15,9 +15,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Cart'
+                  $ref: '#/components/schemas/Carts'
               example:
-                - _id: "667c8362a7ba944ab303e3e6"
+                cart:
+                  _id: "667c8362a7ba944ab303e3e6"
                   products:
                     - product:
                         owner: "admin"
@@ -31,20 +32,6 @@ paths:
                         status: true
                         code: 289
                       quantity: 2
-                - _id: "667c8362a7ba944ab303e3e7"
-                  products:
-                    - product:
-                        owner: "admin"
-                        _id: "66341e60ae100d582fa75345"
-                        title: "SPOOKY NIGHT"
-                        category: "terror"
-                        description: "Un evento aterrador con sorpresas espeluznantes."
-                        price: 5000
-                        thumbnail: "https://static.cinemarkhoyts.com.ar/Images/Posters/feaa7b4e69f36adba02e3a4e344795c8.jpg?v=00002324"
-                        stock: 30
-                        status: true
-                        code: 290
-                      quantity: 1
         "404":
           description: Not Found:carts no encontrado
         "500":
@@ -310,6 +297,12 @@ components:
                 $ref: '#/components/schemas/ProductsCart'
               quantity:
                 type: number
+    Carts:
+      type: object
+      properties:
+        cart:
+          type: object
+          $ref: '#/components/schemas/Cart'
     CreateCart:
       type: object
       properties:

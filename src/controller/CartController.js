@@ -17,8 +17,8 @@ export class CartController {
         }
     }
     static getCartById = async (req, res, next) => {
+        const { cid } = req.params
         try {
-            const { cid } = req.params
             let cart = await cartService.getCartById(cid)
             req.logger.debug(`id recibido ${cid}`)
             req.logger.info(cart)
@@ -28,7 +28,7 @@ export class CartController {
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json(new CartDTO(cart));
         } catch (error) {
-            req.logger.error(`Error fetching cart by ID ${cid}`)
+            req.logger.error(`Error fetching cart by ID `)
             next(error);
         }
     }

@@ -75,9 +75,10 @@ paths:
           description: ID del producto que se desea eliminar.
           schema:
             type: string
+            example: 66341e3bae100d582fa75341
       requestBody:
         description: Cuerpo de solicitud para la eliminación de un producto.
-        required: false  # El cuerpo puede no ser necesario para un DELETE, ajusta si es necesario
+        required: false 
         content:
           application/json:
             schema:
@@ -123,48 +124,7 @@ components:
       properties:
         newProduct:
           type: object
-          properties:
-            owner:
-              type: string
-              description: Email del owner
-              example: dsadas@gmail.com
-            title:
-              type: string
-              description: Título del producto
-              example: SUPER MAN 311
-            category:
-              type: string
-              description: Categoría del producto
-              example: acción
-            description:
-              type: string
-              description: Descripción del producto
-              example: Hachiko (Batong) es un lindo perro pastor chino. Conoce a su dueño Chen Jingxiu entre la gran multitud y se convierte en miembro de la familia Chen. Con el paso del tiempo, la casa que alguna vez fue hermosa ya no está allí, pero Batong espera y espera, sabiendo que su destino está estrechamente ligado a su familia.
-            price:
-              type: number
-              format: float
-              description: Precio del producto
-              example: 20000
-            thumbnail:
-              type: string
-              description: Imagen del producto
-              example: https://static.cinemarkhoyts.com.ar/Images/Posters/6a12441fc44c3621acf8a43b92861c8e.jpg?v=00002337
-            stock:
-              type: number
-              description: Cantidad en stock
-              example: 10
-            status:
-              type: boolean
-              description: Disponibilidad del producto
-              example: true
-            _id:
-              type: string
-              description: ID del producto
-              example: 66aba199cb388082ae23ea51
-            code:
-              type: number
-              description: Código de identificación del producto
-              example: 777
+          $ref: '#/components/schemas/Product'
     CreateProduct:
       type: object
       properties:
@@ -203,48 +163,18 @@ components:
           example: true
     Product:
       type: object
-      properties:
-        owner:
-          type: string
-          description: Email del owner
-          example: mia@gmail.com
-        title:
-          type: string
-          description: Título del producto
-          example: GARFIELD FUERA DE CASA
-        category:
-          type: string
-          description: Categoría del producto
-          example: animación
-        description:
-          type: string
-          description: Descripción del producto
-          example: Garfield, el famoso gato amante de la lasaña que odia los lunes, está…
-        price:
-          type: number
-          format: float
-          description: Precio del producto
-          example: 2000
-        thumbnail:
-          type: string
-          description: Imagen del producto
-          example: https://static.cinemarkhoyts.com.ar/Images/Posters/2bc9ca70c2febb6faf5…
-        stock:
-          type: number
-          description: Cantidad en stock
-          example: 5
-        status:
-          type: boolean
-          description: Disponibilidad del producto
-          example: true
-        _id:
-          type: string
-          description: ID del producto
-          example: 66aba199cb388082ae23ea51
-        code:
-          type: number
-          description: Código de identificación del producto
-          example: 777
+      allOf:
+        - $ref: '#/components/schemas/CreateProduct'
+        - type: object
+          properties:
+            _id:
+              type: string
+              description: ID del producto
+              example: 66341e3bae100d582fa75341
+            code:
+              type: number
+              description: Código de identificación del producto
+              example: 777
     DeleteProduct:
       type: object
       properties:
