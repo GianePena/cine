@@ -28,11 +28,11 @@ export class ProductController {
         }
     }
     static getProductsById = async (req, res, next) => {
-        let { id } = req.params;
+        let { pid } = req.params;
         try {
-            let product = await productService.getProductById(id);
+            let product = await productService.getProductById(pid);
             if (!product) {
-                return CustomError.createError("Not Found", ` Producto ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
+                return CustomError.createError("Not Found", ` Producto ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
             }
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json(new ProductDTO(product));
@@ -60,34 +60,34 @@ export class ProductController {
         }
     }
     static updateProduct = async (req, res, next) => {
-        let { id } = req.params;
+        let { pid } = req.params;
         const { email, price } = req.body;
         if (isNaN(price) || price < 0) {
             return CustomError.createError("Datos incorrectos", " El precio dxebe ser un número", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
         }
         try {
-            const updatedProduct = await productService.updateProduct(id, email, price);
+            const updatedProduct = await productService.updateProduct(pid, email, price);
             res.setHeader('Content-type', 'application/json');
             req.logger.info(`Producto modificado exitosamente: ${updatedProduct}`)
-            res.status(200).json({ message: `Producto con ID ${id} actualizado correctamente`, product: updatedProduct });
+            res.status(200).json({ message: `Producto con ID ${pid} actualizado correctamente`, product: updatedProduct });
         } catch (error) {
             next(error)
-            req.logger.error(`Error en la modificacion del product ID${id}: ${error.message}`)
+            req.logger.error(`Error en la modificacion del product ID${pid}: ${error.message}`)
         }
     }
     static deleteProduct = async (req, res, next) => {
         let { email } = req.body
-        let { id } = req.params
+        let { pid } = req.params
         try {
-            const product = await productService.deleteProduct(email, id)
+            const product = await productService.deleteProduct(email, pid)
             if (!product) {
-                return CustomError.createError("Product NotFound Error", `Producto con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+                return CustomError.createError("Product NotFound Error", `Producto con ID ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             }
             res.setHeader('Content-type', 'application/json')
-            return res.status(204).json({ message: `Producto con ID ${id} eliminado correctamente` })
+            return res.status(204).json({ message: `Producto con ID ${pid} eliminado correctamente` })
         } catch (error) {
             next(error)
-            req.logger.error(`Error en la eliminacion del producto ID${id}: ${error.message}`)
+            req.logger.error(`Error en la eliminacion del producto ID${pid}: ${error.message}`)
         }
     }
 

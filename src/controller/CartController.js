@@ -18,17 +18,17 @@ export class CartController {
     }
     static getCartById = async (req, res, next) => {
         try {
-            const { id } = req.params
-            let cart = await cartService.getCartById(id)
-            req.logger.debug(`id recibido ${id}`)
+            const { cid } = req.params
+            let cart = await cartService.getCartById(cid)
+            req.logger.debug(`id recibido ${cid}`)
             req.logger.info(cart)
             if (!cart) {
-                return CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+                return CustomError.createError("Cart NotFound Error", `Cart con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             }
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json(new CartDTO(cart));
         } catch (error) {
-            req.logger.error(`Error fetching cart by ID ${id}: ${error.message}`)
+            req.logger.error(`Error fetching cart by ID ${cid}`)
             next(error);
         }
     }
@@ -132,7 +132,6 @@ export class CartController {
         } catch (error) {
             req.logger.error(`Error en el vaciado del cart ${cid}: ${error.message}`)
             next(error)
-
         }
     }
     static purchase = async (req, res, next) => {
@@ -149,6 +148,3 @@ export class CartController {
         }
     }
 }
-
-
-

@@ -4,13 +4,14 @@ import { ticketModelo } from "./models/ticketModelo.js";
 import { userModelo } from "./models/userModelo.js";
 import { productModelo } from "./models/productModelo.js";
 import { logger } from "../utils/logger.js";
-
+import { CustomError } from "../utils/CustomError.js";
+import { TIPOS_ERRORS } from "../utils/Errors.js";
 class CartManagerMONGO {
     async getAll() {
         return await cartModelo.find();
     }
-    async getCartById(id) {
-        return await cartModelo.findById(id).populate('products.product')
+    async getCartById(cid) {
+        return await cartModelo.findById(cid).populate('products.product')
     }
     async findUserBy(uid) {
         return await userModelo.findById(uid);
@@ -18,56 +19,16 @@ class CartManagerMONGO {
     async findUserByCartId(cartId) {
         return await userModelo.findOne({ cart: cartId });
     }
+
     async create(products) {
         return await cartModelo.create({
             products: products.map(p => ({
                 product: new mongoose.Types.ObjectId(p.product),
                 quantity: p.quantity || 1,
             }))
-        })
+        });
     }
-
-    async create(uid, products) {
-        let user = await this.findUserBy(uid);
-        if (!user) {
-            logger.warn(`Usuario con email ${uid} no encontrado`)
-            return CustomError.createError(
-                "Error al crear cart", `Usuario con email ${email} no encontrado`, TIPOS_ERRORS.NOT_FOUND
-            );
-        }
-        if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
-            let newCart;
-            for (let p of products) {
-                let product = await productModelo.findById(p.product);
-                if (!product) {
-                    return CustomError.createError(
-                        "Error al crear el carrito", `Producto con ID ${p.product} no encontrado`, TIPOS_ERRORS.NOT_FOUND
-                    )
-                }
-                if (user.rol === "premium" && product.owner === user.email) {
-                    return CustomError.createError(
-                        "Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION
-                    )
-                }
-            }
-            newCart = await cartModelo.create({
-                products: products.map(p => ({
-                    product: new mongoose.Types.ObjectId(p.product),
-                    quantity: p.quantity || 1,
-                }))
-            });
-            user.cart = newCart._id;
-            await user.save();
-            logger.info(`Nuevo cart ${newCart}`)
-            return newCart;
-        } else {
-            logger.error(`El usuario ${uid} ya tiene una cart asociado`)
-            return CustomError.createError(
-                "Error al crear el carrito", "El usuario ya tiene una cart asociado", TIPOS_ERRORS.ERROR_AUTORIZACION
-            )
-        }
-    }
-    async addProductsToCart(cid, newProducts) {
+    async addProductsToCart(cid, products) {
         let cart = await this.getCartById(cid);
         if (!cart) {
             logger.warn(`Cart con ${cid} no encontrado`)
@@ -75,7 +36,7 @@ class CartManagerMONGO {
                 "Error al agregar productos al cart", `Cart con ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND
             );
         }
-        newProducts.forEach(item => {
+        products.forEach(item => {
             let existingProduct = cart.products.find(p => p.product.toString() === item.product);
             if (existingProduct) {
                 existingProduct.quantity += item.quantity;
@@ -91,35 +52,42 @@ class CartManagerMONGO {
         return cart
     }
     async updateQuantity(cid, pid, quantity) {
-        let cartToUpdate = await this.getCartById(cid);
-        if (!cartToUpdate) {
-            logger.warn(`Cart con ${cid} no encontrado`)
+        let cart = await this.getCartById(cid);
+        if (!cart) {
+            logger.warn(`Cart con ID ${cid} no encontrado`);
             return CustomError.createError(
-                "Error al agregar productos al cart", `Cart con ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND
+                "Error al actualizar la cantidad en el cart",
+                `Cart con ID ${cid} no encontrado`,
+                TIPOS_ERRORS.NOT_FOUND
             );
         }
-        cartToUpdate.products.forEach(p => {
+        cart.products.forEach(p => {
             if (p.product._id.toString() === pid) {
                 p.quantity = quantity;
             }
         });
-        return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
+        return await cartModelo.updateOne({ _id: cart.id }, cart)
     }
     async updateCart(cid, products) {
-        let cartToUpdate = await this.getCartById(cid)
+        let cartToUpdate = await this.getCartById(cid);
         if (!cartToUpdate) {
-            logger.warn(`Cart con ${cid} no encontrado`)
+            logger.warn(`Cart con ID ${cid} no encontrado`);
             return CustomError.createError(
-                "Error al modificar el cart", `Cart con ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND
+                "Error al modificar el cart",
+                `Cart con ID ${cid} no encontrado`,
+                TIPOS_ERRORS.NOT_FOUND
             );
         }
-        logger.info(`Carrito a modificar ${cartToUpdate}`)
-        const finalProducts = cartToUpdate.products.concat({ products })
-        cartToUpdate.products = finalProducts
-        logger.info(`Productos modificados ${finalProducts}`)
-        return await cartModelo.updateOne({ _id: cid }, { products: finalProducts });
+        cartToUpdate.products = products.map(p => ({
+            product: p.product,
+            quantity: p.quantity
+        }));
+        await cartToUpdate.save();
+        logger.info(`Carrito actualizado ${cartToUpdate}`);
+        return cartToUpdate;
     }
     async removeProduct(cid, pid) {
+        const cartToUpdate = await this.getCartById(cid);
         if (!cartToUpdate) {
             logger.warn(`Cart con ${cid} no encontrado`)
             return CustomError.createError(
@@ -132,6 +100,8 @@ class CartManagerMONGO {
         return await cartModelo.updateOne({ _id: cid }, cartToUpdate);
     }
     async removeAllProducts(cid) {
+        const cartToUpdate = await this.getCartById(cid);
+        console.log(cartToUpdate);
         if (!cartToUpdate) {
             logger.warn(`Cart con ${cid} no encontrado`)
             return CustomError.createError(
@@ -139,7 +109,8 @@ class CartManagerMONGO {
             );
         }
         cartToUpdate.products = []
-        return await cartModelo.updateOne({ _id: cid }, cartToUpdate)
+        console.log(cartToUpdate.products);
+        return await cartToUpdate.save();
     }
     async createTicket(amount, purchaser) {
         const newTicket = new ticketModelo({ amount, purchaser });

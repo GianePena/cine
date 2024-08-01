@@ -9,16 +9,15 @@ paths:
       description: Devuelve un listado de todos los carts
       responses:
         "200":
-          description: Los cart conseguidos de manera exitos
+          description: Los carts conseguidos de manera exitosa
           content:
             application/json:
               schema:
-                type: object
+                type: array
                 items:
                   $ref: '#/components/schemas/Cart'
               example:
-                cart:
-                  _id: "667c8362a7ba944ab303e3e6"
+                - _id: "667c8362a7ba944ab303e3e6"
                   products:
                     - product:
                         owner: "admin"
@@ -31,48 +30,45 @@ paths:
                         stock: 32
                         status: true
                         code: 289
-                        id: "4755fd99-3227-4573-a702-5107525b9ebb"
                       quantity: 2
-                      _id: "667c8362a7ba944ab303e3e7"
+                - _id: "667c8362a7ba944ab303e3e7"
+                  products:
                     - product:
                         owner: "admin"
-                        _id: "66341e60ae100d582fa75344"
-                        title: "HORRORLAND"
+                        _id: "66341e60ae100d582fa75345"
+                        title: "SPOOKY NIGHT"
                         category: "terror"
-                        description: "Una exclusiva noche privada de Halloween en Liseberg se convierte rápidamente en una verdadera pesadilla."
-                        price: 4500
-                        thumbnail: "https://static.cinemarkhoyts.com.ar/Images/Posters/feaa7b4e69f36adba02e3a4e344795c8.jpg?v=00002323"
-                        stock: 32
+                        description: "Un evento aterrador con sorpresas espeluznantes."
+                        price: 5000
+                        thumbnail: "https://static.cinemarkhoyts.com.ar/Images/Posters/feaa7b4e69f36adba02e3a4e344795c8.jpg?v=00002324"
+                        stock: 30
                         status: true
-                        code: 289
-                        id: "4755fd99-3227-4573-a702-5107525b9ebb"
-                      quantity: 2
-                      _id: "667c8362a7ba944ab303e3e7"
+                        code: 290
+                      quantity: 1
         "404":
           description: Not Found:carts no encontrado
         "500":
           description: Error interno del servidor
-  /api/cart/{cid}: #obtener un solo cart
+  /api/cart/{cid}: 
     delete:
-      summary: Obtiene el cart segun el id para eliminarlo
+      summary: Eliminar todos los productos del cart
       tags:
         - Carts
       parameters:
         - in: path
           name: cid
           required: true
-          description: ID del cart que se desea eliminar
+          description: ID del cart que se desea eliminar todos los productos
           schema:
             type: ObjectId
             example: 669ad0d3e86bb35945c217
       responses:
         "200":
-          description: Los cart eliminado de manera exitosa
+          description: Cart eliminado de manera exitosa
         "404":
           description: Cart no encontrado
         "500":
           description: Error interno del servidor
-
     get:
       summary: Obtiene el cart segun el id
       tags:
@@ -109,16 +105,74 @@ paths:
                         stock: 32
                         status: true
                         code: 289
-                        id: "4755fd99-3227-4573-a702-5107525b9ebb"
                       quantity: 2
-                      _id: "667c8362a7ba944ab303e3e7"
         "404":
           description: Not Found:Cart no encontrado
         "500":
           description: Error interno del servidor
+    put:
+      summary: Modifica el cart asociado al usuario por uno nuevo
+      tags:
+        - Carts
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          description: ID del cart que se desea Modificar/Reemplazar
+          schema:
+            type: string
+            example: 669ad0d3e86bb35945c217
+      requestBody:  
+        description: Cómo modificar el cart
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/UpdateCart'
+      responses:
+        "200":
+          description: Cart modificado con éxito
+        "404":
+          description: Cart no encontrado
+        "500":
+          description: Error interno del servidor
+  /api/cart/{cid}/product/{pid}:
+    put:
+      summary: Modificar cantidad de un producto dentro de un cart
+      tags:
+        - Carts
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          description: ID del cart a modificar
+          schema: 
+            type: string
+            example: 6667a0ad3c1a1040f4e4564e
+        - in: path
+          name: pid
+          required: true
+          description: ID del producto que se desea modificar
+          schema:
+            type: string 
+            example: 6667a0ad3c1a1040f4e4564e
+      requestBody:  
+        description: Cómo modificar la cantidad de un producto del cart
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/UpdateCartQuantity'
+      responses:
+        "200":
+          description: Cart modificado con éxito
+        "404":
+          description: Cart no encontrado
+        "500":
+          description: Error interno del servidor
   /api/cart/{uid}:
     post:
-      summary: Obtiene todos los carts
+      summary: Crear un cart
       tags:
         - Carts
       parameters:
@@ -129,105 +183,119 @@ paths:
           schema:
             type: ObjectId
             example: 6667a0ad3c1a1040f4e4564e
-      responses:
-        "200":
-          description: Los cart conseguidos de manera exitos
-          content: 
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref:'#/components/schemas/CreateCart'
-              examples:
+      requestBody:  
+        description: Como crear un nuevo cart
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCart'
+            examples:
                 cart:
                   value:
                     - products:
                         - product: "66341e60ae100d582fa75344"
                           quantity: 2
-        "500":
-          description: Error interno del servidor
-    put:
-      summary: Obtiene todos los carts
-      tags:
-        - Carts
-      
       responses:
         "200":
           description: Los cart conseguidos de manera exitos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  newCart:
+                    allOf:
+                      - $ref: '#/components/schemas/Product'
+                      - type: object
+                        properties:
+                          _id:
+                            type: string
+                            example: "66aba199cb388082ae23ea51"
+
+        "404":
+          description: Cart no encontrado
         "500":
           description: Error interno del servidor
-  /api/cart/addProducts/{cid}/products:
-    put:
-      summary: Obtiene todos los carts
-      tags:
-        - Carts
-      responses:
-        "200":
-          description: Los cart conseguidos de manera exitos
-        "500":
-          description: Error interno del servidor
-  /api/cart/{cid}/products/{pid}:
-    put:
-      summary: Obtiene todos los carts
-      tags:
-        - Carts
-      responses:
-        "200":
-          description: Los cart conseguidos de manera exitos
-        "500":
-          description: Error interno del servidor
+
+  api/cart/{cid}/product/{pid}:
     delete:
-      summary: Obtiene todos los carts
+      summary: Eliminar un producto determinado del cart
       tags:
         - Carts
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          description: ID del cart donde se quiere eliminar el producto
+          schema:
+            type: string
+            example: 667c8362a7ba944ab303e3e6
+        - in: path
+          name: pid
+          required: true
+          description: ID del producto que se desea eliminar
+          schema:
+            type: string
+            example: 4755fd99-3227-4573-a702-5107525b9eb
       responses:
         "200":
-          description: Los cart conseguidos de manera exitos
-        "500":
-          description: Error interno del servidor
-  /api/cart/{cid}/product/{pid}:
-    delete:
-      summary: Obtiene todos los carts
-      tags:
-        - Carts
-      responses:
-        "200":
-          description: Los cart eliminado de manera exitosa
+          description: Producto eliminado de manera exitosa del cart
         "404":
           description: Cart no encontrado
         "500":
           description: Error interno del servidor
 
 
+  
 
 #schema
 components:
   schemas:
-    Product:
+    ProductsCart:
       type: object
       properties:
         owner:
           type: string
-        _id:
+          description: Email del owner
+          example: mia@gmail.com
+        -id:
           type: string
+          description: ID del producto
+          example: 66aa4701e5707cc9bb898ac5 
         title:
           type: string
+          description: Título del producto
+          example: GARFIELD FUERA DE CASA
         category:
           type: string
+          description: Categoría del producto
+          example: animación
         description:
           type: string
+          description: Descripción del producto
+          example: Garfield, el famoso gato amante de la lasaña que odia los lunes, está…
         price:
           type: number
+          format: float
+          description: Precio del producto
+          example: 2000
         thumbnail:
           type: string
+          description: Imagen del producto
+          example: https://static.cinemarkhoyts.com.ar/Images/Posters/2bc9ca70c2febb6faf5…
         stock:
           type: number
+          description: Cantidad en stock
+          example: 5
         status:
           type: boolean
+          description: Disponibilidad del producto
+          example: true
         code:
           type: number
-        id:
-          type: ObjectId
+          description: codigo de identificacion del producto
+          example: 1233
     Cart:
       type: object
       properties:
@@ -239,11 +307,9 @@ components:
             type: object
             properties:
               product:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/ProductsCart'
               quantity:
                 type: number
-              _id:
-                type: ObjectId
     CreateCart:
       type: object
       properties:
@@ -260,8 +326,29 @@ components:
                 type: number
                 description: cantidad de producto
                 example: 2
-    
-
+    UpdateCart:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+                description: Id autogenerado de mongo.
+                example: "66341e60ae100d582fa75344"
+              quantity:
+                type: number
+                description: cantidad de producto
+                example: 2
+    UpdateCartQuantity:
+      type: object
+      properties:
+        quantity:
+            type: number
+            description: cantidad de producto
+            example: 3
 #body
 requestBodies:
     cartRequestBody:

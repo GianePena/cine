@@ -9,8 +9,8 @@ export const router = Router()
 
 router.get("/", ProductController.getProducts);
 router.get("/all", ProductController.getAllProducts);
-router.get("/:id", ProductController.getProductsById)
-router.post("/", passportCall("jwt"), authorization(["admin", "premium"]), ProductController.addProduct);
-router.put("/:id", passportCall("jwt"), authorization(["premium"]), ProductController.updateProduct);
-router.delete("/:id", passportCall("jwt"), authorization(["admin", "premium"]), ProductController.deleteProduct)
-
+router.get("/:pid", ProductController.getProductsById)
+router.post("/", ProductController.addProduct);
+//router.post("/", passportCall("jwt"), authorization(["admin", "premium"]), ProductController.addProduct);
+router.put("/:pid", passportCall("jwt"), authorization(["premium"]), ProductController.updateProduct);
+router.delete("/:pid", passportCall("jwt"), authorization(["admin", "premium"]), ProductController.deleteProduct)
