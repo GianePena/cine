@@ -1,4 +1,5 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
+import { productModelo } from "../DAO/models/productModelo.js";
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { logger } from "../utils/logger.js";
@@ -25,8 +26,17 @@ class CartService {
         }
         return this.dao.getCartById(cid)
     }
-    createCart = async (uid, products) => {
+    async createCart(products) {
+        try {
+            const newCart = await this.dao.create(products);
+            return newCart;
+        } catch (error) {
+            throw new Error("Error al crear cart: " + error.message);
+        }
+    }
 
+
+    createCartByUser = async (uid, products) => {
         const user = await this.dao.findUserBy(uid);
         if (!user) {
             logger.warn(`Usuario con ID ${uid} no encontrado`);
@@ -34,21 +44,20 @@ class CartService {
         }
         if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
             for (let p of products) {
-                if (user.rol === "premium" && products.owner === user.email) {
+                if (user.rol === "premium" && p.owner === user.email) {
                     throw CustomError.createError("Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION);
                 }
             }
             const newCart = await this.dao.create(products);
             user.cart = newCart._id;
             await user.save();
-            logger.info(`Nuevo cart ${newCart}`);
+            logger.info(`Nuevo cart creado: ${newCart}`);
             return newCart;
         } else {
             logger.error(`El usuario ${uid} ya tiene un cart asociado`);
             throw CustomError.createError("Error al crear el carrito", "El usuario ya tiene un cart asociado", TIPOS_ERRORS.ERROR_AUTORIZACION);
         }
-
-    };
+    }
 
     addProductsToCart = async (cid, products) => {
         const cart = await this.dao.getCartById(cid);
@@ -60,7 +69,6 @@ class CartService {
                 TIPOS_ERRORS.NOT_FOUND
             );
         }
-
         const updatedCart = await this.dao.addProductsToCart(cid, products);
         if (updatedCart instanceof CustomError) {
             throw updatedCart;
@@ -112,31 +120,38 @@ class CartService {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
-        let insufficientStock = [];
-        let totalAmount = 0;
-        for (let item of cart.products) {
-            const { product, quantity } = item;
-            if (product.stock < quantity) {
-                insufficientStock.push(product._id);
-            } else {
-                totalAmount += product.price * quantity;
-            }
-        }
-        if (insufficientStock.length > 0) {
-            return { error: "Stock insuficiente", insufficientStock };
-        }
         const user = await this.dao.findUserByCartId(cid)
         if (!user) {
             CustomError.createError("User NotFound Error", `User con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
-
         }
+        //let insufficientStock = [];
+        let totalAmount = 0;
+        for (const item of cart.products) {
+            const productId = item.product._id || item.product;
+            const quantity = item.quantity;
+            const product = await productModelo.findById(productId)
+            if (product.stock < quantity) {
+                //insufficientStock.push({ , quantity });
+                insufficientStock.push({ product, quantity });
+            } else {
+                console.log(`PRODUCTO STOCK VIAJO: ${product.stock}`);
+                totalAmount += product.price * quantity;
+                product.stock -= quantity
+                await product.save()
+                console.log(`PRODUCTO STOCK ACT: ${product.stock}`);
+            }
+        }
+        /*if (insufficientStock.length > 0) {
+            CustomError("Cart incompleto", "Stock isnuficiente en alugnos productos", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            logger.warn(`productos con stock insuficiente ${insufficientStock}`)
+            console.log(insufficientStock);
+            return insufficientStock
+        }*/
         const ticket = await this.dao.createTicket(totalAmount, user.email);
-        for (let item of cart.products) {
-            await this.dao.updateProductStock(item.product._id, item.quantity)
-        }
-        await this.dao.removeAllProducts(cart);
-        return { ticket };
+        //cart.products.push(insufficientStock)
+        await cart.save()
+
+        return { ticket }
     }
 }
-
 export const cartService = new CartService(new CartManager())

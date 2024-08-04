@@ -6,27 +6,47 @@ import { productModelo } from "./models/productModelo.js";
 import { logger } from "../utils/logger.js";
 import { CustomError } from "../utils/CustomError.js";
 import { TIPOS_ERRORS } from "../utils/Errors.js";
+import { calcularStock } from "../utils/utils.js";
 class CartManagerMONGO {
     async getAll() {
-        return await cartModelo.find();
+        return await cartModelo.find().lean()
     }
     async getCartById(cid) {
         return await cartModelo.findById(cid).populate('products.product')
     }
     async findUserBy(uid) {
-        return await userModelo.findById(uid);
+        return await userModelo.findById(uid)
     }
     async findUserByCartId(cartId) {
         return await userModelo.findOne({ cart: cartId });
     }
-
     async create(products) {
-        return await cartModelo.create({
+        for (let p of products) {
+            const product = await productModelo.findById(p.product);
+            if (!product) {
+                logger.warn(`Producto con ID ${cid} no encontrado`);
+                return CustomError.createError(
+                    "Error al actualizar la cantidad en el cart",
+                    `Producto con ID ${cid} no encontrado`,
+                    TIPOS_ERRORS.NOT_FOUND
+                )
+            }
+            if (product.stock < p.quantity) {
+                logger.warn(`stock INSUFICIENTE del producto con ID ${product._id}`);
+                return CustomError.createError(
+                    "Error al agregar productos al carrito",
+                    `Cantidad insuficiente de stock`,
+                    TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS
+                );
+            }
+        }
+        const newCart = await cartModelo.create({
             products: products.map(p => ({
                 product: new mongoose.Types.ObjectId(p.product),
                 quantity: p.quantity || 1,
             }))
         });
+        return newCart
     }
     async addProductsToCart(cid, products) {
         let cart = await this.getCartById(cid);
@@ -36,19 +56,36 @@ class CartManagerMONGO {
                 "Error al agregar productos al cart", `Cart con ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND
             );
         }
-        products.forEach(item => {
-            let existingProduct = cart.products.find(p => p.product.toString() === item.product);
+        for (let p of products) {
+            const product = await productModelo.findById(p.product);
+            if (!product) {
+                logger.warn(`Producto con ID ${cid} no encontrado`);
+                return CustomError.createError(
+                    "Error al actualizar la cantidad en el cart",
+                    `Producto con ID ${cid} no encontrado`,
+                    TIPOS_ERRORS.NOT_FOUND
+                )
+            }
+            if (product.stock < p.quantity) {
+                logger.warn(`stock INSUFICIENTE del producto con ID ${product._id}`);
+                return CustomError.createError(
+                    "Error al agregar productos al carrito",
+                    `Cantidad insuficiente de stock`,
+                    TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS
+                );
+            }
+            let existingProduct = cart.products.find(p => p.product.equals(product._id))
             if (existingProduct) {
-                existingProduct.quantity += item.quantity;
+                existingProduct.quantity += p.quantity;
             } else {
                 cart.products.push({
-                    product: item.product,
-                    quantity: item.quantity
+                    product: product._id,
+                    quantity: p.quantity
                 });
             }
-        });
+        }
         await cart.save()
-        logger.info(`Nuevo cart ${cart}`)
+        logger.info(`Cart actualizado ${cart}`)
         return cart
     }
     async updateQuantity(cid, pid, quantity) {
@@ -61,29 +98,73 @@ class CartManagerMONGO {
                 TIPOS_ERRORS.NOT_FOUND
             );
         }
-        cart.products.forEach(p => {
-            if (p.product._id.toString() === pid) {
-                p.quantity = quantity;
-            }
-        });
-        return await cartModelo.updateOne({ _id: cart.id }, cart)
+        let product = await productModelo.findById(pid)
+        if (!product) {
+            logger.warn(`Producto con ID ${cid} no encontrado`);
+            return CustomError.createError(
+                "Error al actualizar la cantidad en el cart",
+                `Producto con ID ${cid} no encontrado`,
+                TIPOS_ERRORS.NOT_FOUND
+            );
+        }
+        if (product.stock < quantity) {
+            logger.warn(`stock INSUFICIENTE: Stock disponible: ${product.stock}, stock solicitado: ${quantity}`);
+            return CustomError.createError(
+                "Error al agregar productos al carrito",
+                `Cantidad insuficiente de stock`,
+                TIPOS_ERRORS.NOT_FOUND
+            );
+
+        }
+        let productInCart = cart.products.find(p => p.product.equals(product._id))
+        if (!productInCart) {
+            logger.warn(`Product with ID ${pid} not found in cart`);
+            throw CustomError.createError(
+                "Error updating quantity in the cart",
+                `Product with ID ${pid} not found in the cart`,
+                TIPOS_ERRORS.NOT_FOUND
+            );
+        }
+        productInCart.quantity = quantity;
+        await cart.save();
+        logger.info(`Cart modificado:${cart}`)
+        return cart;
     }
     async updateCart(cid, products) {
         let cartToUpdate = await this.getCartById(cid);
         if (!cartToUpdate) {
             logger.warn(`Cart con ID ${cid} no encontrado`);
             return CustomError.createError(
-                "Error al modificar el cart",
+                "Error al actualizar la cantidad en el cart",
                 `Cart con ID ${cid} no encontrado`,
                 TIPOS_ERRORS.NOT_FOUND
             );
+        }
+        for (const data of products) {
+            let product = await productModelo.findById(data.product);
+            if (!product) {
+                logger.warn(`Product with ID ${data.product} not found`);
+                throw CustomError.createError(
+                    "Error updating the cart",
+                    `Product with ID ${data.product} not found`,
+                    TIPOS_ERRORS.NOT_FOUND
+                );
+            }
+            if (product.stock < data.quantity) {
+                logger.warn(`stock INSUFICIENTE del producto con ID ${cid}`);
+                return CustomError.createError(
+                    "Error al agregar productos al carrito",
+                    `Cantidad insuficiente de stock`,
+                    TIPOS_ERRORS.NOT_FOUND
+                );
+            }
         }
         cartToUpdate.products = products.map(p => ({
             product: p.product,
             quantity: p.quantity
         }));
         await cartToUpdate.save();
-        logger.info(`Carrito actualizado ${cartToUpdate}`);
+        logger.info(`Nuevo Cart: ${cartToUpdate}`);
         return cartToUpdate;
     }
     async removeProduct(cid, pid) {
@@ -101,7 +182,6 @@ class CartManagerMONGO {
     }
     async removeAllProducts(cid) {
         const cartToUpdate = await this.getCartById(cid);
-        console.log(cartToUpdate);
         if (!cartToUpdate) {
             logger.warn(`Cart con ${cid} no encontrado`)
             return CustomError.createError(
@@ -109,7 +189,6 @@ class CartManagerMONGO {
             );
         }
         cartToUpdate.products = []
-        console.log(cartToUpdate.products);
         return await cartToUpdate.save();
     }
     async createTicket(amount, purchaser) {

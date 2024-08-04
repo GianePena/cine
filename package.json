@@ -37,5 +37,8 @@
     "swagger-ui-express": "^5.0.1",
     "uuid": "^9.0.1",
     "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.7.0"
   }
 }

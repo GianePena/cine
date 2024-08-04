@@ -32,7 +32,35 @@ export class CartController {
             next(error);
         }
     }
+    /*static createCart = async (req, res, next) => {
+        const { products } = req.body;
+        try {
+            const newCart = await cartService.createCart(products);
+        } catch (error) {
+            req.logger.error(`Error en la creacion de un nuevo cart: ${error.message}`)
+            next(error)
+        }
+    }*/
     static createCart = async (req, res, next) => {
+        const { products } = req.body;
+        try {
+            if (!products || products.length === 0) {
+                throw new Error("Debe proporcionar productos (IDs de productos y la cantidad) en el cuerpo de la solicitud");
+            }
+
+            for (const product of products) {
+                if (!product.product || isNaN(product.quantity)) {
+                    throw new Error("El ID del producto es obligatorio y la cantidad de los productos debe ser un número");
+                }
+            }
+
+            const newCart = await cartService.createCart(products);
+            res.status(201).json({ newCart });
+        } catch (error) {
+            next(error);
+        }
+    }
+    static createCartByUser = async (req, res, next) => {
         const { uid } = req.params;
         const { products } = req.body;
         try {
@@ -56,7 +84,7 @@ export class CartController {
                     );
                 }
             }
-            const newCart = await cartService.createCart(uid, products);
+            const newCart = await cartService.createCartByUser(uid, products);
             req.logger.info(`Cart creado exitosamente: ${newCart}`)
             res.status(201).json({ newCart });
         } catch (error) {

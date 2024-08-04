@@ -67,7 +67,7 @@ export const initPassport = () => {
         },
             async (req, username, password, done) => {
                 try {
-                    let { first_name, last_name, age } = req.body;
+                    let { first_name, last_name, age, cart } = req.body;
                     if (!first_name || !last_name || !age) {
                         return done(null, false, { message: "Faltan datos en el formulario" });
                     }
@@ -80,7 +80,14 @@ export const initPassport = () => {
                         rol = "admin";
                     }
                     const hashedPassword = generaHash(password);
-                    let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol });
+                    if (cart) {
+                        let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol, cart })
+                        return done(null, newUser);
+                    }
+                    else {
+                        let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol });
+                        return done(null, newUser);
+                    }
                     return done(null, newUser);
                 } catch (error) {
                     return done(error);

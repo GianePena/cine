@@ -35,4 +35,19 @@ export const amount = async (cid) => {
 
 
 
-
+export const calcularStock = (product) => {
+    let insufficientStock = [];
+    if (product.stock < p.quantity) {
+        insufficientStock.push({
+            productId: p.product,
+            stockDisponible: product.stock,
+            cantidadRequrida: p.quantity
+        });
+    }
+    if (insufficientStock.length > 0) {
+        console.log(insufficientStock);
+        throw new Error('Stock insuficiente para algunos productos ', {
+            insufficientStock
+        });
+    }
+}

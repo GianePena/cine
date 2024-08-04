@@ -28,10 +28,10 @@ const userSchema = new mongoose.Schema(
             type: String, enum: ['admin', 'premium', 'user'],
             default: 'user'
         }
-
     },
     {
-        timestamps: true
+        timestamps: true,
+        strict: false
     }
 )
 userSchema.pre('find', function () {

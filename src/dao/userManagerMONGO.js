@@ -3,7 +3,7 @@ import { generaHash } from "../utils/utils.js";
 
 class UserManagerMONGO {
     async getUsers() {
-        return await userModelo.find()
+        return await userModelo.find().lean()
     }
     async getUserById(id) {
         let user = await userModelo.findById(id).lean()
