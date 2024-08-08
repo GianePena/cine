@@ -1,3 +1,4 @@
+import { productModelo } from "../DAO/models/productModelo.js";
 import { ProductDTO } from "../DTO/ProductDTO.js";
 import { productService } from "../service/ProductService.js";
 import { CustomError } from "../utils/CustomError.js"
@@ -35,9 +36,10 @@ export class ProductController {
                 return CustomError.createError("Not Found", ` Producto ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
             }
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(new ProductDTO(product));
+            //res.status(200).json(new ProductDTO(product));
+            res.status(200).json(product);
         } catch (error) {
-            req.logger.error(`Error fetching product by ID ${id}: ${error.message}`)
+            req.logger.error(`Error fetching product by ID ${pid}: ${error.message}`)
             next(error);
         }
     }
@@ -51,9 +53,10 @@ export class ProductController {
                 return CustomError.createError("Faltante de datos", datosIncompletos, "Completar la totalidad de los campos para ejecutar la creación del producto", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
             }
             let newProduct = await productService.createProduct({ owner, title, category, description, price, thumbnail, stock, status })
+            let product = newProduct
             req.logger.info(`Producto creado exitosamente: ${newProduct}`)
             res.setHeader('Content-Type', 'application/json');
-            return res.status(201).json({ newProduct });
+            return res.status(201).json(product);
         } catch (error) {
             next(error);
             req.logger.error(`Error en la creacion de un nuevo producto: ${error.message}`)
@@ -68,8 +71,9 @@ export class ProductController {
         try {
             const updatedProduct = await productService.updateProduct(pid, email, price);
             res.setHeader('Content-type', 'application/json');
-            req.logger.info(`Producto modificado exitosamente: ${updatedProduct}`)
-            res.status(200).json({ message: `Producto con ID ${pid} actualizado correctamente`, product: updatedProduct });
+            let product = await productModelo.findOne({ _id: pid })
+            req.logger.info(`Producto modificado exitosamente: ${product}`)
+            res.status(200).json(product);
         } catch (error) {
             next(error)
             req.logger.error(`Error en la modificacion del product ID${pid}: ${error.message}`)
@@ -84,7 +88,7 @@ export class ProductController {
                 return CustomError.createError("Product NotFound Error", `Producto con ID ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             }
             res.setHeader('Content-type', 'application/json')
-            return res.status(204).json({ message: `Producto con ID ${pid} eliminado correctamente` })
+            res.status(204).json(`Producto con ID ${product} eliminado correctamente`)
         } catch (error) {
             next(error)
             req.logger.error(`Error en la eliminacion del producto ID${pid}: ${error.message}`)

@@ -7,6 +7,7 @@ import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js"
 
 
+
 class ProductManagerMONGO {
     async getProducts() {
         return await productModelo.find().lean()
@@ -54,7 +55,7 @@ class ProductManagerMONGO {
                 "Error al actualizar el producto", `Usuario con email ${email} no encontrado`, TIPOS_ERRORS.NOT_FOUND
             );
         }
-        let product = await this.getProductById(id)
+        let product = await productModelo.findOne({ _id: id });
         if (!product) {
             logger.warn(`Producto con ${id} no encintrado`)
             return CustomError.createError(
@@ -62,16 +63,15 @@ class ProductManagerMONGO {
             );
         }
         if (product.owner === user.email) {
-            product.price = price
-            product.save
-            logger.info(`Precio acualizado:${product.title} ${product.price}`)
+            product.price = price;
+            await product.save();
             return product
         }
         else {
             logger.warn(`privilegios insuficientes para modifica el producto ${id}: solo usuarios premium o propietarios`)
         }
     }
-    async deleteProduct(email, id) {
+    async deleteProduct(email, pid) {
         let user = await userModelo.findOne({ email: email });
         if (!user) {
             logger.warn(`Usuario con email ${email} no encontrado`)
@@ -79,21 +79,28 @@ class ProductManagerMONGO {
                 "Error al actualizar el producto", `Usuario con email ${email} no encontrado`, TIPOS_ERRORS.NOT_FOUND
             );
         }
-        let product = await this.getProductById(id).lean()
+        let product = await productModelo.findOne({ _id: pid })
         if (!product) {
-            logger.warn(`Producto con ${id} no encintrado`)
+            logger.warn(`Producto con ${pid} no encintrado`)
             return CustomError.createError(
-                "Error al actualizar el producto", `Producto con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND
+                "Error al elimar el producto", `Producto con ID ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND
             );
         }
         if (user.rol === "admin" || product.owner === user.email) {
-            logger.info(`producto eliminado con exito: ${product.title}`)
-            return await productModelo.deleteOne({ _id: id });
-        } else {
-            logger.warn(`privilegios insuficientes para modifica el producto ${id}: solo usuarios premium o propietarios`)
+            await productModelo.deleteOne({ _id: pid });
+            return "PRODUCOTO ELIMINADDDDDDDD"
+
+        }
+        else {
+            logger.warn(`privilegios insuficientes para modifica el producto ${pid}: solo usuarios premium o propietarios`)
         }
     }
 }
 
 
 export { ProductManagerMONGO }
+
+
+
+
+

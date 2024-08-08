@@ -1,3 +1,4 @@
+import { cartModelo } from "../DAO/models/cartModelo.js";
 import { CartDTO } from "../DTO/CartDTO.js"
 import { cartService } from "../service/CartService.js"
 import { CustomError } from "../utils/CustomError.js"
@@ -8,9 +9,9 @@ export class CartController {
     static getCarts = async (req, res, next) => {
         try {
             let carts = await cartService.getCarts()
-            let cartDTO = carts.map(c => new CartDTO(c))
-            res.setHeader('Content-Type', 'application/json')
-            return res.status(200).json({ cartDTO })
+            //let cartDTO = carts.map(c => new CartDTO(c))
+            //res.setHeader('Content-Type', 'application/json')
+            return res.status(200).json(carts)
         } catch (error) {
             req.logger.error(`Error fetching all carts: ${error.message}`)
             next(error)
@@ -26,21 +27,12 @@ export class CartController {
                 return CustomError.createError("Cart NotFound Error", `Cart con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             }
             res.setHeader('Content-Type', 'application/json');
-            return res.status(200).json(new CartDTO(cart));
+            return res.status(200).json(cart);
         } catch (error) {
             req.logger.error(`Error fetching cart by ID `)
             next(error);
         }
     }
-    /*static createCart = async (req, res, next) => {
-        const { products } = req.body;
-        try {
-            const newCart = await cartService.createCart(products);
-        } catch (error) {
-            req.logger.error(`Error en la creacion de un nuevo cart: ${error.message}`)
-            next(error)
-        }
-    }*/
     static createCart = async (req, res, next) => {
         const { products } = req.body;
         try {
@@ -60,35 +52,50 @@ export class CartController {
             next(error);
         }
     }
-    static createCartByUser = async (req, res, next) => {
-        const { uid } = req.params;
-        const { products } = req.body;
+    static createCart = async (req, res, next) => {
+        const { products, uid } = req.body;
         try {
-            if (!uid || !products) {
-                req.logger.warn('Datos incompletos necesarios para producto');
-                req.logger.debug(`Datos recibidos: ${uid, products}`);
-                return CustomError.createError("Faltante de datos", ` "Completar el ID del usuario (uid)`, TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
-            }
-
             if (!products || products.length === 0) {
                 req.logger.warn('Datos incompletos necesarios para producto');
-                req.logger.debug(`Datos recibidos: ${uid, products}`);
-                return CustomError.createError("Faltante de datos", " Debe proporcionar productos (IDs de productos y la cantidad) en el cuerpo de la solicitud", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                req.logger.debug(`Datos recibidos: ${uid}, ${products}`);
+                return next(CustomError.createError("Faltante de datos", "Debe proporcionar productos (IDs de productos y la cantidad) en el cuerpo de la solicitud", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS));
             }
             for (const product of products) {
                 if (isNaN(product.quantity)) {
-                    return CustomError.createError(
+                    return next(CustomError.createError(
                         "Datos incorrectos",
                         "La cantidad de los productos debe ser un número",
                         TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS
-                    );
+                    ));
                 }
             }
-            const newCart = await cartService.createCartByUser(uid, products);
-            req.logger.info(`Cart creado exitosamente: ${newCart}`)
-            res.status(201).json({ newCart });
+            let newCart;
+            if (uid) {
+                newCart = await cartService.createCart(uid, products);
+            } else {
+                newCart = await cartService.createCart(null, products);
+            }
+            req.logger.info(`Cart creado exitosamente: ${newCart}`);
+            res.status(201).json(newCart);
         } catch (error) {
-            req.logger.error(`Error en la creacion de un nuevo cart: ${error.message}`)
+            req.logger.error(`Error en la creacion de un nuevo cart: ${error.message}`);
+            next(error);
+        }
+    }
+    static updateQuantity = async (req, res, next) => {
+        let { quantity } = req.body
+        let { cid, pid } = req.params
+        try {
+            if (!quantity) {
+                return CustomError.createError("Faltante de datos", `Completar la totalidad de los campos`, TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            }
+            if (isNaN(quantity)) return CustomError.createError("Dato incorrecto", "La cantidad de los productos debe ser un número", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            let updateproduct = await cartService.updateQuantity(cid, pid, quantity)
+            res.setHeader('Content-Type', 'application/json');
+            let cart = await cartModelo.findOne({ _id: cid })
+            res.status(200).json(cart)
+        } catch (error) {
+            req.logger.error(`Error en la modificacion del cart ID${cid}: ${error.message}`)
             next(error)
         }
     }
@@ -102,7 +109,8 @@ export class CartController {
             if (isNaN(quantity)) return CustomError.createError("Dato incorrecto", "La cantidad de los productos debe ser un número", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
             let updateproduct = await cartService.updateQuantity(cid, pid, quantity)
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json({ updateproduct })
+            let cart = await cartModelo.findOne({ _id: cid })
+            res.status(200).json(cart)
         } catch (error) {
             req.logger.error(`Error en la modificacion del cart ID${cid}: ${error.message}`)
             next(error)
@@ -117,7 +125,9 @@ export class CartController {
             }
             const updateCart = await cartService.updateCart(cid, products)
             res.setHeader('Content-Type', 'application/json');
-            res.status(201).json(new CartDTO(updateCart))
+            let cart = await cartModelo.findOne({ _id: cid })
+            console.log(cart);
+            res.status(201).json(updateCart)
         } catch (error) {
             req.logger.error(`Error en la modificacion del cart ID${cid}: ${error.message}`)
             next(error)
@@ -131,7 +141,7 @@ export class CartController {
                 return CustomError.createError("Faltante de datos", "Debe proporcionar productos (IDs de productos y la cantidad) en el cuerpo de la solicitud", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
             }
             const updatedCart = await cartService.addProductsToCart(cid, products);
-            res.status(200).json({ message: 'Productos agregados con éxito', updatedCart });
+            res.status(200).json(updatedCart);
         } catch (error) {
             req.logger.error(`Error en el agregado de productos: ${error.message}`)
             next(error)
@@ -144,9 +154,10 @@ export class CartController {
             let removeProduct = await cartService.removeProduct(cid, pid)
             req.logger.info(`Producto id ${pid} eliminado del cart ${cid}`)
             res.setHeader('Content-Type', 'application/json');
-            res.status(201).json(`Producto eliminado con exito: ${pid}`)
+            let cart = await cartModelo.findOne({ _id: cid })
+            res.status(201).json(cart)
         } catch (error) {
-            req.logger.error(`Error en la eliminacion del product ID${pid} del cart ${cid}: ${error.message}`)
+            req.logger.error(`Error en el servido. No se ha podido eliminar ${pid} del cart ${cid}`)
             next(error)
         }
     }
@@ -155,10 +166,11 @@ export class CartController {
         try {
             let removeProducts = await cartService.removeAllProducts(cid)
             req.logger.info(`Productos eliminados del cart ${cid}: Cart vacio`)
+            let cart = await cartModelo.findOne({ _id: cid })
             res.setHeader('Content-Type', 'application/json');
-            res.status(201).json(`Cart ${cid} productos eliminados con exito`)
+            res.status(201).json(cart)
         } catch (error) {
-            req.logger.error(`Error en el vaciado del cart ${cid}: ${error.message}`)
+            req.logger.error(`Error en el servidor. No se ha podido vaciado del cart ${cid}`)
             next(error)
         }
     }

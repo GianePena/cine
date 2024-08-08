@@ -51,11 +51,11 @@ paths:
             example: 669ad0d3e86bb35945c217
       responses:
         "200":
-          description: Cart eliminado de manera exitosa
+          description: Cart  669ad0d3e86bb35945c217 productos eliminados con exito
         "404":
           description: Cart no encontrado
         "500":
-          description: Error interno del servidor
+          description: Error en el servidor. No se ha podido vaciado del cart 669ad0d3e86bb35945c217
     get:
       summary: Obtiene el cart segun el id
       tags:
@@ -199,7 +199,6 @@ paths:
                           _id:
                             type: string
                             example: "66aba199cb388082ae23ea51"
-
         "404":
           description: Cart no encontrado
         "500":
@@ -224,14 +223,14 @@ paths:
           description: ID del producto que se desea eliminar
           schema:
             type: string
-            example: 4755fd99-3227-4573-a702-5107525b9eb
+            example: 66341e60ae100d582fa75344
       responses:
         "200":
-          description: Producto eliminado de manera exitosa del cart
+          description: Producto eliminado con exito 66341e60ae100d582fa75344
         "404":
           description: Cart no encontrado
         "500":
-          description: Error interno del servidor
+          description: Error en el servido. No se ha podido eliminar 66341e60ae100d582fa75344 del cart 667c8362a7ba944ab303e3e6
 
 
   

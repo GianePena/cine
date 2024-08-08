@@ -38,8 +38,8 @@ class ProductService {
     updateProduct = async (id, email, price) => {
         return this.dao.updateProduct(id, email, price);
     }
-    deleteProduct = async (email, id) => {
-        return this.dao.deleteProduct(email, id);
+    deleteProduct = async (email, pid) => {
+        return this.dao.deleteProduct(email, pid);
     }
 
 }

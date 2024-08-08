@@ -6,8 +6,8 @@ class UserService {
     getAllUsers = async () => {
         return this.dao.getUsers()
     }
-    getUserById = async (id) => {
-        return this.dao.getUserById(id);
+    getUserById = async (uid) => {
+        return this.dao.getUserById(uid);
     }
     getUserBy = async (filtro) => {
         return this.dao.getBy(filtro)
@@ -21,8 +21,8 @@ class UserService {
     updateUserPassword = async (email, password) => {
         return this.dao.updatePassword(email, password)
     }
-    deleteUser = async (id) => {
-        return this.dao.delete(id)
+    deleteUser = async (uid) => {
+        return this.dao.delete(uid)
     }
 }
 

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node ./src/app.js --mode prod",
     "dev": "nodemon ./src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha ./test/**/*.js  -- --exit"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +39,8 @@
     "winston": "^3.13.0"
   },
   "devDependencies": {
-    "mocha": "^10.7.0"
+    "chai": "^5.1.1",
+    "mocha": "^10.7.0",
+    "supertest": "^7.0.0"
   }
 }

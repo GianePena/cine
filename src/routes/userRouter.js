@@ -38,7 +38,7 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
         return CustomError.createError("Autenticación fallida", `Token vacio o no proporcionado`, TIPOS_ERRORS.ERROR_AUTENTICACION)
     }
     res.cookie('userCookie', token, { httpOnly: true });
-    res.status(201).json({
+    res.status(200).json({
         message: req.user,
     });
 });
@@ -48,9 +48,9 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
 //PASSPORT-LOCAL
 router.post("/registro", passport.authenticate("registro", { session: false }), async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.status(201).json({
-        newUser: req.user//ESE REQ. USER LO GENERA PASSPORT
-    })
+    let user = req.user;
+    delete user.password;
+    res.status(200).json(user)
 })
 
 router.post("/login", passport.authenticate("login", { session: false }),
@@ -69,17 +69,22 @@ router.post("/login", passport.authenticate("login", { session: false }),
         }
         else {
             res.setHeader('Content-Type', 'application/json');
-            return res.status(200).json({ payload: "Login correcto", user })
+            return res.status(200).json(user)
         }
     }
 )
 
 
 router.get("/data", passportCall("jwt"), authorization(["user", "admin"]), UserController.getData)
-router.get("/", UserController.getUsers)
-router.get("/:id", UserController.getBy)
+//router.get("/", UserController.getUsers)
 //router.get("/:id", passportCall("jwt"), authorization(["user"]), UserController.getBy)
+//router.post("/updatePassword", UserController.updatePassword)
+//router.put('/premium/:uid', UserController.updateRol)
+//router.delete("/:id", UserController.deleteUser)
+router.get("/", UserController.getUsers)
+router.delete("/:uid", UserController.deleteUser)
+router.get("/:uid", UserController.getBy)
 router.post("/updatePassword", UserController.updatePassword)
 router.put('/premium/:uid', UserController.updateRol)
-router.delete("/:id", UserController.deleteUser)
+
 

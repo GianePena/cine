@@ -24,10 +24,9 @@ class CartManagerMONGO {
         for (let p of products) {
             const product = await productModelo.findById(p.product);
             if (!product) {
-                logger.warn(`Producto con ID ${cid} no encontrado`);
                 return CustomError.createError(
                     "Error al actualizar la cantidad en el cart",
-                    `Producto con ID ${cid} no encontrado`,
+                    `Producto con ID no encontrado`,
                     TIPOS_ERRORS.NOT_FOUND
                 )
             }
@@ -204,4 +203,7 @@ class CartManagerMONGO {
 
 
 export { CartManagerMONGO }
+
+
+
 

@@ -1,4 +1,5 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
+import { cartModelo } from "../DAO/models/cartModelo.js";
 import { productModelo } from "../DAO/models/productModelo.js";
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
@@ -34,31 +35,39 @@ class CartService {
             throw new Error("Error al crear cart: " + error.message);
         }
     }
-
-
-    createCartByUser = async (uid, products) => {
-        const user = await this.dao.findUserBy(uid);
-        if (!user) {
-            logger.warn(`Usuario con ID ${uid} no encontrado`);
-            throw CustomError.createError("Error al crear cart", `Usuario con ID ${uid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
-        }
-        if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
-            for (let p of products) {
-                if (user.rol === "premium" && p.owner === user.email) {
-                    throw CustomError.createError("Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION);
-                }
+    createCart = async (uid, products) => {
+        if (uid) {
+            const user = await this.dao.findUserBy(uid);
+            if (!user) {
+                logger.warn(`Usuario con ID ${uid} no encontrado`);
+                throw CustomError.createError("Error al crear cart", `Usuario con ID ${uid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
             }
-            const newCart = await this.dao.create(products);
-            user.cart = newCart._id;
-            await user.save();
-            logger.info(`Nuevo cart creado: ${newCart}`);
-            return newCart;
+            if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
+                for (let p of products) {
+                    if (user.rol === "premium" && p.owner === user.email) {
+                        throw CustomError.createError("Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION);
+                    }
+                }
+                const newCart = await this.dao.create(products);
+                if (!newCart || !newCart._id) {
+                    logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
+                    throw new Error('Error al crear un nuevo cart');
+                }
+                user.cart = newCart._id;
+                await user.save();
+                logger.info(`Nuevo cart creado y asociado al usuario ${uid}: ${newCart}`);
+                return newCart;
+            }
         } else {
-            logger.error(`El usuario ${uid} ya tiene un cart asociado`);
-            throw CustomError.createError("Error al crear el carrito", "El usuario ya tiene un cart asociado", TIPOS_ERRORS.ERROR_AUTORIZACION);
+            const newCart = await this.dao.create(products);
+            if (!newCart || !newCart._id) {
+                logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
+                throw new Error('Error al crear un nuevo cart');
+            }
+            logger.info(`Nuevo cart creado sin asociar a usuario: ${newCart}`);
+            return newCart;
         }
     }
-
     addProductsToCart = async (cid, products) => {
         const cart = await this.dao.getCartById(cid);
         if (!cart) {
@@ -70,12 +79,8 @@ class CartService {
             );
         }
         const updatedCart = await this.dao.addProductsToCart(cid, products);
-        if (updatedCart instanceof CustomError) {
-            throw updatedCart;
-        }
         return updatedCart;
     }
-
     updateQuantity = async (cid, pid, quantity) => {
         const cart = await this.dao.getCartById(cid);
         if (!cart) {
@@ -87,9 +92,6 @@ class CartService {
             );
         }
         const updatedCart = await this.dao.updateQuantity(cid, pid, quantity);
-        if (updatedCart instanceof CustomError) {
-            throw updatedCart;
-        }
         return updatedCart;
     }
     updateCart = async (cid, products) => {
@@ -122,7 +124,7 @@ class CartService {
         }
         const user = await this.dao.findUserByCartId(cid)
         if (!user) {
-            CustomError.createError("User NotFound Error", `User con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+            CustomError.createError("User NotFound Error", `User con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
         //let insufficientStock = [];
         let totalAmount = 0;

@@ -19,28 +19,29 @@ const customLevels = {
 winston.addColors(customLevels.colors);
 
 //Logger produccion
+
 export const logger = winston.createLogger({
     levels: customLevels.levels,
     format: winston.format.combine(
         winston.format.timestamp({
             format: 'YYYY-MM-DD HH:mm:ss'
         }),
-        winston.format.colorize(customLevels.colors),
+        winston.format.colorize(),
         winston.format.printf(({ timestamp, level, message }) => {
-            return `${timestamp} [${level}]: ${message} `;
+            return `${timestamp} [${level}]: ${message}`;
         })
     ),
     transports: [
         new winston.transports.Console({
             level: "info"
-        },
-            new winston.transports.File({
-                filename: "./logs/errors.log",
-                level: "error"
-            })
-        )
+        }),
+        new winston.transports.File({
+            filename: "../utils/logs/errors.log",
+            level: "error"
+        })
     ]
-})
+});
+
 const loggerDev = winston.createLogger({
     levels: customLevels.levels,
     format: winston.format.combine(
