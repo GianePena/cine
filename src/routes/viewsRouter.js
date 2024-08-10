@@ -90,7 +90,7 @@ router.get('/carts/:id', async (req, res) => {
     }
 });
 
-//VISTAS Login
+
 router.get('/registro', (req, res) => {
     res.status(200).render('registro')
 })

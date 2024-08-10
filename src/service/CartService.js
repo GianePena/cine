@@ -119,21 +119,19 @@ class CartService {
     purchase = async (cid) => {
         const cart = await this.dao.getCartById(cid)
         if (!cart) {
-            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
+            CustomError.createError("Cart NotFound Error", `Cart con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
         const user = await this.dao.findUserByCartId(cid)
         if (!user) {
             CustomError.createError("User NotFound Error", `User con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
-        //let insufficientStock = [];
         let totalAmount = 0;
         for (const item of cart.products) {
             const productId = item.product._id || item.product;
             const quantity = item.quantity;
             const product = await productModelo.findById(productId)
             if (product.stock < quantity) {
-                //insufficientStock.push({ , quantity });
                 insufficientStock.push({ product, quantity });
             } else {
                 console.log(`PRODUCTO STOCK VIAJO: ${product.stock}`);
@@ -143,16 +141,8 @@ class CartService {
                 console.log(`PRODUCTO STOCK ACT: ${product.stock}`);
             }
         }
-        /*if (insufficientStock.length > 0) {
-            CustomError("Cart incompleto", "Stock isnuficiente en alugnos productos", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
-            logger.warn(`productos con stock insuficiente ${insufficientStock}`)
-            console.log(insufficientStock);
-            return insufficientStock
-        }*/
         const ticket = await this.dao.createTicket(totalAmount, user.email);
-        //cart.products.push(insufficientStock)
         await cart.save()
-
         return { ticket }
     }
 }

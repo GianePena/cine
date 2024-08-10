@@ -1,9 +1,9 @@
 import passport from "passport"
-//PASSPORT-LOCAL --> estrategia
+
 import local from "passport-local"
-//PASSPORT GITHUB --> estrategia
+
 import github from "passport-github2"
-//PASSPORT JWT 
+
 import passportJWT from "passport-jwt"
 import jwt from "jsonwebtoken"
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
@@ -25,11 +25,9 @@ function buscarToken(req) {
     }
     return token;
 }
-//PASO 1
+
 
 export const initPassport = () => {
-    //ESTRATEGIA DE LOGIN -> PASSPORT-GITHUB
-
     passport.use(
         "github",
         new github.Strategy({
@@ -50,11 +48,8 @@ export const initPassport = () => {
                         user = await userManager.createUser({ name, email, rol });
                     }
                     const token = jwt.sign({ email: user.email, rol: user.rol }, config.JWT_SECRET, { expiresIn: '1h' });
-                    //return done(null, { token, user }); 
                     return done(null, { token, ...user.toObject() });
                 } catch (error) {
-
-
                     return done(error);
                 }
             })

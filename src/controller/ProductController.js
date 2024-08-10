@@ -10,7 +10,7 @@ export class ProductController {
         try {
             let products = await productService.getProducts()
             res.setHeader('Content-Type', 'application/json')
-            return res.status(200).json({ products })
+            return res.status(200).json(products)
 
         } catch (error) {
             req.logger.error(`Error fetching all products: ${error.message}`)

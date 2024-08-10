@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { transporter } from "../utils/mail.js";
 import { CustomError } from "../utils/CustomError.js";
 import { TIPOS_ERRORS } from "../utils/Errors.js";
-//import { logger } from "../utils/logger.js";
 import jwt from "jsonwebtoken"
 import { config } from '../config/config.js';
+
 
 export const sendCodeRouter = Router();
 let code = "C-4F74A8"
@@ -29,3 +29,4 @@ sendCodeRouter.post('/sendCode', (req, res) => {
         .then(resultado => res.send("Correo enviado: " + resultado.response))
         .catch(error => res.send("Error al enviar correo: " + error.message));
 });
+

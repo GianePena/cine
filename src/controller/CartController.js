@@ -1,16 +1,13 @@
 import { cartModelo } from "../DAO/models/cartModelo.js";
-import { CartDTO } from "../DTO/CartDTO.js"
 import { cartService } from "../service/CartService.js"
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
-import { logger } from "../utils/logger.js";
-
+import { transporter } from "../utils/mail.js";
+import { userModelo } from "../DAO/models/userModelo.js";
 export class CartController {
     static getCarts = async (req, res, next) => {
         try {
             let carts = await cartService.getCarts()
-            //let cartDTO = carts.map(c => new CartDTO(c))
-            //res.setHeader('Content-Type', 'application/json')
             return res.status(200).json(carts)
         } catch (error) {
             req.logger.error(`Error fetching all carts: ${error.message}`)
@@ -177,14 +174,35 @@ export class CartController {
     static purchase = async (req, res, next) => {
         const { cid } = req.params;
         try {
-            const result = await cartService.purchase(cid);
-            if (result.error) {
-                return CustomError.createError("Error al completar la compra", `NO ES POSIBLE FINLIZAR LA COMPRA`, TIPOS_ERRORS.NOT_FOUND)
+            const user = await userModelo.findOne({ cart: cid });
+            if (!user.email) {
+                return CustomError.createError("Error en el email", 'Email es necesario para enviar el ticket', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
             }
+
+            const result = await cartService.purchase(cid);
+            if (!result) {
+                return CustomError.createError("Error al completar la compra", `NO ES POSIBLE FINALIZAR LA COMPRA`, TIPOS_ERRORS.NOT_FOUND);
+            }
+
+            const mailOptions = {
+                from: "gianellapena01@gmail.com",
+                to: user.email,
+                subject: "Ticket de compra",
+                html: `
+                TICKET DE COMPRA <hr>
+                USUARIO: ${result.ticket.purchaser}<br>
+                ID CART:${result.ticket._id}<br>
+                Fecha:${result.ticket.purchase_datetime}<hr>
+                TOTAL: ${result.ticket.amount}`
+            };
+
+            transporter.sendMail(mailOptions)
+                .then(resultado => req.logger.info("Correo enviado: " + resultado.response))
+                .catch(error => req.logger.error("Error al enviar correo: " + error.message));
             res.status(201).json({ ticket: result.ticket });
         } catch (error) {
-            req.logger.error(`Error en finalizalizacion de la compra del cart ${cid}: ${error.message}`)
-            next(error)
+            req.logger.error(`Error en finalización de la compra del cart ${cid}: ${error.message}`);
+            next(error);
         }
     }
 }

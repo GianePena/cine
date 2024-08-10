@@ -35,7 +35,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NewProduct'
+                $ref: '#/components/schemas/Product'
         "400":
           description: Solicitud inválida.
         "500":
@@ -108,10 +108,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductUpdated'
+              $ref: '#/components/schemas/UpadatePrice'
       responses:
         "200":
-          description: Producto actualizado exitosamente.
+          description: Producto modificado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
         "404":
           description: Producto no encontrado.
         "500":
@@ -119,12 +123,6 @@ paths:
 
 components:
   schemas:
-    NewProduct:
-      type: object
-      properties:
-        newProduct:
-          type: object
-          $ref: '#/components/schemas/Product'
     CreateProduct:
       type: object
       properties:
@@ -181,14 +179,12 @@ components:
         email:
           type: string
           example: mia@gmail.com
-    ProductUpdated:
+    UpadatePrice:
       type: object
       properties:
         email:
           type: string
-          description: Email del usuario
           example: mia@gmail.com
         price:
           type: number
-          description: Monto actualizado
-          example: 6000
+          example: 2000

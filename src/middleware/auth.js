@@ -1,4 +1,4 @@
-//auth sessions
+
 export const authSessions = (req, res, next) => {
     if (!req.session.user) {
         res.setHeader('Content-Type', 'application/json');
@@ -6,7 +6,7 @@ export const authSessions = (req, res, next) => {
     }
     next()
 }
-//auth jwt
+
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js";
 
@@ -47,7 +47,7 @@ export const authorization = (permisos = []) => {
 
 
 
-//validar token
+
 import { logger } from "../utils/logger.js";
 const validateToken = (req, res, next) => {
     const token = req.query.token

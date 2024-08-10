@@ -80,23 +80,5 @@ class ProductManagerMEMORY {
 
 
 }
-/*
 
-
-const filteredProducts = this.products.filter(product => product.id !== idString);
-        this.products = filteredProducts;
-        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
-        console.log(`Producto eliminado: ID ${idString}`);
-productManager.addProduct("KunFu Panda 4", "basdasdad", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/b008cba4654343ef87745ae0d5633793.jpg?v=00002290", 125, 40)
-productManager.addProduct("Duna", "sadasda", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9259ce8559aa01f8fd771054cd3a1a28.jpg?v=00002290", 132, 40)
-productManager.addProduct("Pobres criaturas", "cxcxcc", 3000, "https://static.cinemarkhoyts.com.ar/Images/Posters/9a7859e6ed1c4fb77bf24248a679946b.jpg?v=00002290", 98, 40)
-productManager.updateProduct(1, 4500)
-const productos = productManager.getProduct()
-
-
-
-let lectura = JSON.parse(fs.readFileSync("./src/productos.json", { encoding: "utf-8" }))
-console.log(lectura[2].title);
-
-*/
 export { ProductManagerMEMORY }

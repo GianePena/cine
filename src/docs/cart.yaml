@@ -15,23 +15,15 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Carts'
+                  $ref: '#/components/schemas/GetCarts'
               example:
-                cart:
-                  _id: "667c8362a7ba944ab303e3e6"
+                - _id: "66b531994e8dc5467c6f5e59"
                   products:
-                    - product:
-                        owner: "admin"
-                        _id: "66341e60ae100d582fa75344"
-                        title: "HORRORLAND"
-                        category: "terror"
-                        description: "Una exclusiva noche privada de Halloween en Liseberg se convierte rápidamente en una verdadera pesadilla."
-                        price: 4500
-                        thumbnail: "https://static.cinemarkhoyts.com.ar/Images/Posters/feaa7b4e69f36adba02e3a4e344795c8.jpg?v=00002323"
-                        stock: 32
-                        status: true
-                        code: 289
-                      quantity: 2
+                    - product: "66b531994e8dc5467c6f5e5a"
+                      quantity: 4
+                  createdAt: "2024-08-08T20:59:05.302Z"
+                  updatedAt: "2024-08-08T20:59:05.302Z"
+                  __v: 0
         "404":
           description: Not Found:carts no encontrado
         "500":
@@ -74,11 +66,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                items:
                   $ref: '#/components/schemas/Cart'
               example:
-                cart:
                   _id: "667c8362a7ba944ab303e3e6"
                   products:
                     - product:
@@ -92,7 +81,10 @@ paths:
                         stock: 32
                         status: true
                         code: 289
-                      quantity: 2
+                        quantity: 2
+                  -createdAt: "2024-08-08T20:59:05.302Z"
+                  -updatedAt: "2024-08-08T20:59:05.302Z"
+                  -__v: 0
         "404":
           description: Not Found:Cart no encontrado
         "500":
@@ -110,15 +102,30 @@ paths:
             type: string
             example: 669ad0d3e86bb35945c217
       requestBody:  
-        description: Cómo modificar el cart
+        description: Como crear un nuevo cart
         required: true
         content:
           application/json:
-            schema: 
+            schema:
               $ref: '#/components/schemas/UpdateCart'
       responses:
         "200":
-          description: Cart modificado con éxito
+          description: Cart modificado con exito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetCarts'
+              example:
+                - _id: "66b531994e8dc5467c6f5e59"
+                  products:
+                    - product: "66b531994e8dc5467c6f5e5a"
+                      quantity: 4
+                  createdAt: "2024-08-08T20:59:05.302Z"
+                  updatedAt: "2024-08-08T20:59:05.302Z"
+                  __v: 0
+            
         "404":
           description: Cart no encontrado
         "500":
@@ -152,7 +159,22 @@ paths:
               $ref: '#/components/schemas/UpdateCartQuantity'
       responses:
         "200":
-          description: Cart modificado con éxito
+          description: Los carts conseguidos de manera exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetCarts'
+              example:
+                - _id: "66b531994e8dc5467c6f5e59"
+                  products:
+                    - product: null
+                      quantity: 4
+                      _id: "66b531994e8dc5467c6f5e5a"
+                  createdAt: "2024-08-08T20:59:05.302Z"
+                  updatedAt: "2024-08-08T20:59:05.302Z"
+                  __v: 0
         "404":
           description: Cart no encontrado
         "500":
@@ -176,7 +198,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCart'
+              $ref: '#/components/schemas/GetCarts'
             examples:
                 cart:
                   value:
@@ -185,20 +207,22 @@ paths:
                           quantity: 2
       responses:
         "200":
-          description: Los cart conseguidos de manera exitos
+          description: Cart creado de manera exitos
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  newCart:
-                    allOf:
-                      - $ref: '#/components/schemas/Product'
-                      - type: object
-                        properties:
-                          _id:
-                            type: string
-                            example: "66aba199cb388082ae23ea51"
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetCarts'
+              example:
+                - _id: "66b531994e8dc5467c6f5e59"
+                  products:
+                    - product: null
+                      quantity: 4
+                      _id: "66b531994e8dc5467c6f5e5a"
+                  createdAt: "2024-08-08T20:59:05.302Z"
+                  updatedAt: "2024-08-08T20:59:05.302Z"
+                  __v: 0
         "404":
           description: Cart no encontrado
         "500":
@@ -238,6 +262,60 @@ paths:
 #schema
 components:
   schemas:
+    GetCarts: 
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "66b531994e8dc5467c6f5e59"
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+                example: "66b531994e8dc5467c6f5e5a"
+              quantity:
+                type: integer
+                example: 4
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T20:59:05.302Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T20:59:05.302Z"
+        __v:
+          type: integer
+          example: 0
+    GetCartByID:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "66b531994e8dc5467c6f5e59"
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                $ref: '#/components/schemas/ProductsCart'
+              quantity:
+                type: integer
+                example: 4
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T20:59:05.302Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T20:59:05.302Z"
+        __v:
+          type: integer
     ProductsCart:
       type: object
       properties:
@@ -282,42 +360,13 @@ components:
           type: number
           description: codigo de identificacion del producto
           example: 1233
-    Cart:
+    UpdateCartQuantity:
       type: object
       properties:
-        _id:
-          type: string
-        products:
-          type: array
-          items:
-            type: object
-            properties:
-              product:
-                $ref: '#/components/schemas/ProductsCart'
-              quantity:
-                type: number
-    Carts:
-      type: object
-      properties:
-        cart:
-          type: object
-          $ref: '#/components/schemas/Cart'
-    CreateCart:
-      type: object
-      properties:
-        products:
-          type: array
-          items:
-            type: object
-            properties:
-              product:
-                type: string
-                description: Id autogenerado de mongo.
-                example: "66341e60ae100d582fa75344"
-              quantity:
-                type: number
-                description: cantidad de producto
-                example: 2
+        quantity:
+            type: number
+            description: cantidad de producto
+            example: 3
     UpdateCart:
       type: object
       properties:
@@ -334,25 +383,6 @@ components:
                 type: number
                 description: cantidad de producto
                 example: 2
-    UpdateCartQuantity:
-      type: object
-      properties:
-        quantity:
-            type: number
-            description: cantidad de producto
-            example: 3
-#body
-requestBodies:
-    cartRequestBody:
-      description: Cuerpo de la solicitud para crear un nuevo cart.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Cart'
-          examples:
-            ejemploCart:
-              value:
-                products:
-                  - product: "66341e60ae100d582fa75344"
-                    quantity: 2
+
+
+

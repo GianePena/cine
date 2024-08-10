@@ -8,8 +8,6 @@ const argumentos = programa.opts()
 
 
 const mode = argumentos.mode
-//node src/app.js --mode prod
-//node src/app.js --mode dev
 
 dotenv.config({
     path: mode === "prod" ? "./src/.env.production" : "./src/.env.development",

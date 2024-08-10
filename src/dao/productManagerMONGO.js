@@ -12,8 +12,7 @@ class ProductManagerMONGO {
     async getProducts() {
         return await productModelo.find().lean()
     }
-    //PAGINATE
-    async getProductsPaginate(page, limit, sort) { //agregar
+    async getProductsPaginate(page, limit, sort) {
         const options = {
             page: page,
             limit: limit,
@@ -24,8 +23,8 @@ class ProductManagerMONGO {
                 'price': sort,
             }
         }
-        return await productModelo.paginate({}, options) //2 argumentos: filtro
-    }//DEVUELVE UN OBJETO CON PROPIEDADES DOCS (ARRAY CON DOCUMENTOS), TOTAL DOC, LIMITE, ....
+        return await productModelo.paginate({}, options)
+    }
     async createProduct({ owner, title, category, description, price, thumbnail, stock, status }) {
         if (owner) {
             let user = await userModelo.findOne({ email: owner });

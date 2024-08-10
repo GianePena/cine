@@ -21,8 +21,6 @@ const cartSchema = new mongoose.Schema(
         },
     }, {
     timestamps: true
-    //STRICT:FALSE --> PERMITE AGREGAR CAMPOS DEIFERENCTES AL MODELO AL CREACION DE UN INSTACION. EJ: FOTO --> SI LA TIENE LA GUARDA Y SI  NO NO
-
 }
 )
 

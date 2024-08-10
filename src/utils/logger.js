@@ -18,7 +18,7 @@ const customLevels = {
 };
 winston.addColors(customLevels.colors);
 
-//Logger produccion
+
 
 export const logger = winston.createLogger({
     levels: customLevels.levels,

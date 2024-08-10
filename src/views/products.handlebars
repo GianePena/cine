@@ -10,12 +10,13 @@
 
 
 <br>
+<hr>
 <ul>
     {{#each products}}
-        <li id=""><h4><strong>{{this.title}}</strong></h4> </li>
-        <li ><img src={{this.thumbnail}} alt={{this.title}}></li>
-        <li><strong>Price:</strong> ${{this.price}}</li>
-        <li><strong>Description: </strong>{{this.description}}</li><br><br>
+        <li id="itemProduct"><h4><strong>{{this.title}}</strong></h4> </li>
+        <li id="itemProduct"><img src={{this.thumbnail}} alt={{this.title}}></li>
+        <li id="itemProduct"><strong>Price:</strong> ${{this.price}}</li>
+        <li id="itemProduct"><strong>Description: </strong>{{this.description}}</li><br><br>
         <button  onclick="handleAddToCartClick('{{this._id}}')">Agregar al carrito</button><br><br><hr>
     {{/each}}
     <p>TOTAL PAGE:  {{totalPages}}</p>
