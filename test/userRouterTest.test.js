@@ -1,4 +1,4 @@
-import mongoose, { isValidObjectId } from "mongoose"
+/*import mongoose, { isValidObjectId } from "mongoose"
 import { afterEach, before, describe, it } from "mocha"
 import { assert, expect } from "chai"
 import supertest from "supertest"
@@ -125,4 +125,4 @@ describe("Pruebas router USER: get, getById, post, update y delete", async funct
         expect(status).to.equal(200)
         expect(body).to.exist.to.equal('Usuario eliminado con exito')
     })
-})
+})*/

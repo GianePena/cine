@@ -58,7 +58,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ]
@@ -72,7 +72,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ]
@@ -86,7 +86,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ],
@@ -102,7 +102,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ]
@@ -111,7 +111,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockAddProductCart = {
             "products": [
                 {
-                    "product": "66b5118e6e90a3998220db6b",
+                    "product": "66b69d67816edbc03425d8e7",
                     "quantity": 4
                 }
             ]
@@ -129,7 +129,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ]
@@ -138,7 +138,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockUpdateCart = {
             "products": [
                 {
-                    "product": "66b5118e6e90a3998220db6b",
+                    "product": "66b69d67816edbc03425d8e7",
                     "quantity": 4
                 }
             ]
@@ -154,7 +154,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69d67816edbc03425d8e7",
                     "quantity": 1
                 }
             ]
@@ -171,11 +171,11 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69d67816edbc03425d8e7",
                     "quantity": 2
                 },
                 {
-                    "product": "66b5118e6e90a3998220db6b",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ]
@@ -191,11 +191,11 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69d67816edbc03425d8e7",
                     "quantity": 10
                 },
                 {
-                    "product": "66b5118e6e90a3998220db6b",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ]
@@ -210,7 +210,7 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
         const mockCart = {
             "products": [
                 {
-                    "product": "66b5114a6e90a3998220db68",
+                    "product": "66b69c8b816edbc03425d8de",
                     "quantity": 1
                 }
             ],

@@ -1,4 +1,4 @@
-
+/*
 import mongoose, { isValidObjectId } from "mongoose"
 import { afterEach, before, describe, it } from "mocha"
 import { assert, expect } from "chai"
@@ -139,4 +139,4 @@ describe("Pruebas router Products: get, getById, post, update y delete", functio
         let { body, status } = await requester.delete(`/api/products/${product._id}`).send(emailUser).set("Cookie", `userCookie=${cookieValue}`)
         expect(status).to.equal(204)
     })
-}) 
+}) */

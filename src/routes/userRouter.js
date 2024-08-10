@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 import passport from "passport";
 import { logger } from "../utils/logger.js";
@@ -21,7 +20,7 @@ router.get('/mockinguser', (req, res) => {
 })
 router.use(sendCodeRouter)
 
-
+//app.use("/user", userRouter)
 
 router.get("/error", (req, res) => {
     res.setHeader('Content-Type', 'application/json');
@@ -29,7 +28,7 @@ router.get("/error", (req, res) => {
 })
 
 
-
+//PASSPORT GITHUB
 router.get('/github', passport.authenticate("github", {}), (req, res) => { });
 
 router.get('/callbackGithub', passport.authenticate("github", { session: false }), (req, res) => {
@@ -45,6 +44,7 @@ router.get('/callbackGithub', passport.authenticate("github", { session: false }
 
 
 
+//PASSPORT-LOCAL
 router.post("/registro", passport.authenticate("registro", { session: false }), async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     let user = req.user;
@@ -76,10 +76,9 @@ router.post("/login", passport.authenticate("login", { session: false }),
 
 router.get("/data", passportCall("jwt"), authorization(["user", "admin"]), UserController.getData)
 router.get("/", UserController.getUsers)
-router.get("/:id", passportCall("jwt"), authorization(["user"]), UserController.getBy)
+router.get("/:uid", passportCall("jwt"), authorization(["user"]), UserController.getBy)
+
 router.post("/updatePassword", UserController.updatePassword)
+
 router.put('/premium/:uid', UserController.updateRol)
-router.delete("/:id", UserController.deleteUser)
-
-
-
+router.delete("/:uid", UserController.deleteUser)

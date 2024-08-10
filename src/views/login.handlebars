@@ -4,7 +4,7 @@
 <hr>
 <h3><strong>Loguarse</strong></h3>
 
-<form action="/user/login" method="post">
+<form action="user/login" method="post">
     Email: <input type="text" name="email" id="email">
     Password: <input type="password" name="password">
     <input type="submit" value="Login"><br>
@@ -22,7 +22,7 @@
             event.preventDefault();
             const email = document.getElementById("email").value;
             console.log(email)
-            fetch('/user/sendCode', {
+            fetch('user/sendCode', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -38,4 +38,3 @@
                 document.getElementById('response').innerText = 'Error al enviar correo.';
             });
         });
-    </script>

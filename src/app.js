@@ -84,6 +84,7 @@ app.use(errorHandler)
 app.use(express.static("./src/public"))
 //ROUTES
 
+
 app.use("/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
