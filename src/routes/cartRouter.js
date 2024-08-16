@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import { CartController } from '../controller/CartController.js';
 import { passportCall } from '../utils/utils.js';
-import { authorization } from '../middleware/auth.js';
+import { authorization } from '../middleware/authorize.js';
 
 
 export const router = Router()
 
 router.get("/", CartController.getCarts)
-//router.get("/:cid", passportCall("jwt"), authorization(["user", "premium"]), CartController.getCartById);
-router.get("/:cid", CartController.getCartById);
+router.get("/:cid", passportCall("jwt"), authorization(["user", "premium"]), CartController.getCartById);
+
 router.post("/", CartController.createCart);
 
 router.put('/addProducts/:cid/products', passportCall("jwt"), authorization(["user", "premium"]), CartController.addProductsToCart)

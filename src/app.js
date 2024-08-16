@@ -1,34 +1,29 @@
-//EXPRESS
 import express from "express";
 import { config } from "./config/config.js";
 import compression from "express-compression";
 
-//swagger
-import swaggerJSDoc from "swagger-jsdoc";
 
+import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from 'swagger-ui-express';
 
-//HANDLEBARSs
 import { engine } from "express-handlebars";
-//ROUTES
+
 import { router as productsRouter } from "./routes/productRouter.js";
 import { router as cartRouter } from "./routes/cartRouter.js";
 import { router as viewsRouter } from "./routes/viewsRouter.js";
 import { router as userRouter } from "./routes/userRouter.js";
-//SOCKET
+
 import { Server } from "socket.io";
-//MONGOOSE
+
 import mongoose from "mongoose"
-//COOKIE
+
 import cookieParser from 'cookie-parser';
-//SESSIONS
-//import session from 'express-session'
-//PASPORT
+
 import passport from "passport";
 import { initPassport } from "./config/passport.config.js";
-//MIDDLEWARE DE  ERRORES
+
 import { errorHandler } from "./middleware/errorHandler.js";
-//LOGGER
+
 import { logger, middLogger } from "./utils/logger.js"
 import { ProductManagerMONGO as ProductManager } from "./DAO/productManagerMONGO.js";
 import { messageModelo } from "./dao/models/messagesModelo.js"
@@ -39,16 +34,14 @@ const PORT = config.PORT;
 const app = express();
 
 
-//COOKIES
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//MIDDLEWARE LOGGER
+
+
 app.use(middLogger)
 
-// Swagger
-//1. instalar swager, 
-//2. configuracion donde se configuran parametros 
+
 const options = {
     definition: {
         openapi: "3.0.0",
@@ -58,37 +51,29 @@ const options = {
             description: "API para cart y products"
         }
     },
-    apis: ["./src/docs/*.yaml"]//3.leer archivos 
+    apis: ["./src/docs/*.yaml"]
 };
-const spec = swaggerJSDoc(options);//4.generar specificaion
-app.use("/api-doc", swaggerUi.serve, swaggerUi.setup(spec));//5. cargar la documentacion
-
-//COMPRESSION --> comprime toda la salida siempre y cuando este comprimida por otro metodo antes
-app.use(compression({ brotli: { enabled: true } }))//indica que comprima con el metodo brotli
-//ver el tipo de compresein segun la informacion que se envia
-//--------------------------------------
+const spec = swaggerJSDoc(options);
+app.use("/api-doc", swaggerUi.serve, swaggerUi.setup(spec));
 
 
-//PASPORT JWT
+app.use(compression({ brotli: { enabled: true } }))
+
 initPassport()
-app.use(passport.initialize())
 
-//HANDLEBARS
+
+
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set("views", "./src/views")
 
-//MIDDLEWARE DE  ERRORES
-app.use(errorHandler)
-//ARCHIVOS ESTATICOS
+app.use(passport.initialize())
 app.use(express.static("./src/public"))
-//ROUTES
-
-
-app.use("/user", userRouter)
+app.use("/api/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/", viewsRouter);
+app.use(errorHandler)
 
 
 
@@ -97,7 +82,6 @@ const serverHTTP = app.listen(PORT, () => {
 });
 
 
-//SOCKET
 const io = new Server(serverHTTP);
 const productManager = new ProductManager("../src/api/products.json");
 
@@ -119,7 +103,6 @@ io.on("connection", (socket) => {
         productManager.deleteProduct(id)
         io.emit("listProducts", productManager.getProducts());
     })
-    ///----------------chat------------
     socket.on("usuario", ({ user, email }) => {
         if (!users.includes({ user, email })) {
             users.push({ user, email });
@@ -145,7 +128,7 @@ io.on("connection", (socket) => {
     });
 });
 
-//CONECCION BASE DE DATOS
+
 const connDB = async () => {
     try {
         await mongoose.connect(

@@ -3,11 +3,13 @@
 <br>
 <hr>
 <h3><strong>Registrarse como usuario</strong></h3>
-<form action="/user/registro" method="post">
-    Nombre: <input type="text" name="first_Name" required>
-    Apellido: <input type="text" name="last_Name" required>
-    Email: <input type="email" name="email" required>
-    Edad: <input type="number" name="age" required>
-    Password: <input type="password" name="password" required><br><br>
+<form action="/api/user/registro" method="post">
+    Nombre: <input type="text" name="first_name">
+    Apellido: <input type="text" name="last_name">
+    Email: <input type="email" name="email">
+    Edad: <input type="number" name="age">
+    Password: <input type="password" name="password"><br><br>
+    <strong>Campo no obligatorio</strong><br><br>
+    Cart Id:<input type="text" name="cart">
     <input type="submit" value="Registrar">
 </form>

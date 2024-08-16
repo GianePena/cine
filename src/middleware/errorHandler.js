@@ -5,7 +5,7 @@ export const errorHandler = (err, req, res, next) => {
     switch (err.code) {
         case TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS:
             res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `Error tipo de dato incorrecto: ${err.message}. ${err.cause}` });
+            return res.status(400).json({ error: `Error tipo de dato incorrecto: ${err.message}` });
         case TIPOS_ERRORS.ERROR_AUTENTICACION:
             res.setHeader('Content-Type', 'application/json');
             return res.status(401).json({ error: `Error de autenticación. Credenciales inválidas:${err.message}` });

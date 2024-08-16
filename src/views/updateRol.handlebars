@@ -1,0 +1,18 @@
+<h1>MODIFICAR ROL: USER/PREMIUM</h1>
+<br>
+<br>
+<strong>User: {{user.email}} <br></strong>
+<strong>Rol: {{user.rol}}</strong>
+
+<h3><strong>Cargar la documetacion correspondiente:</strong></h3>
+<hr>
+
+<form action="/api/user/{{user._id}}/documents" method="post" enctype="multipart/form-data">
+    <h4>Documentacion necesaria</h4> 
+    <h5 style="color:rgb(130, 29, 29); font-size:large"><strong>Importante:cada archivo debe tener el nombre de la documentacion correspondiente separando cada palabra con - . ej: identificacion.png, comprobante-de-cuenta.png , comprobante-de-estado-de-cuenta.png</strong></h5>
+    <br>
+    Identificacion: <input type="file" name="identificacion" /><br><br>
+    Comprobante de domicilio: <input type="file" name="comprobante_de_domicilio" /><br><br>
+    Comprobante de estado de cuenta: <input type="file" name="comprobante_de_estado_de_cuenta"  /><br><br>
+    <input type="submit" value="Cargar Documentacion">
+</form>

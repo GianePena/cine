@@ -1,17 +1,19 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
-import { cartModelo } from "../DAO/models/cartModelo.js";
-import { productModelo } from "../DAO/models/productModelo.js";
+import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js";
+import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js";
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { logger } from "../utils/logger.js";
 import mongoose from "mongoose";
 
 class CartService {
-    constructor(dao) {
-        this.dao = dao
+    constructor() {
+        this.cartManager = new CartManager(),
+            this.productManager = new ProductManager(),
+            this.userManager = new UserManager()
     }
     getCarts = async () => {
-        const carts = await this.dao.getAll()
+        const carts = await this.cartManager.getAll()
         if (carts.length > 0) {
             return carts
         }
@@ -20,69 +22,110 @@ class CartService {
         }
     }
     getCartById = async (cid) => {
-        const cart = await this.dao.getCartById(cid)
+        const cart = await this.cartManager.getCartById(cid)
         if (!cart) {
             logger.error(`Cart ${cart} NO ENCONTRADO`)
             return CustomError.createError("Cart NotFound Error", `Cart con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
-        return this.dao.getCartById(cid)
+        return cart
     }
-    async createCart(products) {
-        try {
-            const newCart = await this.dao.create(products);
-            return newCart;
-        } catch (error) {
-            throw new Error("Error al crear cart: " + error.message);
+    controlStock = async (products) => {
+        for (let p of products) {
+            const product = await this.productManager.getProductById(p.product);
+            console.log(product);
+            if (!product) {
+                return CustomError.createError(
+                    "Error al actualizar la cantidad en el cart",
+                    `Producto con ID no encontrado`,
+                    TIPOS_ERRORS.NOT_FOUND
+                )
+            }
+            if (product.stock < p.quantity) {
+                logger.warn(`stock INSUFICIENTE del producto con ID ${product._id}`);
+                return CustomError.createError(
+                    "Error al agregar productos al carrito",
+                    `Cantidad insuficiente de stock`,
+                    TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS
+                );
+            }
         }
+        return true;
     }
     createCart = async (uid, products) => {
-        if (uid) {
-            const user = await this.dao.findUserBy(uid);
-            if (!user) {
-                logger.warn(`Usuario con ID ${uid} no encontrado`);
-                throw CustomError.createError("Error al crear cart", `Usuario con ID ${uid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
-            }
-            if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
-                for (let p of products) {
-                    if (user.rol === "premium" && p.owner === user.email) {
-                        throw CustomError.createError("Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION);
-                    }
+        let stockSuficiente = await this.controlStock(products)
+        if (stockSuficiente === true) {
+            if (uid) {
+                const user = await this.userManager.getUserBy({ _id: uid })
+                if (!user) {
+                    logger.warn(`Usuario con ID ${uid} no encontrado`);
+                    return CustomError.createError("Error al crear cart", `Usuario con ID ${uid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
                 }
-                const newCart = await this.dao.create(products);
+                if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
+                    for (let p of products) {
+                        if (user.rol === "premium" && p.owner === user.email) {
+                            return CustomError.createError("Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION);
+                        }
+                    }
+                    const newCart = await this.cartManager.create(products)
+                    if (!newCart || !newCart._id) {
+                        logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
+                        return CustomError.createError('Error al crer el cart', 'newCart no creado', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                    }
+                    const updatedUser = this.userManager.addCartToUser(user, newCart)
+                    if (!updatedUser) {
+                        logger.error(`Error al actualizar el usuario con el nuevo carrito: ${uid}`);
+                        return CustomError.createError('Error al actualizar el usuario con el nuevo carrito', `cart no creado`, TIPOS_ERRORS.NOT_FOUND)
+                    }
+                    let usercart = await this.cartManager.getCartBy({ _id: user.cart })
+                    logger.info(`Nuevo cart creado y asociado al usuario ${uid}: ${newCart}`);
+                    return usercart
+                } else {
+                    logger.warn(`El usuario con ID ${uid} ya tiene un carrito asignado`);
+                    return user.cart;
+                }
+            } else {
+                const newCart = await this.cartManager.create(products)
                 if (!newCart || !newCart._id) {
                     logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
-                    throw new Error('Error al crear un nuevo cart');
+                    return CustomError.createError('Error al crer el cart', 'newCart no creado', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
                 }
-                user.cart = newCart._id;
-                await user.save();
-                logger.info(`Nuevo cart creado y asociado al usuario ${uid}: ${newCart}`);
+                logger.info(`Nuevo cart creado sin asociar a usuario: ${newCart}`);
                 return newCart;
             }
-        } else {
-            const newCart = await this.dao.create(products);
-            if (!newCart || !newCart._id) {
-                logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
-                throw new Error('Error al crear un nuevo cart');
-            }
-            logger.info(`Nuevo cart creado sin asociar a usuario: ${newCart}`);
-            return newCart;
         }
     }
     addProductsToCart = async (cid, products) => {
-        const cart = await this.dao.getCartById(cid);
+        const cart = await this.cartManager.getCartById(cid);
         if (!cart) {
             logger.warn(`Cart con ID ${cid} no encontrado`);
-            throw CustomError.createError(
+            return CustomError.createError(
                 "Error al agregar productos al cart",
                 `Cart con ID ${cid} no encontrado`,
                 TIPOS_ERRORS.NOT_FOUND
             );
         }
-        const updatedCart = await this.dao.addProductsToCart(cid, products);
-        return updatedCart;
-    }
+        let stockSuficiente = await this.controlStock(products);
+        if (stockSuficiente === true) {
+            for (const p of products) {
+                let existingProductInCart = cart.products.find(prod => {
+                    const prodId = prod.product._id || prod.product;
+                    return prodId.toString() === p.product.toString();
+                })
+                if (existingProductInCart) {
+                    existingProductInCart.quantity += p.quantity;
+                } else {
+                    cart.products.push({
+                        product: p.product,
+                        quantity: p.quantity
+                    });
+                }
+            }
+            const updatedCart = await this.cartManager.updateCart(cart);
+            return updatedCart;
+        }
+    };
     updateQuantity = async (cid, pid, quantity) => {
-        const cart = await this.dao.getCartById(cid);
+        const cart = await this.cartManager.getCartById(cid);
         if (!cart) {
             logger.warn(`Cart con ID ${cid} no encontrado`);
             return CustomError.createError(
@@ -91,38 +134,85 @@ class CartService {
                 TIPOS_ERRORS.NOT_FOUND
             );
         }
-        const updatedCart = await this.dao.updateQuantity(cid, pid, quantity);
-        return updatedCart;
+        let product = await this.productManager.getProductById(pid)
+        if (product.stock < quantity) {
+            logger.warn(`Cantidad insuficentes`);
+            return CustomError.createError(
+                "Error al actualizar la cantidad en el cart",
+                `Cantidad insuficiente para el producto con ID ${pid}`,
+                TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS
+            );
+        }
+        let findProduct = cart.products.find(p => p.product.equals(pid))
+        if (findProduct) {
+            findProduct.quantity = quantity
+            const updatedCart = await this.cartManager.updateCart(cart);
+            return updatedCart
+        }
     }
     updateCart = async (cid, products) => {
-        const updateCart = await this.dao.updateCart(cid, products)
-        return updateCart
+        let cart = await this.cartManager.getCartById(cid);
+        if (!cart) {
+            logger.warn(`Cart con ID ${cid} no encontrado`);
+            return CustomError.createError(
+                "Error al actualizar la cantidad en el cart",
+                `Cart con ID ${cid} no encontrado`,
+                TIPOS_ERRORS.NOT_FOUND
+            );
+        }
+        let stockSuficiente = await this.controlStock(products);
+        if (stockSuficiente === true) {
+            cart.products = products.map(p => ({
+                product: p.product,
+                quantity: p.quantity
+            }));
+            const updateCart = await this.cartManager.updateCart(cart)
+            return updateCart
+        }
     }
     removeProduct = async (cid, pid) => {
-        const cart = await this.dao.getCartById(cid)
+        let cart = await this.cartManager.getCartById(cid);
         if (!cart) {
-            CustomError.createError("Cart NotFound Error", `Cart con ID ${id} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
-            logger.error(`Cart ${cart} NO ENCONTRADO`)
+            logger.warn(`Cart con ID ${cid} no encontrado`);
+            return CustomError.createError(
+                "Error al actualizar la cantidad en el cart",
+                `Cart con ID ${cid} no encontrado`,
+                TIPOS_ERRORS.NOT_FOUND
+            );
         }
-        const updateCart = await this.dao.removeProduct(cid, pid)
+        let product = await this.productManager.getProductById(pid)
+        if (!product) {
+            logger.warn(`Producto con ${pid} no encintrado`)
+            return CustomError.createError(
+                "Error al actualizar el producto", `Producto con ID ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND
+            );
+        }
+        let indexProduct = cart.products.findIndex(p => p.product._id.toString() === pid);
+        cart.products.splice(indexProduct, 1);
+        const updateCart = await this.cartManager.updateCart(cart);
         return updateCart
     }
     removeAllProducts = async (cid) => {
-        const cart = await this.dao.getCartById(cid)
+        let cart = await this.cartManager.getCartById(cid);
         if (!cart) {
-            CustomError.createError("Cart NotFound Error", `Cart con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
-            logger.error(`Cart ${cart} NO ENCONTRADO`)
+            logger.warn(`Cart con ID ${cid} no encontrado`);
+            return CustomError.createError(
+                "Error al actualizar la cantidad en el cart",
+                `Cart con ID ${cid} no encontrado`,
+                TIPOS_ERRORS.NOT_FOUND
+            );
         }
-        const updateCart = await this.dao.removeAllProducts(cid)
+        cart.products = []
+        const updateCart = await this.cartManager.updateCart(cart)
         return updateCart
     }
     purchase = async (cid) => {
-        const cart = await this.dao.getCartById(cid)
+        const cart = await this.cartManager.getCartById(cid)
         if (!cart) {
             CustomError.createError("Cart NotFound Error", `Cart con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
             logger.error(`Cart ${cart} NO ENCONTRADO`)
         }
-        const user = await this.dao.findUserByCartId(cid)
+        const user = await this.userManager.getUserBy({ cart: cid })
         if (!user) {
             CustomError.createError("User NotFound Error", `User con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
         }
@@ -130,7 +220,7 @@ class CartService {
         for (const item of cart.products) {
             const productId = item.product._id || item.product;
             const quantity = item.quantity;
-            const product = await productModelo.findById(productId)
+            const product = await this.productManager.getProductById(productId)
             if (product.stock < quantity) {
                 insufficientStock.push({ product, quantity });
             } else {
@@ -141,9 +231,10 @@ class CartService {
                 console.log(`PRODUCTO STOCK ACT: ${product.stock}`);
             }
         }
-        const ticket = await this.dao.createTicket(totalAmount, user.email);
+        const ticket = await this.cartManager.createTicket(totalAmount, user.email);
         await cart.save()
         return { ticket }
     }
 }
-export const cartService = new CartService(new CartManager())
+
+export const cartService = new CartService()

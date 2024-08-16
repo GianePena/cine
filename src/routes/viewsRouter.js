@@ -2,7 +2,8 @@ import { Router } from "express"
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js";
 import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js";
 import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js"
-import { authorization } from "../middleware/auth.js";
+import { authorization } from '../middleware/authorize.js';
+
 import { passportCall } from "../utils/utils.js";
 
 export const router = Router()
@@ -67,11 +68,12 @@ router.get('/loggerTest', (req, res) => {
     req.logger.silly('Silly: log test')
     res.send('Logging tests');
 });
-router.get('/logout', (req, res) => {
-    res.clearCookie("userCookie");
-    res.redirect("/login");
-});
 
+router.get('/:uid/updateRol', async (req, res) => {
+    const { uid } = req.params
+    let user = await userManager.getBy({ _id: uid })
+    return res.status(200).render('updateRol', { user });
+});
 
 
 router.get('/carts/:id', async (req, res) => {
@@ -99,17 +101,7 @@ router.get('/login', (req, res) => {
 })
 
 
-
-
-
-
-
-
-
-
-
 import { config } from "../config/config.js";
-import cookieParser from "cookie-parser"
 
 import jwt from "jsonwebtoken"
 

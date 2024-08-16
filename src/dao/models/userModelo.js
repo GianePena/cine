@@ -27,6 +27,27 @@ const userSchema = new mongoose.Schema(
         rol: {
             type: String, enum: ['admin', 'premium', 'user'],
             default: 'user'
+        },
+        documents: [
+            {
+                name: {
+                    type: String, //nombre de documento
+                    default: null
+                },
+                reference: {
+                    type: String, //link al documento
+                    default: null
+                },
+                type: {
+                    type: String, enum: ['DNI', 'DOMICILIO', 'ESTADO_CUENTA'],//DNI,DOMICILIO,ESTADO_CUENTA 
+                    default: null
+                }
+            }
+        ]
+        ,
+        last_conection: {
+            type: Date,
+            default: null
         }
     },
     {
@@ -34,10 +55,10 @@ const userSchema = new mongoose.Schema(
         strict: false
     }
 )
-userSchema.pre('find', function () {
+
+userSchema.pre(['find', 'findMany'], function () {
     this.populate('cart').lean();
 });
-
 export const userModelo = mongoose.model(
     userCollection,
     userSchema

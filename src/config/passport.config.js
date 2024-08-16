@@ -1,19 +1,12 @@
 import passport from "passport"
-
 import local from "passport-local"
-
 import github from "passport-github2"
-
 import passportJWT from "passport-jwt"
 import jwt from "jsonwebtoken"
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { config } from "./config.js"
-import { UserManagerMONGO } from "../DAO/userManagerMONGO.js"
 import { generaHash, validarPasword } from "../utils/utils.js"
 import { logger } from "../utils/logger.js"
-
-
-const userManager = new UserManagerMONGO
+import { userService } from "../service/UserService.js"
 
 function buscarToken(req) {
     let token = null;
@@ -42,13 +35,13 @@ export const initPassport = () => {
                     if (!name || !email) {
                         return done(null, false, { message: "Datos insuficientes, no posee nombre o email en su cuenta de GitHub" });
                     }
-                    let user = await userManager.getBy({ email });
+                    let user = await userService.getBy({ email });
                     let rol = "user";
                     if (!user) {
-                        user = await userManager.createUser({ name, email, rol });
+                        user = await userService.createUser({ name, email, rol });
                     }
                     const token = jwt.sign({ email: user.email, rol: user.rol }, config.JWT_SECRET, { expiresIn: '1h' });
-                    return done(null, { token, ...user.toObject() });
+                    return done(null, { token, ...user });
                 } catch (error) {
                     return done(error);
                 }
@@ -62,24 +55,25 @@ export const initPassport = () => {
         },
             async (req, username, password, done) => {
                 try {
-                    let { first_name, last_name, age, cart, rol } = req.body;
-                    if (!first_name || !last_name || !age) {
+                    let { first_name, last_name, email, age, password, cart, rol } = req.body;
+                    if (!first_name || !last_name || !age || !email) {
                         return done(null, false, { message: "Faltan datos en el formulario" });
                     }
-                    const userExistente = await userManager.getBy({ email: username });
+                    console.log(first_name, last_name, email, age, password, cart, rol);
+                    const userExistente = await userService.getBy({ email: username });
                     if (username === config.ADMIN_EMAIL && password === config.ADMIN_PASSWORD) {
                         rol = "admin";
                     }
-                    if (userExistente && rol != "user") {
+                    if (userExistente) {
                         return done(null, false, { message: "Usuario existente, pruebe con otro email" });
                     }
                     const hashedPassword = generaHash(password);
                     if (cart) {
-                        let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol, cart })
+                        let newUser = await userService.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol, cart })
                         return done(null, newUser);
                     }
                     else {
-                        let newUser = await userManager.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol });
+                        let newUser = await userService.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol });
                         return done(null, newUser);
                     }
                 } catch (error) {
@@ -95,14 +89,14 @@ export const initPassport = () => {
             },
             async (username, password, done) => {
                 try {
-                    let user = await userManager.getBy({ email: username })
+                    let user = await userService.getBy({ email: username })
                     if (!user) {
                         return done(null, false)
                     }
                     if (!validarPasword(password, user.password)) {
                         return done(null, false)
                     }
-                    return done(null, user.toObject())
+                    return done(null, user)
                 } catch (error) {
                     return done(error)
                 }
@@ -118,7 +112,7 @@ export const initPassport = () => {
             },
             async (contenidoToken, done) => {
                 try {
-                    const user = await userManager.getBy({ email: contenidoToken.email })
+                    const user = await userService.getBy({ email: contenidoToken.email })
                     if (!user) {
                         return (null, false, { message: "Token inexistente" })
                     }

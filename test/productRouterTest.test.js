@@ -1,12 +1,9 @@
-/*
-import mongoose, { isValidObjectId } from "mongoose"
+/*import mongoose, { isValidObjectId } from "mongoose"
 import { afterEach, before, describe, it } from "mocha"
 import { assert, expect } from "chai"
 import supertest from "supertest"
 import { config } from "../src/config/config.js"
-import { productModelo } from "../src/DAO/models/productModelo.js"
 import jwt from "jsonwebtoken"
-import { userModelo } from "../src/DAO/models/userModelo.js"
 import { logger } from "../src/utils/logger.js"
 const requester = supertest("http://localhost:3000")
 
@@ -37,12 +34,12 @@ describe("Pruebas router Products: get, getById, post, update y delete", functio
             password: "123456",
             rol: "premium"
         };
-        let { body, status } = await requester.post("/user/registro").send(mockUser);
+        let { body, status } = await requester.post("/api/user/registro").send(mockUser);
         const mockUserLogin = {
             email: "gianetest@gmail.com",
             password: "123456"
         };
-        let { header } = await requester.post("/user/login").send(mockUserLogin);
+        let { header } = await requester.post("/api/user/login").send(mockUserLogin);
         let nombreCookie = header["set-cookie"][0].split("=")[0]
         cookieValue = header["set-cookie"][0].split("=")[1].split(";")[0]
         userCookie = jwt.verify(cookieValue, config.JWT_SECRET)
@@ -90,7 +87,6 @@ describe("Pruebas router Products: get, getById, post, update y delete", functio
             stock: 5,
             status: true
         };
-
         let responseBody = await requester.post("/api/products").send(mockProduct).set("Cookie", `userCookie=${cookieValue}`)
         let { body, status } = await requester.get(`/api/products/${responseBody.body._id}`).set("Cookie", `userCookie=${cookieValue}`)
         expect(body).to.have.property('owner')
@@ -101,6 +97,7 @@ describe("Pruebas router Products: get, getById, post, update y delete", functio
         expect(body).to.have.property('code')
         expect(body).to.have.property('stock')
         expect(body).to.have.property('_id')
+        expect(isValidObjectId(body._id)).to.be.true
     })
     it("Prueba PUT product: /api/products/:pid MODIFICA EL PRICE DEL PRODUCT INDICADO", async function () {
         const mockProduct = {
@@ -118,8 +115,16 @@ describe("Pruebas router Products: get, getById, post, update y delete", functio
         let mockUpdateProduct = { email: userCookie.email, price: 1222 }
         let { body, status } = await requester.put(`/api/products/${responseBody.body._id}`).send(mockUpdateProduct).set("Cookie", `userCookie=${cookieValue}`)
         expect(status).to.equal(200)
-        expect(body).to.exist
+        expect(body).to.have.property('owner')
+        expect(body).to.have.property('title')
+        expect(body).to.have.property('category')
+        expect(body).to.have.property('description')
         expect(body).to.have.property('price').to.equal(mockUpdateProduct.price)
+        expect(body).to.have.property('code')
+        expect(body).to.have.property('stock')
+        expect(body).to.have.property('_id')
+        expect(isValidObjectId(body._id)).to.be.true
+
     })
     it("Prueba DELETE product: /api/products/:pid  ELIMINA EL PRODUCT", async function () {
         const mockProduct = {
@@ -135,8 +140,8 @@ describe("Pruebas router Products: get, getById, post, update y delete", functio
         };
         let responseBody = await requester.post("/api/products").send(mockProduct).set("Cookie", `userCookie=${cookieValue}`)
         let emailUser = { email: userCookie.email }
-        let product = await productModelo.findOne({ _id: responseBody.body._id })
-        let { body, status } = await requester.delete(`/api/products/${product._id}`).send(emailUser).set("Cookie", `userCookie=${cookieValue}`)
-        expect(status).to.equal(204)
+        let { body, status } = await requester.delete(`/api/products/${responseBody.body._id}`).send(emailUser).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(200)
+        expect(body).to.exist.to.equal(`Producto con ID ${responseBody.body._id} eliminado correctamente`)
     })
 }) */

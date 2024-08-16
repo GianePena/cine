@@ -3,8 +3,8 @@
 <br>
 <hr>
 <h3><strong>Loguarse</strong></h3>
-
-<form action="user/login" method="post">
+<!--<form action="user/login" method="post"></form>-->
+<form action="api/user/login" method="post">
     Email: <input type="text" name="email" id="email">
     Password: <input type="password" name="password">
     <input type="submit" value="Login"><br>
@@ -12,7 +12,8 @@
     <input type="hidden" name="web" value="true">
 </form>
 <div id="response"></div>
-<a href="/user/github">Acceder con Github</a>
+<!--<a href="/user/github">Acceder con Github</a>-->
+<a href="api/user/github">Acceder con Github</a>
 <br>
 
 
@@ -22,7 +23,8 @@
             event.preventDefault();
             const email = document.getElementById("email").value;
             console.log(email)
-            fetch('user/sendCode', {
+            //fetch('user/sendCode', {
+            fetch('api/user/sendCode', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

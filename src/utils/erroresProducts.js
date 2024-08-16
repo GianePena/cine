@@ -1,5 +1,3 @@
-import os from "os"
-
 export const argumentosProducts = (product) => {
 
     let { title, category, description, price, thumbnail, stock, status } = product;

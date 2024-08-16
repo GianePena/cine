@@ -1,10 +1,8 @@
-import { productModelo } from "../DAO/models/productModelo.js";
-import { ProductDTO } from "../DTO/ProductDTO.js";
 import { productService } from "../service/ProductService.js";
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { argumentosProducts } from "../utils/erroresProducts.js";
-
+import { logger } from "../utils/logger.js";
 export class ProductController {
     static getAllProducts = async (req, res, next) => {
         try {
@@ -36,7 +34,6 @@ export class ProductController {
                 return CustomError.createError("Not Found", ` Producto ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
             }
             res.setHeader('Content-Type', 'application/json');
-            //res.status(200).json(new ProductDTO(product));
             res.status(200).json(product);
         } catch (error) {
             req.logger.error(`Error fetching product by ID ${pid}: ${error.message}`)
@@ -71,9 +68,8 @@ export class ProductController {
         try {
             const updatedProduct = await productService.updateProduct(pid, email, price);
             res.setHeader('Content-type', 'application/json');
-            let product = await productModelo.findOne({ _id: pid })
+            res.status(200).json(updatedProduct);
             req.logger.info(`Producto modificado exitosamente: ${product}`)
-            res.status(200).json(product);
         } catch (error) {
             next(error)
             req.logger.error(`Error en la modificacion del product ID${pid}: ${error.message}`)
@@ -84,11 +80,8 @@ export class ProductController {
         let { pid } = req.params
         try {
             const product = await productService.deleteProduct(email, pid)
-            if (!product) {
-                return CustomError.createError("Product NotFound Error", `Producto con ID ${pid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
-            }
             res.setHeader('Content-type', 'application/json')
-            res.status(204).json(`Producto con ID ${product} eliminado correctamente`)
+            res.status(200).json(`Producto con ID ${pid} eliminado correctamente`);
         } catch (error) {
             next(error)
             req.logger.error(`Error en la eliminacion del producto ID${pid}: ${error.message}`)

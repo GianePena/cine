@@ -33,7 +33,6 @@ export const amount = async (cid) => {
 
 
 
-
 export const calcularStock = (product) => {
     let insufficientStock = [];
     if (product.stock < p.quantity) {
