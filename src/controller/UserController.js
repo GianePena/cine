@@ -83,7 +83,12 @@ export class UserController {
             let getUser = jwt.verify(token, config.JWT_SECRET)
             let uid = getUser._id
             res.clearCookie("userCookie")
-            const logout = new Date();
+            const date = new Date();
+            let dia = date.getDate()
+            let mes = date.getMonth()
+            let año = date.getFullYear()
+            let hora = date.getHours()
+            let logout = `${dia}-${mes}-${año}-${hora}hs`
             await userService.lastConection(uid, logout);
             res.status(200).json(`User ${getUser.email} logout`)
         } catch (error) {
@@ -118,7 +123,7 @@ export class UserController {
                 }
             ]
             await userService.documentationUpload(uid, files)
-            res.status(200).json(`Documentacion cargada: user ${getUser.email} rol: ${getUser.rol}`)
+            res.status(200).json(`Documentacion cargada: user ${getUser.email}. ROL ACTUALIZADO `)
         } catch (error) {
             next(error)
         }

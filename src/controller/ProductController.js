@@ -9,7 +9,6 @@ export class ProductController {
             let products = await productService.getProducts()
             res.setHeader('Content-Type', 'application/json')
             return res.status(200).json(products)
-
         } catch (error) {
             req.logger.error(`Error fetching all products: ${error.message}`)
             next(error)
@@ -41,8 +40,11 @@ export class ProductController {
         }
     }
     static addProduct = async (req, res, next) => {
-        const { owner, title, category, description, price, thumbnail, stock, status } = req.body;
+        let { owner, title, category, description, price, thumbnail, stock, status } = req.body;
         try {
+            if (!owner) {
+                owner = req.user.email
+            }
             const datosIncompletos = argumentosProducts({ owner, title, category, description, price, thumbnail, stock, status });
             if (datosIncompletos !== "Todos los datos están completos.") {
                 req.logger.warn('Datos incompletos necesarios para producto');

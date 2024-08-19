@@ -30,7 +30,24 @@ describe("Pruebas router USER: get, getById, post, update y delete", async funct
             last_name: "test",
             email: "gianetest@gmail.com",
             age: 23,
-            password: "123456"
+            password: "123456",
+            documents: [
+                {
+                    name: "Captura de pantalla 2024-08-18 a la(s) 8.59.35â¯p.Â m..png",
+                    reference: "src/utils/documents/Captura de pantalla 2024-08-18 a la(s) 8.59.35â¯p…",
+                    type: "DNI"
+                },
+                {
+                    name: "Captura de pantalla 2024-08-18 a la(s) 8.59.35â¯p.Â m..png",
+                    reference: "src/utils/documents/Captura de pantalla 2024-08-18 a la(s) 8.59.35â¯p…",
+                    type: "DOMICILIO"
+                },
+                {
+                    name: "Captura de pantalla 2024-08-18 a la(s) 8.59.35â¯p.Â m..png",
+                    reference: "src/utils/documents/Captura de pantalla 2024-08-18 a la(s) 8.59.35â¯p…",
+                    type: "ESTADO_CUENTA"
+                }
+            ]
         };
         let { body, status } = await requester.post("/api/user/registro").send(mockUser);
         const mockUserLogin = {
@@ -102,8 +119,8 @@ describe("Pruebas router USER: get, getById, post, update y delete", async funct
         expect(isValidObjectId(body._id)).to.be.true
     });
     it("Pruba PUT user: ruta api/user/premium/:uid  MODIFICA EL ROL DEL USUER USER/PREMIUM", async function () {
-        let updateMockUser = { rol: "premium" }
-        let { body, status } = await requester.put(`/api/user/premium/${userCookie._id}`).send(updateMockUser)
+        let { body, status } = await requester.put(`/api/user/premium/${userCookie._id}`)
+        console.log(body);
         expect(status).to.equal(200)
         expect(body).to.have.property('first_name')
         expect(body).to.have.property('last_name')

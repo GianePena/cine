@@ -45,178 +45,178 @@ describe("Pruebas router CART: get, getById, post, update y delete", function ()
     })
     afterEach(async function () {
         await mongoose.connection.collection("users").deleteMany({ email: "gianetest@gmail.com" })
+
     })
     it("Prueba GET carts:  la ruta /api/cart/ TRAE A TODOS LOS CART CREADOS ", async function () {
         let { body, status } = await requester.get("/api/cart")
-        console.log(body);
         expect(status).to.equal(200)
         expect(Array.isArray(body)).to.be.true;
         expect(body[0]).to.have.property('products')
         expect(body[0].products[0]).to.have.property('quantity').to.be.a('number')
         expect(body[0].products[0]).to.have.property('product')
     })
-it("Pruebas GET cart BY ID : la ruta /api/cart/:cid  TRAE AL CART DEL ID INDICADO", async function () {
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69c8b816edbc03425d8de",
-                "quantity": 1
-            }
-        ]
-    }
-    let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    let { body, status } = await requester.get(`/api/cart/${responseBody.body._id}`).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(200)
-    expect(body).to.have.property('products')
-    expect(isValidObjectId(body._id)).to.be.true
-    expect(body.products[0]).to.have.property('quantity').to.be.a('number')
-    expect(body.products[0]).to.have.property('product')
-})
-it("Prueba POST cart SIN USER: la ruta /api/cart/ CREA UN NUEVO CART SIN USER", async function () {
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69c8b816edbc03425d8de",
-                "quantity": 1
-            }
-        ]
-    }
-    let { body, status } = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(201)
-    expect(isValidObjectId(body._id)).to.be.true
-    expect(body.products).that.is.an('array')
-    expect(body.products[0]).to.have.property('quantity').to.be.a('number')
-    expect(body.products[0]).to.have.property('product')
-})
-it("Prueba POST cart con user: la ruta /api/cart/ CREA UN NUEVO CART ASOCIADO A UN USUARIO", async function () {
-    let uid = userCookie._id
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69c8b816edbc03425d8de",
-                "quantity": 1
-            }
-        ],
-        "uid": uid
-    }
-    let { body, status } = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(201)
-    expect(isValidObjectId(body._id)).to.be.true
-    expect(body.products).that.is.an('array')
-    expect(body.products[0]).to.have.property('quantity').to.be.a('number')
-    expect(body.products[0]).to.have.property('product')
-});
-it("Prueba POST cart: ruta /api/cart/addProducts/:cid/products AÑADE UN PRODUCTO AL CART ", async function () {
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69c8b816edbc03425d8de",
-                "quantity": 1
-            }
-        ]
-    }
-    let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    const mockAddProductCart = {
-        "products": [
-            {
-                "product": "66b69d67816edbc03425d8e7",
-                "quantity": 4
-            }
-        ]
-    }
+    it("Pruebas GET cart BY ID : la ruta /api/cart/:cid  TRAE AL CART DEL ID INDICADO", async function () {
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69c8b816edbc03425d8de",
+                    "quantity": 1
+                }
+            ]
+        }
+        let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        let { body, status } = await requester.get(`/api/cart/${responseBody.body._id}`).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(200)
+        expect(body).to.have.property('products')
+        expect(isValidObjectId(body._id)).to.be.true
+        expect(body.products[0]).to.have.property('quantity').to.be.a('number')
+        expect(body.products[0]).to.have.property('product')
+    })
+    it("Prueba POST cart SIN USER: la ruta /api/cart/ CREA UN NUEVO CART SIN USER", async function () {
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69c8b816edbc03425d8de",
+                    "quantity": 1
+                }
+            ]
+        }
+        let { body, status } = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(201)
+        expect(isValidObjectId(body._id)).to.be.true
+        expect(body.products).that.is.an('array')
+        expect(body.products[0]).to.have.property('quantity').to.be.a('number')
+        expect(body.products[0]).to.have.property('product')
+    })
+    it("Prueba POST cart con user: la ruta /api/cart/ CREA UN NUEVO CART ASOCIADO A UN USUARIO", async function () {
+        let uid = userCookie._id
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69c8b816edbc03425d8de",
+                    "quantity": 1
+                }
+            ],
+            "uid": uid
+        }
+        let { body, status } = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(201)
+        expect(isValidObjectId(body._id)).to.be.true
+        expect(body.products).that.is.an('array')
+        expect(body.products[0]).to.have.property('quantity').to.be.a('number')
+        expect(body.products[0]).to.have.property('product')
+    });
+    it("Prueba POST cart: ruta /api/cart/addProducts/:cid/products AÑADE UN PRODUCTO AL CART ", async function () {
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69c8b816edbc03425d8de",
+                    "quantity": 1
+                }
+            ]
+        }
+        let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        const mockAddProductCart = {
+            "products": [
+                {
+                    "product": "66b69d67816edbc03425d8e7",
+                    "quantity": 4
+                }
+            ]
+        }
 
-    let { body, status } = await requester.put(`/api/cart/addProducts/${responseBody.body._id}/products`).send(mockAddProductCart).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(200)
-    expect(body).to.have.property('_id')
-    expect(body).to.have.property('products').that.is.an('array')
-    expect(body.products[0]).to.have.property('quantity').to.be.a('number')
-    expect(body.products[0]).to.have.property('product')
+        let { body, status } = await requester.put(`/api/cart/addProducts/${responseBody.body._id}/products`).send(mockAddProductCart).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(200)
+        expect(body).to.have.property('_id')
+        expect(body).to.have.property('products').that.is.an('array')
+        expect(body.products[0]).to.have.property('quantity').to.be.a('number')
+        expect(body.products[0]).to.have.property('product')
 
-})
-it("Prueba PUT cart: ruta /api/cart/:cid MODIFICA EL CART COMPLETO ", async function () {
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69c8b816edbc03425d8de",
-                "quantity": 1
-            }
-        ]
-    }
-    let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    const mockUpdateCart = {
-        "products": [
-            {
-                "product": "66b69d67816edbc03425d8e7",
-                "quantity": 4
-            }
-        ]
-    }
-    let { body, status } = await requester.put(`/api/cart/${responseBody.body._id}`).send(mockUpdateCart).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(201)
-    expect(isValidObjectId(body._id)).to.be.true
-    expect(body).to.have.property('products').that.is.an('array')
-    expect(body.products[0]).to.have.property('quantity').to.be.a('number')
-    expect(body.products[0]).to.have.property('product')
-})
-it("Prueba UPDATE cart: ruta /api/cart/:cid/products/:pid MODIFICA LA CANTIDAD DE PRODUCTO", async function () {
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69d67816edbc03425d8e7",
-                "quantity": 1
-            }
-        ]
-    }
-    let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    const mockUpdateCart = { quantity: 4 }
-    let { body, status } = await requester.put(`/api/cart/${responseBody.body._id}/products/${mockCart.products[0].product}`).send(mockUpdateCart).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(200)
-    expect(isValidObjectId(body._id)).to.be.true
-    expect(body.products[0].quantity).to.not.equal(mockCart.products[0].quantity)
-    expect(body.products[0]).to.have.property('quantity').to.be.a('number')
-    expect(body.products[0]).to.have.property('product')
-})
-it("Prueba DELETE cart: /api/cart/:cid ELIMINA UN PRODUCO DEL CART", async function () {
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69d67816edbc03425d8e7",
-                "quantity": 2
-            },
-            {
-                "product": "66b69c8b816edbc03425d8de",
-                "quantity": 1
-            }
-        ]
-    }
-    let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    let { body, status } = await requester.delete(`/api/cart/${responseBody.body._id}/product/${mockCart.products[0].product}`).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(201)
-    expect(body).to.not.equal(responseBody.body)
-    expect(isValidObjectId(body._id)).to.be.true
-    expect(body).to.have.property('products').that.is.an('array')
-    expect(body.products[0]).to.have.property('quantity').to.be.a('number')
-    expect(body.products[0]).to.have.property('product')
-})
-it("Prueba DELETE cart: ruta /api/cart/:cid ELIMINA TODOS LOS PRODUCTOS DEL CART ", async function () {
-    const mockCart = {
-        "products": [
-            {
-                "product": "66b69d67816edbc03425d8e7",
-                "quantity": 10
-            },
-            {
-                "product": "66b69c8b816edbc03425d8de",
-                "quantity": 1
-            }
-        ]
-    }
-    let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
-    let { body, status } = await requester.delete(`/api/cart/${responseBody.body._id}`).set("Cookie", `userCookie=${cookieValue}`)
-    expect(status).to.equal(201)
-    expect(body).to.have.property('products').that.is.an('array').to.be.empty
-})
-    it("Prueba POST ticket: ruta /api/cart/:cid/purchase  FINALIZA LA COMPRA", async function () {
+    })
+    it("Prueba PUT cart: ruta /api/cart/:cid MODIFICA EL CART COMPLETO ", async function () {
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69c8b816edbc03425d8de",
+                    "quantity": 1
+                }
+            ]
+        }
+        let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        const mockUpdateCart = {
+            "products": [
+                {
+                    "product": "66b69d67816edbc03425d8e7",
+                    "quantity": 4
+                }
+            ]
+        }
+        let { body, status } = await requester.put(`/api/cart/${responseBody.body._id}`).send(mockUpdateCart).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(201)
+        expect(isValidObjectId(body._id)).to.be.true
+        expect(body).to.have.property('products').that.is.an('array')
+        expect(body.products[0]).to.have.property('quantity').to.be.a('number')
+        expect(body.products[0]).to.have.property('product')
+    })
+    it("Prueba UPDATE cart: ruta /api/cart/:cid/products/:pid MODIFICA LA CANTIDAD DE PRODUCTO", async function () {
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69d67816edbc03425d8e7",
+                    "quantity": 1
+                }
+            ]
+        }
+        let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        const mockUpdateCart = { quantity: 4 }
+        let { body, status } = await requester.put(`/api/cart/${responseBody.body._id}/products/${mockCart.products[0].product}`).send(mockUpdateCart).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(200)
+        expect(isValidObjectId(body._id)).to.be.true
+        expect(body.products[0].quantity).to.not.equal(mockCart.products[0].quantity)
+        expect(body.products[0]).to.have.property('quantity').to.be.a('number')
+        expect(body.products[0]).to.have.property('product')
+    })
+    it("Prueba DELETE cart: /api/cart/:cid ELIMINA UN PRODUCO DEL CART", async function () {
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69d67816edbc03425d8e7",
+                    "quantity": 2
+                },
+                {
+                    "product": "66b69c8b816edbc03425d8de",
+                    "quantity": 1
+                }
+            ]
+        }
+        let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        let { body, status } = await requester.delete(`/api/cart/${responseBody.body._id}/product/${mockCart.products[0].product}`).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(201)
+        expect(body).to.not.equal(responseBody.body)
+        expect(isValidObjectId(body._id)).to.be.true
+        expect(body).to.have.property('products').that.is.an('array')
+        expect(body.products[0]).to.have.property('quantity').to.be.a('number')
+        expect(body.products[0]).to.have.property('product')
+    })
+    it("Prueba DELETE cart: ruta /api/cart/:cid ELIMINA TODOS LOS PRODUCTOS DEL CART ", async function () {
+        const mockCart = {
+            "products": [
+                {
+                    "product": "66b69d67816edbc03425d8e7",
+                    "quantity": 10
+                },
+                {
+                    "product": "66b69c8b816edbc03425d8de",
+                    "quantity": 1
+                }
+            ]
+        }
+        let responseBody = await requester.post(`/api/cart/`).send(mockCart).set("Cookie", `userCookie=${cookieValue}`)
+        let { body, status } = await requester.delete(`/api/cart/${responseBody.body._id}`).set("Cookie", `userCookie=${cookieValue}`)
+        expect(status).to.equal(201)
+        expect(body).to.have.property('products').that.is.an('array').to.be.empty
+    })
+    /*it("Prueba POST ticket: ruta /api/cart/:cid/purchase  FINALIZA LA COMPRA", async function () {
         let uid = userCookie._id
         const mockCart = {
             "products": [

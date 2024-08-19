@@ -9,7 +9,6 @@ const storage = multer.diskStorage({
         if (tipo !== "image") {
             return cb(new Error("Solo se admiten imagenes...!"))
         }
-        //cb(null, file.originalname + "-" + Date.now())
         cb(null, file.originalname)
     }
 })

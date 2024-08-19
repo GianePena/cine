@@ -31,22 +31,22 @@ const userSchema = new mongoose.Schema(
         documents: [
             {
                 name: {
-                    type: String, //nombre de documento
+                    type: String,
                     default: null
                 },
                 reference: {
-                    type: String, //link al documento
+                    type: String,
                     default: null
                 },
                 type: {
-                    type: String, enum: ['DNI', 'DOMICILIO', 'ESTADO_CUENTA'],//DNI,DOMICILIO,ESTADO_CUENTA 
+                    type: String, enum: ['DNI', 'DOMICILIO', 'ESTADO_CUENTA'],
                     default: null
                 }
             }
         ]
         ,
         last_conection: {
-            type: Date,
+            type: String,
             default: null
         }
     },

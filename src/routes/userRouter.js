@@ -61,7 +61,7 @@ router.post("/login", passport.authenticate("login", { session: false }),
     }
 )
 
-router.get('/logout', passportCall("jwt"), authorization(["user"]), UserController.lastConection)
+router.get('/logout', passportCall("jwt"), authorization(["user", "premium", "admin"]), UserController.lastConection)
 
 router.get("/data", passportCall("jwt"), authorization(["user", "admin"]), UserController.getData)
 router.get("/", UserController.getUsers)

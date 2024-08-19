@@ -39,16 +39,13 @@ class ProductService {
     }
     createProduct = async ({ owner, title, category, description, price, thumbnail, stock, status }) => {
         if (owner) {
-            let user = await this.userManager.getBy({ email: owner })
-            if (user) {
-                owner = user.email;
+            let ownerIsUser = await this.userManager.getBy({ email: owner })
+            if (ownerIsUser) {
+                owner = ownerIsUser.email;
             }
             else {
                 owner = "admin"
             }
-        }
-        else {
-            owner = "admin"
         }
         return this.productManager.createProduct({ owner, title, category, description, price, thumbnail, stock, status })
     }
