@@ -1,9 +1,9 @@
 import { cartService } from "../service/CartService.js"
+import { userService } from "../service/UserService.js";
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { transporter } from "../utils/mail.js";
-import { userModelo } from "../DAO/models/userModelo.js";
-import mongoose from "mongoose";
+
 export class CartController {
     static getCarts = async (req, res, next) => {
         try {
@@ -17,13 +17,12 @@ export class CartController {
     static getCartById = async (req, res, next) => {
         const { cid } = req.params
         try {
-            //verificar que cart id sea u id de mongo
             let cart = await cartService.getCartById(cid)
             req.logger.debug(`id recibido ${cid}`)
             req.logger.info(cart)
-            /*if (!cart) {
+            if (!cart) {
                 return CustomError.createError("Cart NotFound Error", `Cart con ID ${cid} no encontrado`, TIPOS_ERRORS.NOT_FOUND)
-            }*/
+            }
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json(cart);
         } catch (error) {
@@ -69,10 +68,8 @@ export class CartController {
                 return CustomError.createError("Faltante de datos", `Completar la totalidad de los campos`, TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
             }
             if (isNaN(quantity)) return CustomError.createError("Dato incorrecto", "La cantidad de los productos debe ser un número", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
-
             let updateCart = await cartService.updateQuantity(cid, pid, quantity)
             res.setHeader('Content-Type', 'application/json');
-            //let cart = await cartModelo.findOne({ _id: cid })
             res.status(200).json(updateCart)
         } catch (error) {
             req.logger.error(`Error en la modificacion del cart ID${cid}: ${error.message}`)
@@ -88,8 +85,6 @@ export class CartController {
             }
             const updateCart = await cartService.updateCart(cid, products)
             res.setHeader('Content-Type', 'application/json');
-            //let cart = await cartModelo.findOne({ _id: cid })
-            //console.log(cart);
             res.status(201).json(updateCart)
         } catch (error) {
             req.logger.error(`Error en la modificacion del cart ID${cid}: ${error.message}`)
@@ -116,7 +111,6 @@ export class CartController {
             let removeProduct = await cartService.removeProduct(cid, pid)
             req.logger.info(`Producto id ${pid} eliminado del cart ${cid}`)
             res.setHeader('Content-Type', 'application/json');
-            //let cart = await cartModelo.findOne({ _id: cid })
             res.status(201).json(removeProduct)
         } catch (error) {
             req.logger.error(`Error en el servido. No se ha podido eliminar ${pid} del cart ${cid}`)
@@ -128,7 +122,6 @@ export class CartController {
         try {
             let removeProducts = await cartService.removeAllProducts(cid)
             req.logger.info(`Productos eliminados del cart ${cid}: Cart vacio`)
-            //let cart = await cartModelo.findOne({ _id: cid })
             res.setHeader('Content-Type', 'application/json');
             res.status(201).json(removeProducts)
         } catch (error) {
@@ -139,7 +132,7 @@ export class CartController {
     static purchase = async (req, res, next) => {
         const { cid } = req.params;
         try {
-            const user = await userModelo.findOne({ cart: cid });
+            const user = await userService.getBy({ cart: cid });
             if (!user.email) {
                 return CustomError.createError("Error en el email", 'Email es necesario para enviar el ticket', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
             }
@@ -159,7 +152,6 @@ export class CartController {
                 Fecha:${result.ticket.purchase_datetime}<hr>
                 TOTAL: ${result.ticket.amount}`
             };
-
             transporter.sendMail(mailOptions)
                 .then(resultado => req.logger.info("Correo enviado: " + resultado.response))
                 .catch(error => req.logger.error("Error al enviar correo: " + error.message));

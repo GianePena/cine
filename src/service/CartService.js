@@ -32,10 +32,9 @@ class CartService {
     controlStock = async (products) => {
         for (let p of products) {
             const product = await this.productManager.getProductById(p.product);
-            console.log(product);
             if (!product) {
                 return CustomError.createError(
-                    "Error al actualizar la cantidad en el cart",
+                    `Error al actualizar la cantidad en el cart`,
                     `Producto con ID no encontrado`,
                     TIPOS_ERRORS.NOT_FOUND
                 )

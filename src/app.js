@@ -26,7 +26,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 import { logger, middLogger } from "./utils/logger.js"
 import { ProductManagerMONGO as ProductManager } from "./DAO/productManagerMONGO.js";
-import { messageModelo } from "./dao/models/messagesModelo.js"
+import { messageModelo } from "./DAO/models/messagesModelo.js";
 
 
 
@@ -73,6 +73,8 @@ app.use("/api/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/", viewsRouter);
+
+
 app.use(errorHandler)
 
 

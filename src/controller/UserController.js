@@ -4,17 +4,39 @@ import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js"
 import { config } from "../config/config.js"
 import { logger } from "../utils/logger.js"
-import { userModelo } from "../DAO/models/userModelo.js"
 import jwt from 'jsonwebtoken';
+
 export class UserController {
     static getUsers = async (req, res, next) => {
         try {
-            const users = await userModelo.find()
-            const usersDto = users.map(u => new userDTO(u))
-            res.status(200).json(usersDto)
+            const users = await userService.getAllUsers()
+            const usersDto = users.map(u => new userDTO(u));
+            res.status(200).json(usersDto);
         } catch (error) {
-            req.logger.error(`Error fetching all users: ${error.message}`)
-            next(error)
+            req.logger.error(`Error fetching all users: ${error.message}`);
+            next(error);
+        }
+    }
+    static getUsersAndDelete = async (req, res, next) => {
+        try {
+            const users = await userService.getAllUsers();
+            const date = new Date();
+            date.setDate(date.getDate() - 2)
+            for (let user of users) {
+                if (!user.last_conection) {
+                    continue;
+                }
+                const lastConectionDate = new Date(user.last_conection);
+                if (lastConectionDate < date) {
+                    logger.info(`Usuario: ${user._id} eliminado por inactividad`)
+                    await userService.deleteUser(user._id);
+                }
+            }
+            const usersDto = users.map(u => new userDTO(u));
+            res.status(200).json(usersDto);
+        } catch (error) {
+            req.logger.error(`Error fetching all users: ${error.message}`);
+            next(error);
         }
     }
     static getBy = async (req, res, next) => {
@@ -22,17 +44,17 @@ export class UserController {
         try {
             const user = await userService.getUserById(uid);
             res.status(200).json(new userDTO(user))
-            //res.status(200).json(user)
         } catch (error) {
             req.logger.error(`Error al obtener users by ${uid}: ${error.message}`)
             next(error)
         }
     }
-    static getData = (req, res, next) => {
+    static getData = async (req, res, next) => {
         try {
-            let user = new userDTO(req.user)
+            const { uid } = req.params
+            const user = await userService.getUserById(uid);
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(user);
+            res.status(200).json(new userDTO(user));
         } catch (error) {
             req.logger.error(`Error al obtener la data del user: ${error.message}`)
             next(error)
@@ -42,7 +64,6 @@ export class UserController {
         const { uid } = req.params
         try {
             const updatedUser = await userService.updateUserRol(uid)
-            req.logger.info(`Rol del usario modificado correctamente: usuario ${user}`)
             res.status(200).json(new userDTO(updatedUser))
         } catch (error) {
             req.logger.error(`Error al modificar los datos del user`)
@@ -57,7 +78,7 @@ export class UserController {
                 const error = CustomError.createError("Codigo incorrecto", "El codigo ingresado no coincide con el enviado", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
                 return next(error);
             }
-            let user = await userModelo.findOne({ email: email })
+            let user = await userService.getBy({ email: email })
             const newPassword = await userService.updateUserPassword(email, password);
             res.status(201).json(`Contraseña del usuario: ${user.email} actualizada`)
         } catch (error) {
@@ -84,12 +105,7 @@ export class UserController {
             let uid = getUser._id
             res.clearCookie("userCookie")
             const date = new Date();
-            let dia = date.getDate()
-            let mes = date.getMonth()
-            let año = date.getFullYear()
-            let hora = date.getHours()
-            let logout = `${dia}-${mes}-${año}-${hora}hs`
-            await userService.lastConection(uid, logout);
+            await userService.lastConection(uid, date);
             res.status(200).json(`User ${getUser.email} logout`)
         } catch (error) {
             req.logger.error(`ERROR AL REALIZARL EL LOGOUT`)
@@ -123,7 +139,7 @@ export class UserController {
                 }
             ]
             await userService.documentationUpload(uid, files)
-            res.status(200).json(`Documentacion cargada: user ${getUser.email}. ROL ACTUALIZADO `)
+            res.status(200).json(`Documentacion cargada: user ${getUser.email}`)
         } catch (error) {
             next(error)
         }

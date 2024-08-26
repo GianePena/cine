@@ -2,7 +2,7 @@ import { productService } from "../service/ProductService.js";
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { argumentosProducts } from "../utils/erroresProducts.js";
-import { logger } from "../utils/logger.js";
+
 export class ProductController {
     static getAllProducts = async (req, res, next) => {
         try {

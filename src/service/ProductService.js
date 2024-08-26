@@ -88,7 +88,6 @@ class ProductService {
         }
         if (user.rol === "admin" || product.owner === user.email) {
             this.productManager.deleteProduct(product);
-            //return { message: "Producto eliminado con éxito" };
         }
         else {
             logger.warn(`privilegios insuficientes para modifica el producto ${pid}: solo usuarios premium o propietarios`)

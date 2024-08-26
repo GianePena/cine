@@ -1,0 +1,90 @@
+<form action="" id="getDataForm">
+    <strong>OBTENER DATA</strong>
+    ID: <input type="text" id="uid" name="uid">
+    <input type="submit" value="Buscar">
+</form>
+
+<div id="data"></div>
+
+<form action="" id="updateUserForm" style="display: none;">
+    <strong>MODIFICAR ROL</strong>
+    confirmar id: <input type="text" name="uid" id="updateFormID">
+    <input type="submit" value="Modificar">
+</form>
+<div id="actualizacion"></div>
+
+<form action="" id="deleteUserForm"style="display: none;">
+    <strong>ELIMINAR USUARIO</strong>
+    confirmar id: <input type="text" name="uid" id="deleteFormID">
+    <input type="submit" value="Eliminar">
+</form>
+<div id="eliminacion"></div>
+
+<script>
+let userForm = document.getElementById("getDataForm");
+let updateForm = document.getElementById("updateUserForm");
+let deleteForm = document.getElementById("deleteUserForm");
+
+userForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); 
+    let uid = document.getElementById("uid").value.trim()
+    try {
+        let response = await fetch(`/api/user/data/${uid}`, { 
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            
+        });
+        if (response.ok) {
+            const user = await response.json(); 
+            document.getElementById("data").innerHTML = `
+                <strong><p>User data</p></strong>
+                <p>ID: ${user._id}</p>
+                <p>Email: ${user.email}</p>
+                <p>Rol: ${user.rol}</p>`;
+            updateForm.style.display = "block";
+            deleteForm.style.display = "block";
+        } else {
+            document.getElementById("data").innerHTML = `<p>Usuario no encontrado</p>`;
+        }
+    } catch (error) {
+        logger.warn("Error en la búsqueda del usuario:", error);
+    }
+});
+
+updateForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    let uid = document.getElementById("updateFormID").value.trim()
+    try {
+        let response = await fetch(`/api/user/updateRol/${uid}`, {
+            method: "PUT"
+        });
+        if (response.ok) {
+            document.getElementById("actualizacion").innerHTML = `<p>ROL ACTUALIZADO: USUARIO PREMIUM</p>`;
+        } else {
+            document.getElementById("actualizacion").innerHTML = `<p>IMPOSIBLE ACTUALIZAR ROL: USUARIO CON DOCUMENTO INSUFICIENTES</p>`;
+        }
+    } catch (error) {
+        console.error("Error en la actualización del rol:", error);
+    }
+});
+
+deleteForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    let uid = document.getElementById("deleteFormID").value.trim()
+    try {
+        let response = await fetch(`/api/user/delete/${uid}`, {
+            method: "DELETE"
+        });
+        if (response.ok) {
+            document.getElementById("eliminacion").innerHTML = `<p>USUARIO ELIMINADO</p>`;
+        } else {
+            document.getElementById("eliminacion").innerHTML = `<p>IMPOSIBLE ELIMINAR EL USUARIO</p>`;
+        }
+    } catch (error) {
+        console.error("Error en la eliminación del usuario:", error);
+    }
+});
+</script>
+

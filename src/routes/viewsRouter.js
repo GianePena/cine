@@ -69,10 +69,15 @@ router.get('/loggerTest', (req, res) => {
     res.send('Logging tests');
 });
 
-router.get('/:uid/updateRol', async (req, res) => {
+router.get('/:uid/updateRol', passportCall("jwt"), authorization(["admin"]), async (req, res) => {
     const { uid } = req.params
     let user = await userManager.getBy({ _id: uid })
     return res.status(200).render('updateRol', { user });
+});
+
+
+router.get('/updateUser/admin', async (req, res) => {
+    res.status(200).render('updateUser');
 });
 
 
@@ -120,3 +125,5 @@ router.get("/newPassword", (req, res) => {
         return res.status(200).render('newPassword', { user });
     });
 });
+
+

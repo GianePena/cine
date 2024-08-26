@@ -1,4 +1,4 @@
-
+/*
 let addToCartButtons = document.getElementById("addToCartButton")
 
 
@@ -59,3 +59,4 @@ addToCartButtons.forEach(button => {
     button.addEventListener("click", handleAddToCartClick);
 });
 
+*/

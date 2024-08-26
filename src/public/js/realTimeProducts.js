@@ -17,7 +17,6 @@ socket.on("listProducts", (products) => {
 addProductForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
-
     const title = document.getElementById("title").value;
     const category = document.getElementById("category").value;
     const description = document.getElementById("description").value;

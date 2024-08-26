@@ -11,9 +11,9 @@ router.get("/:cid", passportCall("jwt"), authorization(["user", "premium"]), Car
 
 router.post("/", CartController.createCart);
 
-router.put('/addProducts/:cid/products', passportCall("jwt"), authorization(["user", "premium"]), CartController.addProductsToCart)
+router.put('/addProducts/:cid/product', passportCall("jwt"), authorization(["user", "premium"]), CartController.addProductsToCart)
 router.put(("/:cid"), passportCall("jwt"), authorization(["user", "premium"]), CartController.updateCart)
-router.put(("/:cid/products/:pid"), passportCall("jwt"), authorization(["user", "premium"]), CartController.updateQuantity)
+router.put(("/:cid/product/:pid"), passportCall("jwt"), authorization(["user", "premium"]), CartController.updateQuantity)
 
 router.delete(("/:cid/product/:pid"), passportCall("jwt"), authorization(["user", "premium"]), CartController.removeProduct)
 router.delete("/:cid", CartController.removeAllProduct)

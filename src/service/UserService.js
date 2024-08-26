@@ -3,6 +3,7 @@ import { generaHash } from "../utils/utils.js";
 import { logger } from "../utils/logger.js";
 import { CustomError } from "../utils/CustomError.js";
 import { TIPOS_ERRORS } from "../utils/Errors.js";
+import mongoose from "mongoose";
 class UserService {
     constructor(dao) {
         this.dao = dao
@@ -11,6 +12,13 @@ class UserService {
         return this.dao.getUsers()
     }
     getUserById = async (uid) => {
+        if (!mongoose.Types.ObjectId.isValid(uid)) {
+            throw new CustomError(
+                "Error al encontrar usuario",
+                `ID ${uid} no es un ObjectId válido`,
+                TIPOS_ERRORS.BAD_REQUEST
+            );
+        }
         let user = await this.dao.getUserById(uid)
         if (!user) {
             logger.warn(`Usuario con id ${uid} no encontrado`)
@@ -50,6 +58,9 @@ class UserService {
         }
         if (identificacion === true && comprobanteDomicilio === true && comprobanteDeEstadoDeCuenta === true) {
             user.rol = "premium"
+        }
+        else {
+            return res.status(400).json({ message: "Usuario con documentos insuficientes" });
         }
         await this.dao.updateUser(user)
         return user
@@ -108,23 +119,6 @@ class UserService {
             let path = file.path
             let type = file.type
             user.documents.push({ name: filename, reference: path, type: type })
-        }
-        let identificacion = false
-        let comprobanteDomicilio = false
-        let comprobanteDeEstadoDeCuenta = false
-        for (let documento of user.documents) {
-            if (documento.type === "DNI") {
-                identificacion = true
-            }
-            if (documento.type === "DOMICILIO") {
-                comprobanteDomicilio = true
-            }
-            if (documento.type === "ESTADO_CUENTA") {
-                comprobanteDeEstadoDeCuenta = true
-            }
-        }
-        if (identificacion === true && comprobanteDomicilio === true && comprobanteDeEstadoDeCuenta === true) {
-            user.rol = "premium"
         }
         await this.dao.updateUser(user)
         return user
