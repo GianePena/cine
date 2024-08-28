@@ -60,7 +60,9 @@ router.get('/logout', passportCall("jwt"), authorization(["user", "premium", "ad
 router.get("/data/:uid", UserController.getData)
 
 router.get("/", UserController.getUsers)
-router.get("/deleteUsersInactive", passportCall("jwt"), authorization(["admin"]), UserController.getUsersAndDelete)
+
+router.get("/activeUsers", passportCall("jwt"), authorization(["admin"]), UserController.getActiveUsers)
+
 router.get("/:uid", passportCall("jwt"), authorization(["user"]), UserController.getBy)
 
 router.post("/updatePassword", UserController.updatePassword)
@@ -70,7 +72,6 @@ router.post("/:uid/documents", passportCall("jwt"), authorization(["user"]), upl
     { name: 'comprobante_de_estado_de_cuenta', maxCount: 1 }
 ]), UserController.documentationUpload)
 
-router.put('/updateRol/:uid', UserController.updateRol)
 
 router.delete("/delete/:uid", UserController.deleteUser)
 

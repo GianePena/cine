@@ -13,8 +13,9 @@ class CartManagerMONGO {
     async getCartBy() {
         return await cartModelo.findOne()
     }
-    async create(products) {
+    async create(products, uid) {
         const newCart = await cartModelo.create({
+            user: uid,
             products: products.map(p => ({
                 product: new mongoose.Types.ObjectId(p.product),
                 quantity: p.quantity || 1,

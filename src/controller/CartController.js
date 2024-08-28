@@ -53,8 +53,8 @@ export class CartController {
             } else {
                 newCart = await cartService.createCart(null, products);
             }
-            req.logger.info(`Cart creado exitosamente: ${newCart}`);
             res.status(201).json(newCart);
+            req.logger.info(`Cart creado exitosamente: ${newCart}`);
         } catch (error) {
             req.logger.error(`Error en la creacion de un nuevo cart: ${error.message}`);
             next(error);

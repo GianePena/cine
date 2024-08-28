@@ -64,14 +64,29 @@ describe("Pruebas router USER: get, getById, post, update y delete", async funct
         await mongoose.connection.collection("users").deleteMany({ email: "testest@gmail.com" })
     })
     it("Pruebas GET users: la ruta api/user/ ", async function () {
-        let { body, status } = await requester.get("/api/user");
+        let { body, status } = await requester.get("/api/user").set("Cookie", `userCookie=${cookieValue}`)
         expect(status).to.equal(200)
+
         expect(Array.isArray(body)).to.be.true
         if (Array.isArray(body) && body.length > 0) {
             expect(body[0]).to.have.property('first_name')
             expect(body[0]).to.have.property('last_name')
             expect(body[0]).to.have.property('email')
             expect(body[0]).not.to.have.property('password')
+            expect(isValidObjectId(body[0]._id)).to.be.true
+        }
+    });
+    it("Pruebas GET Active Users: la ruta api/user/activeUsers ", async function () {
+        let { body, status } = await requester.get("/api/user/activeUsers");
+        expect(status).to.equal(200)
+        expect(Array.isArray(body)).to.be.true
+        if (Array.isArray(body) && body.length > 0) {
+            expect(body[0]).to.have.property('first_name')
+            expect(body[0]).to.have.property('last_name')
+            expect(body[0]).to.have.property('email')
+            expect(body[0]).to.have.property('status').equal('active')
+            expect(body[0]).not.to.have.property('password')
+
             expect(isValidObjectId(body[0]._id)).to.be.true
         }
     });

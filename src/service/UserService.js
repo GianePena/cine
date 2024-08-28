@@ -1,15 +1,37 @@
+
 import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js"
 import { generaHash } from "../utils/utils.js";
 import { logger } from "../utils/logger.js";
 import { CustomError } from "../utils/CustomError.js";
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import mongoose from "mongoose";
+import { config } from "../config/config.js";
 class UserService {
     constructor(dao) {
         this.dao = dao
     }
     getAllUsers = async () => {
         return this.dao.getUsers()
+    }
+    getUsersActive = async () => {
+        let users = await this.getAllUsers()
+        const date = new Date();
+        date.setDate(date.getDate() - 2)
+        for (let user of users) {
+            if (!user.last_conection) {
+                continue;
+            }
+            const lastConectionDate = new Date(user.last_conection);
+            if (lastConectionDate < date) {
+                user.status = "inactive"
+                await this.dao.updateUser(user)
+            }
+            if (user.status === "inactive" && lastConectionDate >= date) {
+                user.status = "active"
+                await this.dao.updateUser(user)
+            }
+        }
+        return this.dao.getUsers({ status: "active" })
     }
     getUserById = async (uid) => {
         if (!mongoose.Types.ObjectId.isValid(uid)) {
@@ -121,11 +143,9 @@ class UserService {
             user.documents.push({ name: filename, reference: path, type: type })
         }
         await this.dao.updateUser(user)
+        await this.updateUserRol(user)
         return user
     }
 }
 
 export const userService = new UserService(new UserManager())
-
-
-

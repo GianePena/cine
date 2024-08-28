@@ -1,3 +1,4 @@
+
 import { userDTO } from "../DTO/UserDTO.js"
 import { userService } from "../service/UserService.js"
 import { CustomError } from "../utils/CustomError.js"
@@ -17,21 +18,9 @@ export class UserController {
             next(error);
         }
     }
-    static getUsersAndDelete = async (req, res, next) => {
+    static getActiveUsers = async (req, res, next) => {
         try {
-            const users = await userService.getAllUsers();
-            const date = new Date();
-            date.setDate(date.getDate() - 2)
-            for (let user of users) {
-                if (!user.last_conection) {
-                    continue;
-                }
-                const lastConectionDate = new Date(user.last_conection);
-                if (lastConectionDate < date) {
-                    logger.info(`Usuario: ${user._id} eliminado por inactividad`)
-                    await userService.deleteUser(user._id);
-                }
-            }
+            const users = await userService.getUsersActive()
             const usersDto = users.map(u => new userDTO(u));
             res.status(200).json(usersDto);
         } catch (error) {
@@ -60,16 +49,6 @@ export class UserController {
             next(error)
         }
     }
-    static updateRol = async (req, res, next) => {
-        const { uid } = req.params
-        try {
-            const updatedUser = await userService.updateUserRol(uid)
-            res.status(200).json(new userDTO(updatedUser))
-        } catch (error) {
-            req.logger.error(`Error al modificar los datos del user`)
-            next(error)
-        }
-    }
     static updatePassword = async (req, res, next) => {
         const { code, email, password } = req.body;
         try {
@@ -78,9 +57,8 @@ export class UserController {
                 const error = CustomError.createError("Codigo incorrecto", "El codigo ingresado no coincide con el enviado", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
                 return next(error);
             }
-            let user = await userService.getBy({ email: email })
-            const newPassword = await userService.updateUserPassword(email, password);
-            res.status(201).json(`Contraseña del usuario: ${user.email} actualizada`)
+            await userService.updateUserPassword(email, password);
+            res.status(201).json(`Contraseña del usuario: ${email} actualizada`)
         } catch (error) {
             req.logger.error(`Error al modificar los datos del user`);
             next(error);
@@ -145,5 +123,3 @@ export class UserController {
         }
     }
 }
-
-

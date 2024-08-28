@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema(
         last_conection: {
             type: String,
             default: null
+        },
+        status: {
+            type: String, enum: ['active', 'inactive'],
+            default: 'active'
         }
     },
     {
@@ -57,7 +61,7 @@ const userSchema = new mongoose.Schema(
 )
 
 userSchema.pre(['find', 'findMany'], function () {
-    this.populate('cart').lean();
+    this.populate('cart')
 });
 export const userModelo = mongoose.model(
     userCollection,

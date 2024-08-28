@@ -7,6 +7,7 @@ export class userDTO {
             this.age = user.age,
             this.cart = user.cart || null,
             this.rol = user.rol,
+            this.status = user.status,
             this._id = user._id
     }
 }

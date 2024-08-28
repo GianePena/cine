@@ -1,7 +1,7 @@
 import { TIPOS_ERRORS } from "../utils/Errors.js"
 
 
-export const errorHandler = () => {
+export const errorHandler = (err, req, res, next) => {
     const errorResponse = {
         error: err.name,
         message: err.message,

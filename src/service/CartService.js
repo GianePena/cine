@@ -54,7 +54,7 @@ class CartService {
         let stockSuficiente = await this.controlStock(products)
         if (stockSuficiente === true) {
             if (uid) {
-                const user = await this.userManager.getUserBy({ _id: uid })
+                const user = await this.userManager.getUserById(uid)
                 if (!user) {
                     logger.warn(`Usuario con ID ${uid} no encontrado`);
                     return CustomError.createError("Error al crear cart", `Usuario con ID ${uid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
@@ -65,7 +65,8 @@ class CartService {
                             return CustomError.createError("Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION);
                         }
                     }
-                    const newCart = await this.cartManager.create(products)
+                    let uid = user._id
+                    const newCart = await this.cartManager.create(products, uid)
                     if (!newCart || !newCart._id) {
                         logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
                         return CustomError.createError('Error al crer el cart', 'newCart no creado', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)

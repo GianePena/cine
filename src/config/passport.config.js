@@ -46,7 +46,7 @@ export const initPassport = () => {
                     return done(error);
                 }
             })
-    );
+    )
     passport.use(
         "registro",
         new local.Strategy({
@@ -60,7 +60,7 @@ export const initPassport = () => {
                         return done(null, false, { message: "Faltan datos en el formulario" });
                     }
                     console.log(first_name, last_name, email, age, password, cart, rol);
-                    const userExistente = await userService.getBy({ email: username });
+                    const userExistente = await userService.getBy({ email: username })
                     if (username === config.ADMIN_EMAIL && password === config.ADMIN_PASSWORD) {
                         rol = "admin";
                     }
