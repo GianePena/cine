@@ -40,7 +40,7 @@ export const initPassport = () => {
                     if (!user) {
                         user = await userService.createUser({ name, email, rol });
                     }
-                    const token = jwt.sign({ email: user.email, rol: user.rol }, config.JWT_SECRET, { expiresIn: '1h' });
+                    const token = jwt.sign({ email: user.email, _id: user._id, rol: user.rol, cart: user.cart, last_conection: user.last_conection, status: user.status }, config.JWT_SECRET, { expiresIn: '1h' });
                     return done(null, { token, ...user });
                 } catch (error) {
                     return done(error);

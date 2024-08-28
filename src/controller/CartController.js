@@ -33,6 +33,9 @@ export class CartController {
     static createCart = async (req, res, next) => {
         const { products, uid } = req.body;
         try {
+            if (!Array.isArray(products)) {
+                return CustomError.createError("Error al crear el cart", "Products debe ser un array", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
+            }
             if (!products || products.length === 0) {
                 req.logger.warn('Datos incompletos necesarios para producto');
                 req.logger.debug(`Datos recibidos: ${uid}, ${products}`);

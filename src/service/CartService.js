@@ -51,13 +51,16 @@ class CartService {
         return true;
     }
     createCart = async (uid, products) => {
-        let stockSuficiente = await this.controlStock(products)
+        let stockSuficiente = await this.controlStock(products);
         if (stockSuficiente === true) {
             if (uid) {
-                const user = await this.userManager.getUserById(uid)
+                const user = await this.userManager.getUserById(uid);
                 if (!user) {
                     logger.warn(`Usuario con ID ${uid} no encontrado`);
                     return CustomError.createError("Error al crear cart", `Usuario con ID ${uid} no encontrado`, TIPOS_ERRORS.NOT_FOUND);
+                }
+                if (user.cart) {
+                    return CustomError.createError("Error al crear el carrito", "El usuario ya posee un cart asociado", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
                 }
                 if (!user.cart || !mongoose.Types.ObjectId.isValid(user.cart)) {
                     for (let p of products) {
@@ -65,35 +68,34 @@ class CartService {
                             return CustomError.createError("Error al crear el carrito", "No es posible agregar un producto creado por usted mismo", TIPOS_ERRORS.ERROR_AUTORIZACION);
                         }
                     }
-                    let uid = user._id
-                    const newCart = await this.cartManager.create(products, uid)
+                    let uid = user._id;
+                    const newCart = await this.cartManager.create(uid, products);
                     if (!newCart || !newCart._id) {
                         logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
-                        return CustomError.createError('Error al crer el cart', 'newCart no creado', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                        return CustomError.createError('Error al crer el cart', 'newCart no creado', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
                     }
-                    const updatedUser = this.userManager.addCartToUser(user, newCart)
+                    const updatedUser = this.userManager.addCartToUser(user, newCart);
                     if (!updatedUser) {
                         logger.error(`Error al actualizar el usuario con el nuevo carrito: ${uid}`);
-                        return CustomError.createError('Error al actualizar el usuario con el nuevo carrito', `cart no creado`, TIPOS_ERRORS.NOT_FOUND)
+                        return CustomError.createError('Error al actualizar el usuario con el nuevo carrito', `cart no creado`, TIPOS_ERRORS.NOT_FOUND);
                     }
-                    let usercart = await this.cartManager.getCartBy({ _id: user.cart })
                     logger.info(`Nuevo cart creado y asociado al usuario ${uid}: ${newCart}`);
-                    return usercart
+                    return newCart;
                 } else {
                     logger.warn(`El usuario con ID ${uid} ya tiene un carrito asignado`);
                     return user.cart;
                 }
             } else {
-                const newCart = await this.cartManager.create(products)
+                const newCart = await this.cartManager.create(uid = null, products)
                 if (!newCart || !newCart._id) {
                     logger.error('Error al crear un nuevo cart: El objeto retornado es undefined o no contiene un _id');
-                    return CustomError.createError('Error al crer el cart', 'newCart no creado', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                    return CustomError.createError('Error al crer el cart', 'newCart no creado', TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS);
                 }
                 logger.info(`Nuevo cart creado sin asociar a usuario: ${newCart}`);
                 return newCart;
             }
         }
-    }
+    };
     addProductsToCart = async (cid, products) => {
         const cart = await this.cartManager.getCartById(cid);
         if (!cart) {
@@ -151,7 +153,8 @@ class CartService {
         }
     }
     updateCart = async (cid, products) => {
-        let cart = await this.cartManager.getCartById(cid);
+        //let cart = await this.cartManager.getCartById(cid);
+        let cart = await this.cartManager.getCartBy({ _id: cid });
         if (!cart) {
             logger.warn(`Cart con ID ${cid} no encontrado`);
             return CustomError.createError(

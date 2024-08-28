@@ -7,6 +7,7 @@ import { authorization } from '../middleware/authorize.js';
 export const router = Router()
 
 router.get("/", CartController.getCarts)
+
 router.get("/:cid", passportCall("jwt"), authorization(["user", "premium"]), CartController.getCartById);
 
 router.post("/", CartController.createCart);
@@ -18,3 +19,6 @@ router.delete(("/:cid/product/:pid"), passportCall("jwt"), authorization(["user"
 router.delete("/:cid", CartController.removeAllProduct)
 
 router.post("/:cid/purchase", passportCall("jwt"), authorization(["user", "premium"]), CartController.purchase)
+
+
+

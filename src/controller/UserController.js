@@ -66,13 +66,12 @@ export class UserController {
     };
     static deleteUser = async (req, res, next) => {
         const { uid } = req.params
+        console.log(uid);
         try {
             const deleteUser = await userService.deleteUser(uid)
-            res.status(200).json(`Usuario ${uid} eliminado con exito`)
-                ('Usuario eliminado con exito')
             req.logger.info(`Usuario cuyo id es ${uid}: ELIMINADO CON EXITO`)
+            res.status(200).json(`Usuario ${uid} eliminado con exito`)
         } catch (error) {
-            req.logger.error(`Error al elimianr el usuario ${uid}`)
             next(error)
         }
     }

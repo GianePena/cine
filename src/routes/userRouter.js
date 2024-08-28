@@ -57,6 +57,7 @@ router.post("/login", passport.authenticate("login", { session: false }),
 )
 
 router.get('/logout', passportCall("jwt"), authorization(["user", "premium", "admin"]), UserController.lastConection)
+
 router.get("/data/:uid", UserController.getData)
 
 router.get("/", UserController.getUsers)
@@ -73,7 +74,7 @@ router.post("/:uid/documents", passportCall("jwt"), authorization(["user"]), upl
 ]), UserController.documentationUpload)
 
 
-router.delete("/delete/:uid", UserController.deleteUser)
+router.delete("/:uid", UserController.deleteUser)
 
 
 

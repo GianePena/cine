@@ -5,7 +5,7 @@ const cartCollection = "cart"
 const cartSchema = new mongoose.Schema(
     {
         user: {
-            type: String,
+            type: mongoose.Types.ObjectId,
             default: null
         },
         products: {

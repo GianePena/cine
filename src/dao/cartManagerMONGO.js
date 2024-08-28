@@ -10,10 +10,10 @@ class CartManagerMONGO {
     async getCartById(cid) {
         return await cartModelo.findById(cid).populate('products.product')
     }
-    async getCartBy() {
-        return await cartModelo.findOne()
+    async getCartBy(filtro) {
+        return await cartModelo.findOne(filtro)
     }
-    async create(products, uid) {
+    async create(uid, products) {
         const newCart = await cartModelo.create({
             user: uid,
             products: products.map(p => ({
