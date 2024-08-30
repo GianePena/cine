@@ -3,7 +3,7 @@ import { userService } from "../service/UserService.js";
 import { CustomError } from "../utils/CustomError.js"
 import { TIPOS_ERRORS } from "../utils/Errors.js";
 import { transporter } from "../utils/mail.js";
-
+import mongoose from "mongoose";
 export class CartController {
     static getCarts = async (req, res, next) => {
         try {
@@ -42,6 +42,9 @@ export class CartController {
                 return CustomError.createError("Faltante de datos", "Debe proporcionar productos (IDs de productos y la cantidad) en el cuerpo de la solicitud", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
             }
             for (const product of products) {
+                if (!mongoose.Types.ObjectId.isValid(product.product)) {
+                    return CustomError.createError("Error al crear cart", "Id del producto incorrecto", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                }
                 if (isNaN(product.quantity)) {
                     return CustomError.createError(
                         "Datos incorrectos",
@@ -52,6 +55,9 @@ export class CartController {
             }
             let newCart;
             if (uid) {
+                if (!mongoose.Types.ObjectId.isValid(uid)) {
+                    return CustomError.createError("Error al crear cart", "Id del usuario incorrecto o no valido", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                }
                 newCart = await cartService.createCart(uid, products)
             } else {
                 newCart = await cartService.createCart(null, products);
@@ -83,8 +89,13 @@ export class CartController {
         let { cid } = req.params
         let { products } = req.body
         try {
-            if (!products) {
-                return CustomError.createError("Faltante de datos", "Debe proporcionar productos (IDs de productos y la cantidad) en el cuerpo de la solicitud", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            if (!products || !Array.isArray(products) || products.length === 0) {
+                return CustomError.createError("Error en la actualizadion del cart", "La lista de productos es inválida o está vacía", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            }
+            for (let product of products) {
+                if (!mongoose.Types.ObjectId.isValid(product.product) || isNaN(product.quantity)) {
+                    return CustomError.createError("Error en la actualizadion del cart", "Id invlado o cantidad invalida dede ser un numero", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                }
             }
             const updateCart = await cartService.updateCart(cid, products)
             res.setHeader('Content-Type', 'application/json');
@@ -98,8 +109,13 @@ export class CartController {
         const { cid } = req.params;
         const products = req.body.products
         try {
-            if (!products) {
-                return CustomError.createError("Faltante de datos", "Debe proporcionar productos (IDs de productos y la cantidad) en el cuerpo de la solicitud", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            if (!products || !Array.isArray(products) || products.length === 0) {
+                return CustomError.createError("Error en la actualizadion del cart", "La lista de productos es inválida o está vacía", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+            }
+            for (let product of products) {
+                if (!mongoose.Types.ObjectId.isValid(product.product) || isNaN(product.quantity)) {
+                    return CustomError.createError("Error en la actualizadion del cart", "Id invlado o cantidad invalida dede ser un numero", TIPOS_ERRORS.ERROR_TIPOS_DE_DATOS)
+                }
             }
             const updatedCart = await cartService.addProductsToCart(cid, products);
             res.status(200).json(updatedCart);

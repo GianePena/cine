@@ -1,4 +1,5 @@
 import { CartManagerMONGO as CartManager } from "../DAO/cartManagerMONGO.js"
+import { ticketModelo } from "../DAO/models/ticketModelo.js";
 import { ProductManagerMONGO as ProductManager } from "../DAO/productManagerMONGO.js";
 import { UserManagerMONGO as UserManager } from "../DAO/userManagerMONGO.js";
 import { CustomError } from "../utils/CustomError.js"
@@ -153,7 +154,6 @@ class CartService {
         }
     }
     updateCart = async (cid, products) => {
-        //let cart = await this.cartManager.getCartById(cid);
         let cart = await this.cartManager.getCartBy({ _id: cid });
         if (!cart) {
             logger.warn(`Cart con ID ${cid} no encontrado`);

@@ -37,8 +37,6 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
 app.use(middLogger)
 
 
@@ -56,11 +54,9 @@ const options = {
 const spec = swaggerJSDoc(options);
 app.use("/api-doc", swaggerUi.serve, swaggerUi.setup(spec));
 
-
 app.use(compression({ brotli: { enabled: true } }))
 
 initPassport()
-
 
 
 app.engine('handlebars', engine());

@@ -17,13 +17,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/GetCarts'
               example:
-                - _id: "66b531994e8dc5467c6f5e59"
-                  products:
+                uid: "66b531994e8dc5467c6f5e59"
+                _id: "66b531994e8dc5467c6f5e59"
+                products:
                     - product: "66b531994e8dc5467c6f5e5a"
                       quantity: 4
-                  createdAt: "2024-08-08T20:59:05.302Z"
-                  updatedAt: "2024-08-08T20:59:05.302Z"
-                  __v: 0
+                createdAt: "2024-08-08T20:59:05.302Z"
+                updatedAt: "2024-08-08T20:59:05.302Z"
+                __v: 0
         "404":
           description: Not Found:carts no encontrado
         "500":
@@ -68,6 +69,7 @@ paths:
               schema:
                   $ref: '#/components/schemas/Cart'
               example:
+                  uid: "66b531994e8dc5467c6f5e59"
                   _id: "667c8362a7ba944ab303e3e6"
                   products:
                     - product:
@@ -114,18 +116,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
                 items:
-                  $ref: '#/components/schemas/GetCarts'
+                  $ref: '#/components/schemas/GetCart'
               example:
-                - _id: "66b531994e8dc5467c6f5e59"
+                  uid: "66b531994e8dc5467c6f5e59"
                   products:
-                    - product: "66b531994e8dc5467c6f5e5a"
+                    - product: null
                       quantity: 4
+                      _id: "66b531994e8dc5467c6f5e5a"
                   createdAt: "2024-08-08T20:59:05.302Z"
                   updatedAt: "2024-08-08T20:59:05.302Z"
-                  __v: 0
-            
+                  __v: 0              
+
         "404":
           description: Cart no encontrado
         "500":
@@ -163,11 +165,10 @@ paths:
           content:
             application/json:
               schema:
-                type: array
                 items:
-                  $ref: '#/components/schemas/GetCarts'
+                  $ref: '#/components/schemas/GetCart'
               example:
-                - _id: "66b531994e8dc5467c6f5e59"
+                  uid: "66b531994e8dc5467c6f5e59"
                   products:
                     - product: null
                       quantity: 4
@@ -198,24 +199,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetCarts'
-            examples:
-                cart:
-                  value:
-                    - products:
-                        - product: "66341e60ae100d582fa75344"
-                          quantity: 2
+              allOf:
+                - $ref: '#/components/schemas/UpdateCart'
+                - type: object
+                  properties:
+                    uid:
+                      type: string
+                      description: ID del usuario que crea el cart
+                      example: "66b531994e8dc5467c6f5e59"
       responses:
         "200":
           description: Cart creado de manera exitos
           content:
             application/json:
               schema:
-                type: array
                 items:
-                  $ref: '#/components/schemas/GetCarts'
+                  $ref: '#/components/schemas/GetCart'
               example:
-                - _id: "66b531994e8dc5467c6f5e59"
+                  uid: "66b531994e8dc5467c6f5e59"
                   products:
                     - product: null
                       quantity: 4
@@ -250,7 +251,21 @@ paths:
             example: 66341e60ae100d582fa75344
       responses:
         "200":
-          description: Producto eliminado con exito 66341e60ae100d582fa75344
+          description: Producto eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GetCart'
+              example:
+                  uid: "66b531994e8dc5467c6f5e59"
+                  products:
+                    - product: "66b531994e8dc5467c6f5e59"
+                      quantity: 4
+                      _id: "66b531994e8dc5467c6f5e5a"
+                  createdAt: "2024-08-08T20:59:05.302Z"
+                  updatedAt: "2024-08-08T20:59:05.302Z"
+                  __v: 0
         "404":
           description: Cart no encontrado
         "500":
@@ -263,11 +278,42 @@ paths:
 components:
   schemas:
     GetCarts: 
-      type: object
       properties:
+        uid:
+          type: string
+          example: "66341e60ae100d582fa75344"
         _id:
           type: string
           example: "66b531994e8dc5467c6f5e59"
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+                example: "66b531994e8dc5467c6f5e5a"
+              quantity:
+                type: integer
+                example: 4
+        
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T20:59:05.302Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T20:59:05.302Z"
+        __v:
+          type: integer
+          example: 0
+    GetCart: 
+      type: object
+      properties:
+        uid:
+          type: string
+          example: "66341e60ae100d582fa75344"
         products:
           type: array
           items:
@@ -306,6 +352,9 @@ components:
               quantity:
                 type: integer
                 example: 4
+        uid:
+          type: string
+          example: "66341e60ae100d582fa75344"
         createdAt:
           type: string
           format: date-time
