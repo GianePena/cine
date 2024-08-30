@@ -11,7 +11,7 @@ router.get("/", ProductController.getProducts);
 router.get("/all", ProductController.getAllProducts);
 router.get("/:pid", ProductController.getProductsById)
 
-router.post("/", passportCall("jwt"), ProductController.addProduct);
+router.post("/", passportCall("jwt"), authorization(["user", "premium"]), ProductController.addProduct);
 router.put("/:pid", passportCall("jwt"), authorization(["admin"]), ProductController.updateProduct);
 
 router.delete("/:pid", passportCall("jwt"), authorization(["admin"]), ProductController.deleteProduct)
