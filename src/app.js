@@ -12,7 +12,7 @@ import { router as productsRouter } from "./routes/productRouter.js";
 import { router as cartRouter } from "./routes/cartRouter.js";
 import { router as viewsRouter } from "./routes/viewsRouter.js";
 import { router as userRouter } from "./routes/userRouter.js";
-
+import { router as sessionRouter } from "./routes/sessionsRouter.js"
 import { Server } from "socket.io";
 
 import mongoose from "mongoose"
@@ -65,6 +65,7 @@ app.set("views", "./src/views")
 
 app.use(passport.initialize())
 app.use(express.static("./src/public"))
+app.use("/api/sessions", sessionRouter)
 app.use("/api/user", userRouter)
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);

@@ -5,7 +5,7 @@ export class userDTO {
             this.email = user.email,
             this.last_conection = user.last_conection,
             this.age = user.age,
-            this.cart = user.cart || null,
+            this.cart = user.cart,
             this.rol = user.rol,
             this.status = user.status,
             this._id = user._id

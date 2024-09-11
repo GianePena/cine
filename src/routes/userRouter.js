@@ -22,7 +22,7 @@ router.get('/mockinguser', (req, res) => {
     res.status(200).json(usersGenerados)
     logger.info(`Usuarios mokcs:${usersGenerados}`)
 })
-
+/*
 router.get("/error", (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     return CustomError.createError(`Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`, `Fallo al autenticar`, TIPOS_ERRORS.ERROR_SERVIDOR_INTERNO)
@@ -52,9 +52,9 @@ router.post("/login", passport.authenticate("login", { session: false }),
         let token = jwt.sign(user, config.JWT_SECRET, { expiresIn: "1h" })
         res.cookie("userCookie", token, { httpOnly: true })
         logger.info(token)
-        res.status(200).json(`Usuario ${user.email} logeado con exito`)
+        res.status(200).json(user)
     }
-)
+)*/
 
 router.get('/logout', passportCall("jwt"), authorization(["user", "premium", "admin"]), UserController.lastConection)
 

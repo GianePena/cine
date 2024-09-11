@@ -10,10 +10,25 @@ class CartManagerMONGO {
     async getCartById(cid) {
         return await cartModelo.findById(cid).populate('products.product')
     }
+
     async getCartBy(filtro) {
         return await cartModelo.findOne(filtro)
     }
-    async create(uid, products) {
+    async create(user, products) {
+        if (!products) {
+            products = []
+        } else {
+            products.map(p => ({
+                product: new mongoose.Types.ObjectId(p.product),
+                quantity: p.quantity || 1,
+            }))
+        }
+        return await cartModelo.create({
+            user: user._id,
+            products: products
+        })
+    }
+    /*async create(uid, products) {
         const newCart = await cartModelo.create({
             user: uid,
             products: products.map(p => ({
@@ -22,7 +37,7 @@ class CartManagerMONGO {
             }))
         });
         return newCart
-    }
+    }*/
     async updateCart(cart) {
         await cart.save()
         return cart

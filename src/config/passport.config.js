@@ -7,7 +7,7 @@ import { config } from "./config.js"
 import { generaHash, validarPasword } from "../utils/utils.js"
 import { logger } from "../utils/logger.js"
 import { userService } from "../service/UserService.js"
-
+import { cartService } from "../service/CartService.js"
 function buscarToken(req) {
     let token = null;
     if (req.cookies && req.cookies["userCookie"]) {
@@ -55,11 +55,11 @@ export const initPassport = () => {
         },
             async (req, username, password, done) => {
                 try {
-                    let { first_name, last_name, email, age, password, cart, rol } = req.body;
+
+                    let { first_name, last_name, email, age, password, rol, cart } = req.body;
                     if (!first_name || !last_name || !age || !email) {
                         return done(null, false, { message: "Faltan datos en el formulario" });
                     }
-                    console.log(first_name, last_name, email, age, password, cart, rol);
                     const userExistente = await userService.getBy({ email: username })
                     if (username === config.ADMIN_EMAIL && password === config.ADMIN_PASSWORD) {
                         rol = "admin";
@@ -68,14 +68,11 @@ export const initPassport = () => {
                         return done(null, false, { message: "Usuario existente, pruebe con otro email" });
                     }
                     const hashedPassword = generaHash(password);
-                    if (cart) {
-                        let newUser = await userService.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol, cart })
-                        return done(null, newUser);
-                    }
-                    else {
-                        let newUser = await userService.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol });
-                        return done(null, newUser);
-                    }
+                    let user = await userService.createUser({ first_name, last_name, email: username, age, password: hashedPassword, rol, cart })
+                    cart = await cartService.createEmptyCart(user)
+                    user.cart = cart
+                    await userService.updateUser(user)
+                    return done(null, user);
                 } catch (error) {
                     return done(error);
                 }

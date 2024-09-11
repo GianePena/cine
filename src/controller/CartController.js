@@ -105,6 +105,16 @@ export class CartController {
             next(error)
         }
     }
+    static addProductToCart = async (req, res, next) => {
+        const { cid, pid } = req.params;
+        try {
+            const updatedCart = await cartService.addProductToCart(cid, pid);
+            res.status(200).json(updatedCart);
+        } catch (error) {
+            req.logger.error(`Error en el agregado de productos: ${error.message}`)
+            next(error)
+        }
+    }
     static addProductsToCart = async (req, res, next) => {
         const { cid } = req.params;
         const products = req.body.products

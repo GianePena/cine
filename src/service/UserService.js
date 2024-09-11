@@ -56,6 +56,9 @@ class UserService {
     createUser = async (user) => {
         return this.dao.createUser(user)
     }
+    updateUser = async (user) => {
+        return this.dao.updateUser(user)
+    }
     updateUserRol = async (uid) => {
         const user = await this.dao.getUserById(uid)
         if (!user) {
